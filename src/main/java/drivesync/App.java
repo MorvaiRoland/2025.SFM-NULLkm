@@ -10,7 +10,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/main.fxml"));
-        Scene scene = new Scene(loader.load(), 900, 500);
+        Scene scene = new Scene(loader.load(), 900, 600);
         scene.getStylesheets().add(getClass().getResource("/drivesync/style.css").toExternalForm());
 
         stage.setTitle("DriveSync");
