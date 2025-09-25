@@ -1,8 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.2"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="drivesync.MainController"
+            prefWidth="600" prefHeight="400"
+            style="-fx-background-color: linear-gradient(to bottom right, #6a11cb, #2575fc);">
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.2" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="drivesync.MainController" />
+    <!-- Logo -->
+    <ImageView fx:id="logoImage" layoutX="250" layoutY="20" fitWidth="100" fitHeight="100"
+               pickOnBounds="true" preserveRatio="true" />
+
+    <!-- TabPane for Login/Register -->
+    <TabPane layoutX="100" layoutY="150" prefWidth="400" prefHeight="200"
+             style="-fx-background-color: rgba(255,255,255,0.8); -fx-background-radius: 15;">
+        <tabs>
+            <!-- Login Tab -->
+            <Tab text="Login">
+                <AnchorPane style="-fx-padding: 20;">
+                    <VBox spacing="10">
+                        <TextField fx:id="loginUsername" promptText="Username" />
+                        <PasswordField fx:id="loginPassword" promptText="Password" />
+                        <Button text="Login" onAction="#handleLogin" style="-fx-background-color: #6a11cb; -fx-text-fill: white; -fx-font-weight: bold;" />
+                    </VBox>
+                </AnchorPane>
+            </Tab>
+
+            <!-- Register Tab -->
+            <Tab text="Register">
+                <AnchorPane style="-fx-padding: 20;">
+                    <VBox spacing="10">
+                        <TextField fx:id="regUsername" promptText="Username" />
+                        <TextField fx:id="regEmail" promptText="Email" />
+                        <PasswordField fx:id="regPassword" promptText="Password" />
+                        <TextField fx:id="regVnev" promptText="First Name" />
+                        <TextField fx:id="regKnev" promptText="Last Name" />
+                        <Button text="Register" onAction="#handleRegister" style="-fx-background-color: #2575fc; -fx-text-fill: white; -fx-font-weight: bold;" />
+                    </VBox>
+                </AnchorPane>
+            </Tab>
+        </tabs>
+    </TabPane>
+</AnchorPane>
