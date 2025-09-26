@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -29,9 +30,10 @@
             <!-- Login pane -->
             <VBox fx:id="loginPane" alignment="CENTER" spacing="15" styleClass="form-pane">
                 <Label fx:id="loginTitle" styleClass="panel-title" text="Bejelentkezés">
-               <font>
-                  <Font size="43.0" />
-               </font></Label>
+                    <font>
+                        <Font size="43.0" />
+                    </font>
+                </Label>
                 <Label text="Felhasználónév:" />
                 <TextField fx:id="loginUsername" promptText="Felhasználónév" />
                 <Label text="Jelszó:" />
@@ -43,19 +45,32 @@
             <!-- Register pane -->
             <VBox fx:id="registerPane" alignment="CENTER" spacing="10" styleClass="form-pane" visible="false">
                 <Label fx:id="registerTitle" styleClass="panel-title" text="Regisztráció">
-               <font>
-                  <Font size="43.0" />
-               </font></Label>
+                    <font>
+                        <Font size="43.0" />
+                    </font>
+                </Label>
                 <Label text="Felhasználónév:" />
                 <TextField fx:id="regUsername" promptText="Felhasználónév" />
                 <Label text="Email:" />
                 <TextField fx:id="regEmail" promptText="Email" />
+
+                <!-- Jelszó -->
                 <Label text="Jelszó:" />
-                <PasswordField fx:id="regPassword" promptText="Jelszó" />
-                <Label text="Keresztnév:" />
-                <TextField fx:id="regVnev" promptText="Keresztnév" />
-                <Label text="Vezetéknév:" />
-                <TextField fx:id="regKnev" promptText="Vezetéknév" />
+                <StackPane>
+                    <PasswordField fx:id="regPassword" promptText="Jelszó" />
+                    <TextField fx:id="regPasswordVisible" promptText="Jelszó" visible="false" />
+                </StackPane>
+
+                <!-- Jelszó megerősítése -->
+                <Label text="Jelszó megerősítése:" />
+                <StackPane>
+                    <PasswordField fx:id="regPasswordConfirm" promptText="Jelszó ismét" />
+                    <TextField fx:id="regPasswordConfirmVisible" promptText="Jelszó ismét" visible="false" />
+                </StackPane>
+
+                <!-- Jelszó mutatás -->
+                <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
+
                 <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" />
                 <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
             </VBox>

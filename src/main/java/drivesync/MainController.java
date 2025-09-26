@@ -18,8 +18,10 @@ public class MainController {
 
     @FXML private ImageView logoImage, panelImage;
     @FXML private VBox loginPane, registerPane;
-    @FXML private TextField loginUsername, regUsername, regEmail, regVnev, regKnev;
-    @FXML private PasswordField loginPassword, regPassword;
+    @FXML private TextField loginUsername, regUsername, regEmail;
+    @FXML private PasswordField loginPassword, regPassword, regPasswordConfirm;
+    @FXML private TextField regPasswordVisible, regPasswordConfirmVisible;
+    @FXML private CheckBox showPasswordCheck;
     @FXML private Button loginButton, registerButton;
 
     private List<Image> carImages = new ArrayList<>();
@@ -49,6 +51,25 @@ public class MainController {
 
         setupButtonAnimation(loginButton);
         setupButtonAnimation(registerButton);
+
+        // Jelszó láthatóság kapcsoló
+        showPasswordCheck.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                regPasswordVisible.setText(regPassword.getText());
+                regPasswordConfirmVisible.setText(regPasswordConfirm.getText());
+                regPasswordVisible.setVisible(true);
+                regPasswordConfirmVisible.setVisible(true);
+                regPassword.setVisible(false);
+                regPasswordConfirm.setVisible(false);
+            } else {
+                regPassword.setText(regPasswordVisible.getText());
+                regPasswordConfirm.setText(regPasswordConfirmVisible.getText());
+                regPassword.setVisible(true);
+                regPasswordConfirm.setVisible(true);
+                regPasswordVisible.setVisible(false);
+                regPasswordConfirmVisible.setVisible(false);
+            }
+        });
     }
 
     private void switchImage() {
@@ -74,7 +95,17 @@ public class MainController {
 
     @FXML
     private void handleRegister() {
-        System.out.println("Register: " + regUsername.getText() + ", " + regEmail.getText());
+        String username = regUsername.getText();
+        String email = regEmail.getText();
+        String password = showPasswordCheck.isSelected() ? regPasswordVisible.getText() : regPassword.getText();
+        String confirmPassword = showPasswordCheck.isSelected() ? regPasswordConfirmVisible.getText() : regPasswordConfirm.getText();
+
+        if (!password.equals(confirmPassword)) {
+            System.out.println("Hiba: a jelszavak nem egyeznek!");
+            return;
+        }
+
+        System.out.println("Register: " + username + ", " + email);
     }
 
     @FXML
