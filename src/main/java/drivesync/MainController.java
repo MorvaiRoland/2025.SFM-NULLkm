@@ -8,38 +8,28 @@ import javafx.scene.layout.VBox;
 
 public class MainController {
 
-    // Jobb panel login/register
+    // Jobb panel – login/register
     @FXML private VBox loginPane, registerPane;
     @FXML private TextField loginUsername, regUsername, regEmail;
     @FXML private PasswordField loginPassword, regPassword, regPasswordConfirm;
-    @FXML private TextField regPasswordVisible, regPasswordConfirmVisible;
+    @FXML private TextField loginPasswordVisible, regPasswordVisible, regPasswordConfirmVisible;
     @FXML private Button loginButton, registerButton;
-    @FXML private CheckBox showPasswordCheck;
+    @FXML private CheckBox showLoginPasswordCheck, showPasswordCheck;
 
-    // Bal panel – statikus kép
-    @FXML private ImageView panelImage;
+    @FXML private ImageView logoImage;
 
     @FXML
     private void initialize() {
-        // Logó betöltése
-        Image logo = loadImage("/drivesync/logo.png"); // ide a nagy kép
-        if (logo != null) {
-            panelImage.setImage(logo);
-        }
+        // Logo betöltése
+        Image logo = new Image(getClass().getResourceAsStream("/drivesync/logo.png"));
+        logoImage.setImage(logo);
 
+        // Jelszó mutatás beállítása
         setupPasswordToggle();
     }
 
-    private Image loadImage(String path) {
-        try {
-            return new Image(getClass().getResourceAsStream(path));
-        } catch (Exception e) {
-            System.out.println("Nem található a kép: " + path);
-            return null;
-        }
-    }
-
     private void setupPasswordToggle() {
+        // Regisztrációs panelek
         showPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if (isSelected) {
                 regPasswordVisible.setText(regPassword.getText());
@@ -57,6 +47,19 @@ public class MainController {
                 regPasswordConfirm.setText(regPasswordConfirmVisible.getText());
                 regPasswordConfirm.setVisible(true);
                 regPasswordConfirmVisible.setVisible(false);
+            }
+        });
+
+        // Login panel
+        showLoginPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if (isSelected) {
+                loginPasswordVisible.setText(loginPassword.getText());
+                loginPasswordVisible.setVisible(true);
+                loginPassword.setVisible(false);
+            } else {
+                loginPassword.setText(loginPasswordVisible.getText());
+                loginPassword.setVisible(true);
+                loginPasswordVisible.setVisible(false);
             }
         });
     }

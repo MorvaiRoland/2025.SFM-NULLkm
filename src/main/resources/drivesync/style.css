@@ -1,107 +1,89 @@
-/* ----------------- BAL PANEL ----------------- */
-.left-panel {
-    -fx-background-color: linear-gradient(to bottom right, #1c1c2e, #3a3a5c); /* sötét, elegáns */
-    -fx-padding: 30;
-    -fx-alignment: center;
-}
-
-/* Üdvözlő szöveg bal oldalon */
-.welcome-text {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-}
-
-/* ----------------- JOBB PANEL ----------------- */
+/* Jobb panel háttér */
 .right-panel {
-    -fx-background-color: #121212; /* sötét háttér */
+    -fx-background-color: linear-gradient(to bottom right, #f0f0f0, #e0e0e0);
     -fx-padding: 40;
+}
+
+/* Form pane-ek */
+.right-panel VBox {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-spacing: 10;
     -fx-alignment: center;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);
 }
 
-/* ----------------- PANEL TITLE ----------------- */
-.panel-title {
-    -fx-text-fill: white;
-    -fx-font-size: 52px;
-    -fx-font-weight: bold;
-    -fx-font-family: "Segoe UI", "Arial", sans-serif;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6,0,0,2);
+/* Label stílus */
+.right-panel Label {
+    -fx-font-family: "Arial";
+    -fx-text-fill: #333333;
 }
 
-
-/* ----------------- FORM PANE ----------------- */
-.form-pane {
-    -fx-background-color: rgba(255,255,255,0.05);
-    -fx-background-radius: 20;
-    -fx-padding: 25;
-    -fx-spacing: 12;
-}
-
-/* Label a mezők fölött */
-.form-pane Label {
-    -fx-text-fill: #e0e0e0;
-    -fx-font-size: 14px;
-}
-
-/* ----------------- INPUT MEZŐK ----------------- */
-.TextField, .PasswordField {
-    -fx-background-color: rgba(255,255,255,0.1);
-    -fx-background-radius: 15;
-    -fx-border-radius: 15;
-    -fx-border-color: rgba(255,255,255,0.3);
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: rgba(255,255,255,0.5);
-    -fx-padding: 10 15;
-}
-
-/* ----------------- GOMBOK ----------------- */
-.Button {
-    -fx-background-color: #03dac6; /* türkiz */
+/* Gomb stílus */
+.right-panel Button {
+    -fx-background-color: #FFD700;
     -fx-text-fill: black;
-    -fx-background-radius: 15;
     -fx-font-weight: bold;
-    -fx-pref-width: 160;
-    -fx-pref-height: 45;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5,0,0,2);
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+    -fx-transition: all 0.2s ease;
 }
 
-.Button:hover {
-    -fx-background-color: #00bfa5; /* sötétebb türkiz hover */
+.right-panel Button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-background-color: #FFC107;
 }
 
-/* ----------------- HYPERLINK ----------------- */
-.hyperlink {
-    -fx-text-fill: white;   /* alapból fehér */
+/* Gomb-stílusú Hyperlink */
+.right-panel Hyperlink {
+    -fx-background-color: transparent;
+    -fx-border-color: #FFD700;
+    -fx-border-width: 2;
+    -fx-text-fill: #FFD700;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
 }
 
-.hyperlink:hover {
-    -fx-text-fill: #d0a0ff; /* hover szín */
+/* Hover állapot */
+.right-panel Hyperlink:hover {
+    -fx-background-color: #FFD700;
+    -fx-text-fill: black;
 }
 
-/* ----------------- CHECKBOX ----------------- */
-.check-box {
-    -fx-text-fill: white;   /* szöveg színe */
+/* TextField és PasswordField stílus */
+.right-panel TextField,
+.right-panel PasswordField {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #CCCCCC;
+    -fx-padding: 5;
 }
 
-.check-box .box {
-    -fx-border-color: white;   /* keret */
-    -fx-border-radius: 3;
-    -fx-background-color: transparent; /* háttér átlátszó */
+/* Checkbox alap stílus – pipálatlan állapotban nincs arany */
+.right-panel CheckBox > .box {
+    -fx-background-color: white;       /* alap háttér */
+    -fx-border-color: #DAA520;         /* sötétebb arany keret */
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5;
 }
 
-.check-box:selected .mark {
-    -fx-background-color: white; /* pipa színe */
+/* Csak pipált állapotban legyen arany */
+.right-panel CheckBox:selected > .box {
+    -fx-background-color: #FFD700;     /* arany háttér pipálva */
 }
 
-#loginTitle, #registerTitle {
-    -fx-text-fill: white;
-    -fx-font-size: 35px; /* nagyobb, kiemelkedő */
-    -fx-font-weight: italic;
-    -fx-font-family: Georgia, serif;
-    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.7) , 8,0,0,4 ); /* erősebb árnyék */
+.right-panel CheckBox:selected > .box > .mark {
+    -fx-background-color: black;       /* pipaszín */
 }
 
-#panelImage {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10,0,0,5);
-    -fx-background-radius: 15;
-}
