@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.util.prefs.Preferences;
+
 public class App extends Application {
 
     private static Scene loginScene; // eltároljuk a login scene-t
@@ -23,6 +25,14 @@ public class App extends Application {
         stage.setResizable(false);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/drivesync/DriveSync logo-2.png")));
         stage.show();
+
+        // Ellenőrizzük, van-e mentett felhasználó
+        Preferences prefs = Preferences.userNodeForPackage(MainController.class);
+        String rememberedUser = prefs.get("username", null);
+        if (rememberedUser != null) {
+            MainController controller = loader.getController();
+            controller.loadHomeSceneAfterStageShown(rememberedUser, stage);
+        }
     }
 
     public static Scene getLoginScene() {

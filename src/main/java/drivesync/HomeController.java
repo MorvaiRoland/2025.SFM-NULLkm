@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class HomeController {
 
     @FXML private Label usernameLabel;
@@ -13,7 +15,6 @@ public class HomeController {
     @FXML private StackPane contentPane;
     @FXML private Label contentLabel;
 
-    // Menü gombok
     @FXML private Button homeBtn;
     @FXML private Button carsBtn;
     @FXML private Button budgetBtn;
@@ -22,7 +23,6 @@ public class HomeController {
 
     @FXML
     private void initialize() {
-        // Hover effektek minden gombra
         setupHover(homeBtn);
         setupHover(carsBtn);
         setupHover(budgetBtn);
@@ -37,42 +37,29 @@ public class HomeController {
                 "-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-background-radius: 0; -fx-font-size: 16px; -fx-font-weight: bold;"));
     }
 
-    // Felhasználónév beállítása
     public void setUsername(String username) {
         usernameLabel.setText(username);
     }
 
-    // Kijelentkezés
     @FXML
     private void handleLogout() {
         Stage stage = (Stage) logoutButton.getScene().getWindow();
+
+        // Remember me törlése
+        File rememberFile = new File("remember_me.txt");
+        if(rememberFile.exists()) rememberFile.delete();
+
         stage.setScene(App.getLoginScene());
         stage.setTitle("DriveSync");
 
-        // Képernyő közepére pozicionálás
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
         stage.setX((screenBounds.getWidth() - 900) / 2);
         stage.setY((screenBounds.getHeight() - 600) / 2);
     }
 
-    // Menü gomb események
-    @FXML private void showHome() {
-        contentLabel.setText("Főoldal tartalom");
-    }
-
-    @FXML private void showCars() {
-        contentLabel.setText("Saját autók tartalom");
-    }
-
-    @FXML private void showBudget() {
-        contentLabel.setText("Költségvetés tartalom");
-    }
-
-    @FXML private void showLinks() {
-        contentLabel.setText("Hasznos linkek tartalom");
-    }
-
-    @FXML private void showCalculator() {
-        contentLabel.setText("Kalkulátor modul: ide jön a számítási felület.");
-    }
+    @FXML private void showHome() { contentLabel.setText("Főoldal tartalom"); }
+    @FXML private void showCars() { contentLabel.setText("Saját autók tartalom"); }
+    @FXML private void showBudget() { contentLabel.setText("Költségvetés tartalom"); }
+    @FXML private void showLinks() { contentLabel.setText("Hasznos linkek tartalom"); }
+    @FXML private void showCalculator() { contentLabel.setText("Kalkulátor modul: ide jön a számítási felület."); }
 }

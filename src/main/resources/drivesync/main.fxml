@@ -33,6 +33,7 @@
                 <TextField fx:id="loginPasswordVisible" promptText="Jelszó" visible="false" />
             </StackPane>
             <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
+            <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
 
             <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" />
             <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" />
@@ -61,10 +62,6 @@
             <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
             <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" />
             <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
-        </VBox>
-
-        <VBox fx:id="Menu" alignment="CENTER" spacing="10" visible="false">
-
         </VBox>
 
     </StackPane>
