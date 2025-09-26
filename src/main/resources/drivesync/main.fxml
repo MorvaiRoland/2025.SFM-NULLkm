@@ -63,6 +63,10 @@
             <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
         </VBox>
 
+        <VBox fx:id="Menu" alignment="CENTER" spacing="10" visible="false">
+
+        </VBox>
+
     </StackPane>
 
 </HBox>
