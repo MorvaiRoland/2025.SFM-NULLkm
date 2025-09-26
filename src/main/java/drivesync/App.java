@@ -7,10 +7,13 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class App extends Application {
+
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/main.fxml"));
         Scene scene = new Scene(loader.load(), 900, 600);
+
+        // CSS betöltése
         scene.getStylesheets().add(getClass().getResource("/drivesync/style.css").toExternalForm());
 
         stage.setTitle("DriveSync");

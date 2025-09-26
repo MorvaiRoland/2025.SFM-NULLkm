@@ -19,13 +19,15 @@
     -fx-alignment: center;
 }
 
-/* Panel címek */
+/* ----------------- PANEL TITLE ----------------- */
 .panel-title {
-    -fx-text-fill: #03dac6; /* türkiz */
-    -fx-font-size: 40px;
+    -fx-text-fill: white;
+    -fx-font-size: 52px;
     -fx-font-weight: bold;
-    -fx-padding: 0 0 10 0;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6,0,0,2);
 }
+
 
 /* ----------------- FORM PANE ----------------- */
 .form-pane {
@@ -68,10 +70,38 @@
 }
 
 /* ----------------- HYPERLINK ----------------- */
-.Hyperlink {
-    -fx-text-fill: #bb86fc;
+.hyperlink {
+    -fx-text-fill: white;   /* alapból fehér */
 }
 
-.Hyperlink:hover {
-    -fx-text-fill: #d0a0ff;
+.hyperlink:hover {
+    -fx-text-fill: #d0a0ff; /* hover szín */
+}
+
+/* ----------------- CHECKBOX ----------------- */
+.check-box {
+    -fx-text-fill: white;   /* szöveg színe */
+}
+
+.check-box .box {
+    -fx-border-color: white;   /* keret */
+    -fx-border-radius: 3;
+    -fx-background-color: transparent; /* háttér átlátszó */
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white; /* pipa színe */
+}
+
+#loginTitle, #registerTitle {
+    -fx-text-fill: white;
+    -fx-font-size: 35px; /* nagyobb, kiemelkedő */
+    -fx-font-weight: italic;
+    -fx-font-family: Georgia, serif;
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.7) , 8,0,0,4 ); /* erősebb árnyék */
+}
+
+#panelImage {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10,0,0,5);
+    -fx-background-radius: 15;
 }
