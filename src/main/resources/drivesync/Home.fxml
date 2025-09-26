@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <HBox xmlns="http://javafx.com/javafx/24.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -11,8 +10,6 @@
 
     <!-- Oldalsó menü -->
     <VBox spacing="30" prefWidth="250" style="-fx-background-color: linear-gradient(to bottom, #000000, #1a1a1a); -fx-padding: 40;">
-
-        <!-- Üdvözlés -->
         <VBox spacing="5">
             <Label text="Üdv," style="-fx-text-fill: #FFD700; -fx-font-size: 20px; -fx-font-weight: bold;"/>
             <Label fx:id="usernameLabel" text="Felhasználó" style="-fx-text-fill: #FFD700; -fx-font-size: 20px; -fx-font-weight: bold;" wrapText="true"/>
@@ -35,16 +32,11 @@
                 style="-fx-background-color: #FF4C4C; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12;"/>
     </VBox>
 
-    <!-- Tartalom terület -->
-    <StackPane fx:id="contentPane" HBox.hgrow="ALWAYS" style="-fx-background-color: #FFF8DC; -fx-padding: 50;">
-        <VBox spacing="30" alignment="CENTER">
-            <Label fx:id="contentLabel" text="Főoldal tartalom" style="-fx-font-size: 28px; -fx-text-fill: #333333; -fx-font-weight: bold;"/>
-            <HBox spacing="20" alignment="CENTER">
-                <Pane prefWidth="250" prefHeight="150" style="-fx-background-color: #FFD700; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8,0,0,4);"/>
-                <Pane prefWidth="250" prefHeight="150" style="-fx-background-color: #FFD700; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8,0,0,4);"/>
-                <Pane prefWidth="250" prefHeight="150" style="-fx-background-color: #FFD700; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8,0,0,4);"/>
-            </HBox>
-        </VBox>
-    </StackPane>
+    <!-- Tartalom terület (FlowPane) -->
+    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #FFF8DC; -fx-padding: 20; spacing: 10;">
+        <FlowPane fx:id="contentFlow" hgap="15" vgap="15" prefWrapLength="900"/>
+        <Button text="➕ Új widget" onAction="#addNewWidget"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12;"/>
+    </VBox>
 
 </HBox>
