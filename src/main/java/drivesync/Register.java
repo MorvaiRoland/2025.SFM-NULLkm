@@ -1,5 +1,6 @@
 package drivesync;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -36,30 +37,77 @@ public class Register {
         return false;
     }
 
-    public void registerUser() {
-        if (regUsername.getText().trim().isEmpty() || regEmail.getText().trim().isEmpty() || regPassword.getText().trim().isEmpty() || regPasswordConfirm.getText().trim().isEmpty()) {
-            System.out.println("[DriveSync] Field(s) are emtpy"); //Átírni majd error pop-up-ba.
-            return;
-        }
-        if (!regPassword.getText().trim().equals(regPasswordConfirm.getText().trim())) {
-            System.out.println("[DriveSync] The password are not matching"); //Átírni majd error pop-up-ba.
-            return;
-        }
-        if (isUserExists()) {
-            System.out.println("[DriveSync] Username is already registered"); //Átírni majd error pop-up-ba.
-        }
-        else {
-            String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, SHA2(?, 256))";
-            try {
-                conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, regUsername.getText().trim());
-                stmt.setString(2, regEmail.getText().trim());
-                stmt.setString(3, regPassword.getText().trim());
-                stmt.executeUpdate();
-                System.out.println("[DriveSync] User registered"); //Átírni majd error pop-up-ba.
+    private boolean isEmailExists() {
+        String sql = "SELECT 1 FROM users WHERE email = ?";
+        try {
+            conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, regEmail.getText().trim());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
                 Database.closeConnection();
-            } catch (SQLException e) { e.printStackTrace(); }
+                return true;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        Database.closeConnection();
+        return false;
+    }
+
+    public boolean registerUser() {
+        // Üres mezők ellenőrzése
+        if (regUsername.getText().trim().isEmpty() ||
+                regEmail.getText().trim().isEmpty() ||
+                regPassword.getText().trim().isEmpty() ||
+                regPasswordConfirm.getText().trim().isEmpty()) {
+
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Minden mezőt ki kell tölteni!");
+            return false;
         }
+
+        // Jelszó egyezés ellenőrzése
+        if (!regPassword.getText().trim().equals(regPasswordConfirm.getText().trim())) {
+            showAlert(Alert.AlertType.ERROR, "Hiba", "A jelszavak nem egyeznek!");
+            return false;
+        }
+
+        // Felhasználónév egyediség
+        if (isUserExists()) {
+            showAlert(Alert.AlertType.WARNING, "Hiba", "Ez a felhasználónév már foglalt!");
+            return false;
+        }
+
+        // Email egyediség
+        if (isEmailExists()) {
+            showAlert(Alert.AlertType.WARNING, "Hiba", "Ezzel az email címmel már van regisztráció!");
+            return false;
+        }
+
+        // Sikeres regisztráció
+        String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, SHA2(?, 256))";
+        try {
+            conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, regUsername.getText().trim());
+            stmt.setString(2, regEmail.getText().trim());
+            stmt.setString(3, regPassword.getText().trim());
+            stmt.executeUpdate();
+            Database.closeConnection();
+
+            showAlert(Alert.AlertType.INFORMATION, "Siker", "A regisztráció sikeres!");
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Adatbázis hiba", "Nem sikerült a regisztráció.");
+            return false;
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

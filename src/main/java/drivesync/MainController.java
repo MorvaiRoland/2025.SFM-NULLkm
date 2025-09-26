@@ -1,20 +1,19 @@
 package drivesync;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
 
 public class MainController {
 
-    // Jobb panel – login/register
-    @FXML private VBox loginPane, registerPane, Menu;
+    @FXML private VBox loginPane, registerPane;
     @FXML private TextField loginUsername, regUsername, regEmail;
     @FXML private PasswordField loginPassword, regPassword, regPasswordConfirm;
     @FXML private TextField loginPasswordVisible, regPasswordVisible, regPasswordConfirmVisible;
@@ -24,17 +23,12 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        // Logo betöltése
         Image logo = new Image(getClass().getResourceAsStream("/drivesync/logo.png"));
         logoImage.setImage(logo);
-        Database db = new Database();
-
-        // Jelszó mutatás beállítása
         setupPasswordToggle();
     }
 
     private void setupPasswordToggle() {
-        // Regisztrációs panelek
         showPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if (isSelected) {
                 regPasswordVisible.setText(regPassword.getText());
@@ -55,7 +49,6 @@ public class MainController {
             }
         });
 
-        // Login panel
         showLoginPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if (isSelected) {
                 loginPasswordVisible.setText(loginPassword.getText());
@@ -73,15 +66,37 @@ public class MainController {
     private void handleLogin() {
         Login login = new Login(loginButton, loginUsername, loginPassword);
         if (login.loginUser()) {
-            loginPane.setVisible(false);
-            Menu.setVisible(true);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/Home.fxml"));
+                Scene homeScene = new Scene(loader.load(), 1200, 700); // megnövelt méret
+
+                HomeController homeController = loader.getController();
+                homeController.setUsername(loginUsername.getText().trim());
+
+                Stage stage = (Stage) loginButton.getScene().getWindow();
+                stage.setScene(homeScene);
+                stage.setTitle("DriveSync - Főoldal");
+
+                // Home oldal középre
+                javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+                stage.setX((screenBounds.getWidth() - 1200) / 2);
+                stage.setY((screenBounds.getHeight() - 700) / 2);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Helytelen felhasználónév vagy jelszó!");
         }
     }
 
     @FXML
     private void handleRegister() {
         Register reg = new Register(registerButton, regUsername, regEmail, regPassword, regPasswordConfirm);
-        reg.registerUser();
+        if (reg.registerUser()) {
+            showLogin();
+            showAlert(Alert.AlertType.INFORMATION, "Siker", "Sikeres regisztráció! Most bejelentkezhetsz.");
+        }
     }
 
     @FXML
@@ -94,5 +109,13 @@ public class MainController {
     private void showLogin() {
         registerPane.setVisible(false);
         loginPane.setVisible(true);
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
