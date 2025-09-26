@@ -3,25 +3,76 @@ package drivesync;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class HomeController {
 
-    @FXML private Label welcomeLabel;
+    @FXML private Label usernameLabel;
     @FXML private Button logoutButton;
+    @FXML private StackPane contentPane;
+    @FXML private Label contentLabel;
 
-    public void setUsername(String username) {
-        welcomeLabel.setText("Üdv, " + username + "!");
+    // Menü gombok
+    @FXML private Button homeBtn;
+    @FXML private Button carsBtn;
+    @FXML private Button budgetBtn;
+    @FXML private Button linksBtn;
+    @FXML private Button calculatorBtn;
+
+    @FXML
+    private void initialize() {
+        // Hover effektek minden gombra
+        setupHover(homeBtn);
+        setupHover(carsBtn);
+        setupHover(budgetBtn);
+        setupHover(linksBtn);
+        setupHover(calculatorBtn);
     }
 
+    private void setupHover(Button btn) {
+        btn.setOnMouseEntered(e -> btn.setStyle(
+                "-fx-background-color: #FFD700; -fx-text-fill: black; -fx-background-radius: 12; -fx-font-size: 16px; -fx-font-weight: bold;"));
+        btn.setOnMouseExited(e -> btn.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-background-radius: 0; -fx-font-size: 16px; -fx-font-weight: bold;"));
+    }
+
+    // Felhasználónév beállítása
+    public void setUsername(String username) {
+        usernameLabel.setText(username);
+    }
+
+    // Kijelentkezés
     @FXML
     private void handleLogout() {
         Stage stage = (Stage) logoutButton.getScene().getWindow();
         stage.setScene(App.getLoginScene());
         stage.setTitle("DriveSync");
 
-        // opcionálisan törölhetjük a login mezőket
-        // ((TextField)App.getLoginScene().lookup("#loginUsername")).clear();
-        // ((PasswordField)App.getLoginScene().lookup("#loginPassword")).clear();
+        // Képernyő közepére pozicionálás
+        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        stage.setX((screenBounds.getWidth() - 900) / 2);
+        stage.setY((screenBounds.getHeight() - 600) / 2);
+    }
+
+    // Menü gomb események
+    @FXML private void showHome() {
+        contentLabel.setText("Főoldal tartalom");
+    }
+
+    @FXML private void showCars() {
+        contentLabel.setText("Saját autók tartalom");
+    }
+
+    @FXML private void showBudget() {
+        contentLabel.setText("Költségvetés tartalom");
+    }
+
+    @FXML private void showLinks() {
+        contentLabel.setText("Hasznos linkek tartalom");
+    }
+
+    @FXML private void showCalculator() {
+        contentLabel.setText("Kalkulátor modul: ide jön a számítási felület.");
     }
 }
