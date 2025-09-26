@@ -85,6 +85,7 @@ class LoginTest {
         assertTrue(login.loginUser(), "Helyes felhasználónév/jelszó esetén true-t kell adnia");
     }
 
+
     @Test
     void testInvalidLogin() throws SQLException {
         System.out.println("Rossz adatok teszt");

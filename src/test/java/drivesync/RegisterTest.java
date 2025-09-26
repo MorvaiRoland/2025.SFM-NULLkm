@@ -94,6 +94,7 @@ class RegisterTest {
         } catch (SQLException e) { fail(e); }
     }
 
+
     @Test
     void testDuplicateUsername() throws SQLException {
         System.out.println("Duplikált felhasználónév teszt:");
