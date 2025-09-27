@@ -27,6 +27,19 @@ public class Database {
         }
         catch (SQLException e) { e.printStackTrace(); }
     }
+    private void createTransactionsTable() throws SQLException {
+        String sql = "CREATE TABLE IF NOT EXISTS transactions (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "type ENUM('INCOME','EXPENSE') NOT NULL," +
+                "date DATE NOT NULL," +
+                "amount DOUBLE NOT NULL," +
+                "description VARCHAR(255)" +
+                ")";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+            System.out.println("[DriveSync] transactions table ready");
+        }
+    }
 
     public static Connection getConnection() {
         try {

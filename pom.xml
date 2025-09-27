@@ -26,7 +26,7 @@
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-swing</artifactId>
           <version>${javafx.version}</version>
-          <classifier>windows</classifier>
+          <classifier>win</classifier>
       </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -50,7 +50,12 @@
           <scope>test</scope>
       </dependency>
   </dependencies>
-
+    <repositories>
+        <repository>
+            <id>openjfx-releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
   <build>
     <plugins>
       <plugin>
