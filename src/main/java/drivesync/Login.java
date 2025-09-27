@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Login {
-
     private Button btn;
     private TextField usernameField;
     private PasswordField passwordField;
@@ -29,7 +28,7 @@ public class Login {
             stmt.setString(2, passwordField.getText().trim());
 
             ResultSet rs = stmt.executeQuery();
-            return rs.next(); // ha van találat → sikeres login
+            return rs.next();
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="drivesync.CalculatorController"
+      spacing="10" alignment="CENTER"
+      style="-fx-padding: 20; -fx-background-color: #f0f0f0;">
+
+    <Label text="Üzemanyag kalkulátor" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+
+    <TextField fx:id="distanceField" promptText="Megtett km" />
+    <TextField fx:id="consumptionField" promptText="Fogyasztás (l/100km)" />
+    <TextField fx:id="priceField" promptText="Üzemanyag ára (Ft/l)" />
+
+    <Button fx:id="calcButton" text="Számolás" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+
+    <Label fx:id="resultLabel" text="Eredmény itt" style="-fx-font-size: 14; -fx-text-fill: #333;" />
+</VBox>

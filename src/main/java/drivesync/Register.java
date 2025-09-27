@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import java.sql.*;
 
 public class Register {
-    private Connection conn;
     private Button btn;
     private TextField regUsername, regEmail;
     private PasswordField regPassword, regPasswordConfirm;
@@ -23,38 +22,27 @@ public class Register {
 
     private boolean isUserExists() {
         String sql = "SELECT 1 FROM users WHERE username = ?";
-        try {
-            conn = Database.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, regUsername.getText().trim());
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Database.closeConnection();
-                return true;
-            }
+            return rs.next();
         } catch (SQLException e) { e.printStackTrace(); }
-        Database.closeConnection();
         return false;
     }
 
     private boolean isEmailExists() {
         String sql = "SELECT 1 FROM users WHERE email = ?";
-        try {
-            conn = Database.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, regEmail.getText().trim());
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Database.closeConnection();
-                return true;
-            }
+            return rs.next();
         } catch (SQLException e) { e.printStackTrace(); }
-        Database.closeConnection();
         return false;
     }
 
     public boolean registerUser() {
-        // Üres mezők ellenőrzése
         if (regUsername.getText().trim().isEmpty() ||
                 regEmail.getText().trim().isEmpty() ||
                 regPassword.getText().trim().isEmpty() ||
@@ -64,34 +52,28 @@ public class Register {
             return false;
         }
 
-        // Jelszó egyezés ellenőrzése
         if (!regPassword.getText().trim().equals(regPasswordConfirm.getText().trim())) {
             showAlert(Alert.AlertType.ERROR, "Hiba", "A jelszavak nem egyeznek!");
             return false;
         }
 
-        // Felhasználónév egyediség
         if (isUserExists()) {
             showAlert(Alert.AlertType.WARNING, "Hiba", "Ez a felhasználónév már foglalt!");
             return false;
         }
 
-        // Email egyediség
         if (isEmailExists()) {
             showAlert(Alert.AlertType.WARNING, "Hiba", "Ezzel az email címmel már van regisztráció!");
             return false;
         }
 
-        // Sikeres regisztráció
         String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, SHA2(?, 256))";
-        try {
-            conn = Database.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, regUsername.getText().trim());
             stmt.setString(2, regEmail.getText().trim());
             stmt.setString(3, regPassword.getText().trim());
             stmt.executeUpdate();
-            Database.closeConnection();
 
             showAlert(Alert.AlertType.INFORMATION, "Siker", "A regisztráció sikeres!");
             return true;
