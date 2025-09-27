@@ -9,12 +9,11 @@
       fx:controller="drivesync.MainController"
       prefWidth="900" prefHeight="550">
 
-    <!-- Bal panel – arany-fekete átmenet, logo és felirat -->
+    <!-- Bal panel – logo -->
     <StackPane prefWidth="300">
         <VBox alignment="CENTER" spacing="20" style="-fx-background-color: linear-gradient(to bottom, #FFD700, #000000);">
             <ImageView fx:id="logoImage" fitWidth="150" fitHeight="150" preserveRatio="true"/>
             <Label text="DriveSync" style="-fx-font-size:36px; -fx-text-fill:white; -fx-font-weight:bold;"/>
-            <Label text="˝Gyors, Biztonságos, Egyszerű˝"  style="-fx-font-family: 'Pacifico'; -fx-font-style: italic; -fx-font-size: 15px; -fx-text-fill: white;"  />
         </VBox>
     </StackPane>
 
@@ -24,17 +23,11 @@
         <!-- Login pane -->
         <VBox fx:id="loginPane" alignment="CENTER" spacing="15">
             <Label text="Bejelentkezés" style="-fx-font-size:32px;" />
-            <Label text="Felhasználónév:" />
             <TextField fx:id="loginUsername" promptText="Felhasználónév" />
-
-            <Label text="Jelszó:" />
-            <StackPane>
-                <PasswordField fx:id="loginPassword" promptText="Jelszó" />
-                <TextField fx:id="loginPasswordVisible" promptText="Jelszó" visible="false" />
-            </StackPane>
+            <PasswordField fx:id="loginPassword" promptText="Jelszó" />
+            <TextField fx:id="loginPasswordVisible" promptText="Jelszó" visible="false"/>
             <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
             <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
-
             <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" />
             <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" />
         </VBox>
@@ -42,23 +35,12 @@
         <!-- Register pane -->
         <VBox fx:id="registerPane" alignment="CENTER" spacing="10" visible="false">
             <Label text="Regisztráció" style="-fx-font-size:32px;" />
-            <Label text="Felhasználónév:" />
             <TextField fx:id="regUsername" promptText="Felhasználónév" />
-            <Label text="Email:" />
             <TextField fx:id="regEmail" promptText="Email" />
-
-            <Label text="Jelszó:" />
-            <StackPane>
-                <PasswordField fx:id="regPassword" promptText="Jelszó" />
-                <TextField fx:id="regPasswordVisible" promptText="Jelszó" visible="false" />
-            </StackPane>
-
-            <Label text="Jelszó megerősítése:" />
-            <StackPane>
-                <PasswordField fx:id="regPasswordConfirm" promptText="Jelszó ismét" />
-                <TextField fx:id="regPasswordConfirmVisible" promptText="Jelszó ismét" visible="false" />
-            </StackPane>
-
+            <PasswordField fx:id="regPassword" promptText="Jelszó" />
+            <TextField fx:id="regPasswordVisible" promptText="Jelszó" visible="false"/>
+            <PasswordField fx:id="regPasswordConfirm" promptText="Jelszó ismét" />
+            <TextField fx:id="regPasswordConfirmVisible" promptText="Jelszó ismét" visible="false"/>
             <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
             <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" />
             <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
