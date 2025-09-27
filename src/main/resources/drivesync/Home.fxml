@@ -35,8 +35,6 @@
     <!-- Tartalom terület (FlowPane) -->
     <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #FFF8DC; -fx-padding: 20; spacing: 10;">
         <FlowPane fx:id="contentFlow" hgap="15" vgap="15" prefWrapLength="900"/>
-        <Button text="➕ Új widget" onAction="#addNewWidget"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12;"/>
     </VBox>
 
 </HBox>

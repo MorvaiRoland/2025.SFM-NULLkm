@@ -24,50 +24,40 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        // Logo betöltése
         Image logo = new Image(getClass().getResourceAsStream("/drivesync/logo.png"));
         logoImage.setImage(logo);
+
         setupPasswordToggle();
     }
 
     private void setupPasswordToggle() {
-        showPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            if (isSelected) {
-                regPasswordVisible.setText(regPassword.getText());
-                regPasswordVisible.setVisible(true);
-                regPassword.setVisible(false);
+        // ===== LOGIN jelszó =====
+        loginPasswordVisible.managedProperty().bind(showLoginPasswordCheck.selectedProperty());
+        loginPasswordVisible.visibleProperty().bind(showLoginPasswordCheck.selectedProperty());
+        loginPassword.managedProperty().bind(showLoginPasswordCheck.selectedProperty().not());
+        loginPassword.visibleProperty().bind(showLoginPasswordCheck.selectedProperty().not());
+        loginPassword.textProperty().bindBidirectional(loginPasswordVisible.textProperty());
 
-                regPasswordConfirmVisible.setText(regPasswordConfirm.getText());
-                regPasswordConfirmVisible.setVisible(true);
-                regPasswordConfirm.setVisible(false);
-            } else {
-                regPassword.setText(regPasswordVisible.getText());
-                regPassword.setVisible(true);
-                regPasswordVisible.setVisible(false);
+        // ===== REGISTER jelszavak =====
+        regPasswordVisible.managedProperty().bind(showPasswordCheck.selectedProperty());
+        regPasswordVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
+        regPassword.managedProperty().bind(showPasswordCheck.selectedProperty().not());
+        regPassword.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
+        regPassword.textProperty().bindBidirectional(regPasswordVisible.textProperty());
 
-                regPasswordConfirm.setText(regPasswordConfirmVisible.getText());
-                regPasswordConfirm.setVisible(true);
-                regPasswordConfirmVisible.setVisible(false);
-            }
-        });
-
-        showLoginPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            if (isSelected) {
-                loginPasswordVisible.setText(loginPassword.getText());
-                loginPasswordVisible.setVisible(true);
-                loginPassword.setVisible(false);
-            } else {
-                loginPassword.setText(loginPasswordVisible.getText());
-                loginPassword.setVisible(true);
-                loginPasswordVisible.setVisible(false);
-            }
-        });
+        regPasswordConfirmVisible.managedProperty().bind(showPasswordCheck.selectedProperty());
+        regPasswordConfirmVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
+        regPasswordConfirm.managedProperty().bind(showPasswordCheck.selectedProperty().not());
+        regPasswordConfirm.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
+        regPasswordConfirm.textProperty().bindBidirectional(regPasswordConfirmVisible.textProperty());
     }
 
     @FXML
     private void handleLogin() {
         Login login = new Login(loginButton, loginUsername, loginPassword);
         if (login.loginUser()) {
-            // Ha "Maradjak bejelentkezve" ki van pipálva
+            // "Maradjak bejelentkezve"
             if (rememberMeCheck.isSelected()) {
                 Preferences prefs = Preferences.userNodeForPackage(MainController.class);
                 prefs.put("username", loginUsername.getText().trim());
