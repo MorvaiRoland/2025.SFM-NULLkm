@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.control.Label?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="drivesync.HomeDashboardController"
+      spacing="30"
+      alignment="TOP_CENTER"
+      style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom, #e0f7fa, #ffffff);">
+
+    <!-- Üdvözlés -->
+    <VBox spacing="10" alignment="CENTER">
+        <Label fx:id="welcomeLabel" text="Üdvözöllek a DriveSync-ben!"
+               style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+        <Label fx:id="dateLabel"
+               style="-fx-font-size: 16; -fx-text-fill: #34495e;" />
+    </VBox>
+
+    <!-- Autók kártyák -->
+    <FlowPane fx:id="carsFlowPane" hgap="25" vgap="25" prefWrapLength="500" alignment="CENTER" />
+</VBox>
