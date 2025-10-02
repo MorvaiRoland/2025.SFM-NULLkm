@@ -7,8 +7,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
 import javafx.geometry.Pos;
 
 import java.sql.*;
@@ -33,7 +31,7 @@ public class HomeDashboardController {
         loadCars();
     }
 
-    public static String getUsername() {return username;}
+    public static String getUsername() { return username; }
 
     private void loadCars() {
         carsFlowPane.getChildren().clear();
@@ -79,18 +77,15 @@ public class HomeDashboardController {
         box.setAlignment(Pos.TOP_CENTER);
         box.setStyle(
                 "-fx-padding: 20; " +
-                        "-fx-background-radius: 20; " +
-                        "-fx-background-color: linear-gradient(to bottom right, #6dd5ed, #2193b0);" +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 15, 0, 0, 5);"
+                        "-fx-background-radius: 15; " +
+                        "-fx-background-color: linear-gradient(to bottom right, #ffffff, #e6f2ff);" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 3);"
         );
 
         // Hover effekt
-        box.setOnMouseEntered(e -> box.setScaleX(1.05));
-        box.setOnMouseEntered(e -> box.setScaleY(1.05));
-        box.setOnMouseExited(e -> box.setScaleX(1));
-        box.setOnMouseExited(e -> box.setScaleY(1));
+        box.setOnMouseEntered(e -> { box.setScaleX(1.03); box.setScaleY(1.03); });
+        box.setOnMouseExited(e -> { box.setScaleX(1); box.setScaleY(1); });
 
-        // Ikonok
         Image carIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/car.png"), 60, 60, true, true);
         Image oilIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/oil.png"), 24, 24, true, true);
         Image insuranceIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/insurance.png"), 24, 24, true, true);
@@ -99,32 +94,30 @@ public class HomeDashboardController {
         ImageView oilView = new ImageView(oilIcon);
         ImageView insuranceView = new ImageView(insuranceIcon);
 
-        // Feliratok
         Label licenseLbl = new Label(car.getLicense());
-        licenseLbl.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+        licenseLbl.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
         Label brandTypeLbl = new Label(car.getBrand() + " " + car.getType());
-        brandTypeLbl.setStyle("-fx-font-size: 14; -fx-text-fill: #ecf0f1;");
+        brandTypeLbl.setStyle("-fx-font-size: 14; -fx-text-fill: #34495e;");
 
         Label vintageLbl = new Label("Évjárat: " + car.getVintage());
         Label kmLbl = new Label("Km: " + car.getKm());
-        vintageLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #dff9fb;");
-        kmLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #dff9fb;");
+        vintageLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
+        kmLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
 
-        // Progress bar-ok
         double serviceProgress = calculateProgress(car.getService());
         ProgressBar serviceBar = new ProgressBar(serviceProgress);
-        serviceBar.setStyle("-fx-accent: #2ecc71;");
+        serviceBar.setStyle("-fx-accent: #27ae60;");
 
         Label serviceLbl = new Label("Szerviz: " + car.getService().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        serviceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #ffffff;");
+        serviceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
 
         double insuranceProgress = calculateProgress(car.getInsurance());
         ProgressBar insuranceBar = new ProgressBar(insuranceProgress);
         insuranceBar.setStyle("-fx-accent: #e74c3c;");
 
         Label insuranceLbl = new Label("Bizt.: " + car.getInsurance().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        insuranceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #ffffff;");
+        insuranceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
 
         box.getChildren().addAll(carView, licenseLbl, brandTypeLbl, vintageLbl, kmLbl,
                 oilView, serviceLbl, serviceBar,
