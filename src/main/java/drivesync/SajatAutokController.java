@@ -192,6 +192,17 @@ public class SajatAutokController {
             showAlert("Hiba", "Nem sikerült betölteni a szervizeket.");
         }
     }
+    @FXML private Button generatePdfBtn; // PDF gomb
+
+    @FXML
+    private void handleGeneratePdf() {
+        if (selectedCarId != -1) {
+            PdfGenerator.generateCarReport(selectedCarId, username); // username-t is átadhatjuk
+            showAlert("PDF elkészült", "A PDF jelentés sikeresen létrehozva!");
+        } else {
+            showAlert("Hiba", "Nincs kiválasztott autó!");
+        }
+    }
 
 
 
