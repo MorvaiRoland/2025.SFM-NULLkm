@@ -18,8 +18,8 @@ public class SajatAutokController {
 
     private String username;
 
-    public void setUsername(String username) {
-        this.username = username;
+    @FXML private void initialize() {
+        this.username = HomeDashboardController.getUsername();
         welcomeLabel.setText("Üdv, " + username + "! Itt a saját autóid listája:");
         loadUserCars();
     }

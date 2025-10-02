@@ -24,14 +24,16 @@ public class HomeDashboardController {
     @FXML private Label welcomeLabel;
     @FXML private Label dateLabel;
 
-    private String username;
+    private static String username;
 
-    public void setUsername(String username) {
-        this.username = username;
-        welcomeLabel.setText("Üdvözöllek, " + username + "!");
+    public void setUsername(String user) {
+        username = user;
+        welcomeLabel.setText("Üdvözöllek, " + user + "!");
         dateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
         loadCars();
     }
+
+    public static String getUsername() {return username;}
 
     private void loadCars() {
         carsFlowPane.getChildren().clear();
