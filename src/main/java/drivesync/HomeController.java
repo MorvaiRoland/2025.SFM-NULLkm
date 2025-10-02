@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -159,7 +160,7 @@ public class HomeController {
     private void loadFXMLToContent(String fxmlFileName) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFileName));
-            VBox pane = loader.load();
+            Parent pane = loader.load();
 
             contentFlow.getChildren().clear();
             contentFlow.getChildren().add(pane);
