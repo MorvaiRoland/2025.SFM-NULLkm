@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -9,34 +8,32 @@
       prefWidth="1200" prefHeight="700">
 
     <!-- Oldalsó menü -->
-    <VBox spacing="30" prefWidth="250" style="-fx-background-color: linear-gradient(to bottom, #000000, #1a1a1a); -fx-padding: 40;">
+    <VBox spacing="30" prefWidth="250" style="-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); -fx-padding: 40;">
         <VBox spacing="5">
-            <Label text="Üdv," style="-fx-text-fill: #FFD700; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <Label fx:id="usernameLabel" text="Felhasználó" style="-fx-text-fill: #FFD700; -fx-font-size: 20px; -fx-font-weight: bold;" wrapText="true"/>
+            <Label text="Üdv," style="-fx-text-fill: #ecf0f1; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label fx:id="usernameLabel" text="Felhasználó" style="-fx-text-fill: #ecf0f1; -fx-font-size: 20px; -fx-font-weight: bold;" wrapText="true"/>
         </VBox>
 
         <!-- Menü gombok -->
         <Button fx:id="homeBtn" text="🏠 Főoldal" onAction="#showHome"
-                style="-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                style="-fx-background-color: transparent; -fx-text-fill: #ecf0f1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
         <Button fx:id="carsBtn" text="🚗 Saját autók" onAction="#showCars"
-                style="-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                style="-fx-background-color: transparent; -fx-text-fill: #ecf0f1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
         <Button fx:id="budgetBtn" text="💰 Költségvetés" onAction="#showBudget"
-                style="-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                style="-fx-background-color: transparent; -fx-text-fill: #ecf0f1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
         <Button fx:id="linksBtn" text="🔗 Hasznos linkek" onAction="#showLinks"
-                style="-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                style="-fx-background-color: transparent; -fx-text-fill: #ecf0f1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
         <Button fx:id="calculatorBtn" text="🔢 Kalkulátor" onAction="#showCalculator"
-                style="-fx-background-color: transparent; -fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                style="-fx-background-color: transparent; -fx-text-fill: #ecf0f1; -fx-font-size: 16px; -fx-font-weight: bold; -fx-cursor: hand;"/>
 
         <!-- Kijelentkezés -->
         <Button fx:id="logoutButton" text="🚪 Kijelentkezés" onAction="#handleLogout"
-                style="-fx-background-color: #FF4C4C; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12;"/>
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 12; -fx-cursor: hand;"/>
     </VBox>
 
-    <!-- Tartalom terület (FlowPane) -->
-    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #FFF8DC; -fx-padding: 20; spacing: 10;">
-        <FlowPane fx:id="contentFlow" hgap="15" vgap="15" prefWrapLength="900"/>
-        <Button text="➕ Új widget" onAction="#addNewWidget"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12;"/>
-    </VBox>
+    <!-- Tartalom terület ScrollPane-ben -->
+    <ScrollPane fx:id="contentScrollPane" HBox.hgrow="ALWAYS" fitToWidth="true" fitToHeight="true" style="-fx-background: #ecf0f1;">
+        <VBox fx:id="contentContainer" spacing="10" style="-fx-padding: 20;"/>
+    </ScrollPane>
 
 </HBox>

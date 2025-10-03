@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.CalculatorController"
+            fitToHeight="true"
+            fitToWidth="true"
+            style="-fx-background: transparent;">
+
+    <!-- 3 kártya egy sorban -->
+    <HBox spacing="20" alignment="CENTER">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- ================= Üzemanyag kalkulátor (kártya) ================= -->
+        <VBox spacing="10" prefWidth="300"
+              style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8,0,0,3);">
+
+            <Label text="Üzemanyag kalkulátor"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Számold ki, mennyibe kerül egy út üzemanyagköltsége."
+                   wrapText="true" style="-fx-text-fill: #555;"/>
+
+            <TextField fx:id="distanceField" promptText="Megtett km"/>
+            <TextField fx:id="consumptionField" promptText="Fogyasztás (l/100km)"/>
+            <TextField fx:id="priceField" promptText="Üzemanyag ára (Ft/l)"/>
+
+            <!-- Gomb + Eredmény egy sorban -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="calcButton" text="Számolás"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                <Label fx:id="resultLabel" text="Eredmény itt"
+                       style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
+            </HBox>
+        </VBox>
+
+
+        <!-- ================= Gépjárműadó kalkulátor (kártya) ================= -->
+        <VBox spacing="10" prefWidth="300"
+              style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8,0,0,3);">
+
+            <Label text="Gépjárműadó kalkulátor"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Becsüld meg az éves gépjárműadót a teljesítmény és a gyártási év alapján."
+                   wrapText="true" style="-fx-text-fill: #555;"/>
+
+            <TextField fx:id="HorsePower" promptText="Teljesítmény (kW)"/>
+            <TextField fx:id="ProductionYear" promptText="Gyártás éve"/>
+
+            <!-- Gomb + Eredmény egy sorban -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="calcButton1" text="Számolás"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                <Label fx:id="resultLabel1" text="Eredmény itt"
+                       style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
+            </HBox>
+        </VBox>
+
+
+        <!-- ================= Kötelező biztosítás kalkulátor (kártya) ================= -->
+        <VBox spacing="10" prefWidth="300"
+              style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8,0,0,3);">
+
+            <Label text="Kötelező biztosítás kalkulátor"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Számold ki az éves kötelező biztosítás díját az alapdíj, teljesítmény és B/M fokozat alapján."
+                   wrapText="true" style="-fx-text-fill: #555;"/>
+
+            <TextField fx:id="BaseFee" promptText="Alapdíj (Ft)"/>
+            <TextField fx:id="PowerFactor" promptText="Teljesítmény faktor (kW)"/>
+            <TextField fx:id="ProductionYear1" promptText="Gyártás éve"/>
+            <TextField fx:id="BonusMalus" promptText="Bónusz-Malusz szorzó"/>
+
+            <!-- Gomb + Eredmény egy sorban -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="calcButton2" text="Számolás"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                <Label fx:id="resultLabel2" text="Eredmény itt"
+                       style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
+            </HBox>
+        </VBox>
+
+    </HBox>
+</ScrollPane>
