@@ -21,29 +21,60 @@
     <StackPane prefWidth="600" styleClass="right-panel">
 
         <!-- Login pane -->
-        <VBox fx:id="loginPane" alignment="CENTER" spacing="15">
+        <VBox fx:id="loginPane" alignment="CENTER" spacing="20">
             <Label text="Bejelentkezés" style="-fx-font-size:32px;" />
-            <TextField fx:id="loginUsername" promptText="Felhasználónév" />
-            <PasswordField fx:id="loginPassword" promptText="Jelszó" />
-            <TextField fx:id="loginPasswordVisible" promptText="Jelszó" visible="false"/>
-            <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
-            <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
-            <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" />
-            <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" />
+
+            <GridPane hgap="10" vgap="10" alignment="CENTER">
+                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="loginUsername" promptText="Add meg a felhasználóneved"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <PasswordField fx:id="loginPassword" promptText="Add meg a jelszavad"
+                               GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                <TextField fx:id="loginPasswordVisible" promptText="Add meg a jelszavad"
+                           visible="false" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <VBox spacing="10" alignment="CENTER">
+                <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
+                <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
+                <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" prefWidth="200"/>
+                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" />
+            </VBox>
         </VBox>
 
         <!-- Register pane -->
-        <VBox fx:id="registerPane" alignment="CENTER" spacing="10" visible="false">
+        <VBox fx:id="registerPane" alignment="CENTER" spacing="20" visible="false">
             <Label text="Regisztráció" style="-fx-font-size:32px;" />
-            <TextField fx:id="regUsername" promptText="Felhasználónév" />
-            <TextField fx:id="regEmail" promptText="Email" />
-            <PasswordField fx:id="regPassword" promptText="Jelszó" />
-            <TextField fx:id="regPasswordVisible" promptText="Jelszó" visible="false"/>
-            <PasswordField fx:id="regPasswordConfirm" promptText="Jelszó ismét" />
-            <TextField fx:id="regPasswordConfirmVisible" promptText="Jelszó ismét" visible="false"/>
-            <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
-            <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" />
-            <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
+
+            <GridPane hgap="10" vgap="10" alignment="CENTER">
+                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="regUsername" promptText="Add meg a felhasználóneved"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="regEmail" promptText="Add meg az email címed"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <PasswordField fx:id="regPassword" promptText="Adj meg egy jelszót"
+                               GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                <TextField fx:id="regPasswordVisible" promptText="Adj meg egy jelszót"
+                           visible="false" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó ismét:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <PasswordField fx:id="regPasswordConfirm" promptText="Írd be újra a jelszót"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                <TextField fx:id="regPasswordConfirmVisible" promptText="Írd be újra a jelszót"
+                           visible="false" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <VBox spacing="10" alignment="CENTER">
+                <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
+                <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" prefWidth="200"/>
+                <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
+            </VBox>
         </VBox>
 
     </StackPane>

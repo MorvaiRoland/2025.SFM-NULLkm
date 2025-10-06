@@ -2,67 +2,161 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 
-<VBox xmlns="http://javafx.com/javafx/24.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="drivesync.SajatAutokController"
-      spacing="20"
-      style="-fx-background-color: linear-gradient(to bottom, #e8f0f7, #ffffff); -fx-padding: 20;">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="drivesync.SajatAutokController"
+            prefWidth="900" prefHeight="600" style="-fx-background-color: #f4f4f4;">
 
-    <Label fx:id="welcomeLabel"
-           text="Üdv, felhasználó!"
-           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    <top>
+        <Label fx:id="welcomeLabel" text="Itt a saját autóid listája:" BorderPane.alignment="CENTER"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+        </Label>
+    </top>
 
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button text="◀" fx:id="scrollLeftBtn" onAction="#scrollLeft"
-                style="-fx-font-size: 18px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 8;"/>
-        <ScrollPane fx:id="carsScrollPane" fitToHeight="true" fitToWidth="true"
-                    hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
-                    style="-fx-background: transparent;">
-            <FlowPane fx:id="carsList" hgap="20" vgap="20" prefWrapLength="800"/>
-        </ScrollPane>
-        <Button text="▶" fx:id="scrollRightBtn" onAction="#scrollRight"
-                style="-fx-font-size: 18px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 8;"/>
-    </HBox>
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
 
-    <!-- Autó részletek + szerviz -->
-    <TitledPane fx:id="carDetailsPane" expanded="false" collapsible="true"
-                text="🚗 Autó részletei"
-                style="-fx-font-size: 16px; -fx-font-weight: bold;">
-        <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 12;">
-            <Label fx:id="carDetailsLabel" text="Nincs kiválasztott autó."
-                   style="-fx-font-size: 16px; -fx-text-fill: #34495e;"/>
+            <ScrollPane fx:id="carsScrollPane" fitToHeight="false" fitToWidth="true"
+                        hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" style="-fx-background: transparent;">
+                <content>
+                    <FlowPane fx:id="carsList" hgap="20" vgap="20">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+                    </FlowPane>
+                </content>
+            </ScrollPane>
 
-            <Label text="➕ Új szerviz rögzítése" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <GridPane hgap="10" vgap="10">
-                <Label text="Szerviz típusa:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <ChoiceBox fx:id="serviceTypeChoice" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TitledPane fx:id="addCarTitledPane" text="➕ Új autó hozzáadása" expanded="false"
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
+                <content>
+                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label fx:id="formTitle" text="Új autó hozzáadása"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #222;"/>
 
-                <Label text="KM:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="serviceKmField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <GridPane hgap="15" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
 
-                <Label text="Ár (Ft):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TextField fx:id="servicePriceField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                            <Label text="Rendszám:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <TextField fx:id="licenseField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                <Label text="Dátum:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="serviceDatePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                            <Label text="Márka:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextField fx:id="brandField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <Label text="Cserélt alkatrészek:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                <TextField fx:id="replacedPartsField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            <Label text="Típus:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="typeField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                <Button fx:id="saveServiceBtn" text="✔ Mentés" onAction="#saveService"
-                        GridPane.rowIndex="5" GridPane.columnIndex="1"
-                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 8;"/>
-            </GridPane>
+                            <Label text="Évjárat:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <ChoiceBox fx:id="vintageField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-            <Label text="🔧 Korábbi szervizek:" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <ListView fx:id="serviceListView" prefHeight="150" minHeight="150"/>
+                            <Label text="Motor típusa:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <TextField fx:id="engineTypeField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-            <Button fx:id="generatePdfBtn"
-                    text="📄 PDF generálás"
-                    onAction="#handleGeneratePdf"
-                    style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;"/>
+                            <Label text="Üzemanyag:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                            <ChoiceBox fx:id="fuelTypeField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                            <Label text="Futásteljesítmény:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                            <TextField fx:id="kmField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                            <Label text="Olaj mennyiség (ml):" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                            <TextField fx:id="oilField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+                            <Label text="Gumi méret:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                            <TextField fx:id="tireSizeField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+
+                            <Label text="Szerviz dátuma:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                            <DatePicker fx:id="serviceDatePickerCar" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+
+                            <Label text="Biztosítás:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                            <DatePicker fx:id="insuranceDatePicker" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Button text="Mentés" onAction="#handleAddOrEditCar"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+
+            <TitledPane fx:id="addServicePane" text="➕ Új szerviz hozzáadása" expanded="false"
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
+                <content>
+                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+
+                        <GridPane hgap="15" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label text="Szerviz típus:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <ChoiceBox fx:id="serviceTypeChoice" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                            <Label text="Szerviz dátuma:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <DatePicker fx:id="serviceDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                            <Label text="KM:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextField fx:id="serviceKmField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <Label text="Ár (Ft):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <TextField fx:id="servicePriceField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                            <Label text="Cserélt alkatrészek:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <TextField fx:id="replacedPartsField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Button text="Szerviz mentése" onAction="#saveService"
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+            <TitledPane fx:id="carDetailsPane" text="Autó részletei" expanded="false"
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
+                <content>
+                    <VBox spacing="10" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
+                                  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label fx:id="carDetailsLabel" text="Válassz egy autót a listából!"
+                               style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
+                        <ListView fx:id="serviceListView" prefHeight="150"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+
+
         </VBox>
-    </TitledPane>
+    </center>
 
-</VBox>
+    <bottom>
+        <HBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Button fx:id="scrollLeftBtn" text="⭠" onAction="#scrollLeft"
+                    style="-fx-background-color: #EEEEEE; -fx-background-radius: 5; -fx-font-weight: bold;"/>
+            <Button fx:id="scrollRightBtn" text="⭢" onAction="#scrollRight"
+                    style="-fx-background-color: #EEEEEE; -fx-background-radius: 5; -fx-font-weight: bold;"/>
+            <Button fx:id="generatePdfBtn" text="PDF generálása" onAction="#handleGeneratePdf"
+                    style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
