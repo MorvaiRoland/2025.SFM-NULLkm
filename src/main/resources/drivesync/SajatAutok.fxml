@@ -3,46 +3,76 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="drivesync.SajatAutokController"
-            prefWidth="900" prefHeight="600" style="-fx-background-color: #f4f4f4;">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="drivesync.SajatAutokController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background: #f4f4f4; -fx-background-color: #f4f4f4;"
+            prefWidth="1000" prefHeight="700">
 
-    <top>
-        <Label fx:id="welcomeLabel" text="Itt a saját autóid listája:" BorderPane.alignment="CENTER"
-               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;">
-            <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
-            </padding>
-        </Label>
-    </top>
+    <content>
 
-    <center>
-        <VBox spacing="20">
-            <padding>
-                <Insets top="15" right="15" bottom="15" left="15"/>
-            </padding>
+        <VBox spacing="25" alignment="TOP_CENTER"
+              style="-fx-background-color: #f4f4f4;"
+              prefWidth="Infinity">
 
-            <ScrollPane fx:id="carsScrollPane" fitToHeight="false" fitToWidth="true"
-                        hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" style="-fx-background: transparent;">
+            <!-- 🏁 Felső cím -->
+            <Label fx:id="welcomeLabel"
+                   text="Itt a saját autóid listája:"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #222;"
+                   alignment="CENTER">
+                <padding>
+                    <Insets top="25" bottom="5"/>
+                </padding>
+            </Label>
+
+            <!-- 🚗 AUTÓ KÁRTYÁK -->
+            <ScrollPane fx:id="carsScrollPane"
+                        fitToHeight="false"
+                        fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="NEVER"
+                        style="-fx-background: transparent; -fx-background-color: transparent;"
+                        maxHeight="250">
+
                 <content>
-                    <FlowPane fx:id="carsList" hgap="20" vgap="20">
+                    <FlowPane fx:id="carsList"
+                              hgap="24" vgap="24"
+                              alignment="CENTER"
+                              style="-fx-background-color: linear-gradient(to bottom right, #f0f4f8, #ffffff);
+                                     -fx-padding: 20;
+                                     -fx-background-radius: 16;">
                         <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
                         </padding>
                     </FlowPane>
                 </content>
             </ScrollPane>
 
+            <!-- ⬅️➡️ Navigáció gombok -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="scrollLeftBtn" text="⭠" onAction="#scrollLeft"
+                        style="-fx-background-color: #e0e0e0; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 8;"/>
+                <Button fx:id="scrollRightBtn" text="⭢" onAction="#scrollRight"
+                        style="-fx-background-color: #e0e0e0; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 8;"/>
+                <Button fx:id="generatePdfBtn" text="PDF generálása" onAction="#handleGeneratePdf"
+                        style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 8;"/>
+            </HBox>
+
+            <!-- 🚘 ÚJ AUTÓ HOZZÁADÁSA -->
             <TitledPane fx:id="addCarTitledPane" text="➕ Új autó hozzáadása" expanded="false"
-                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;"
+                        maxWidth="850">
                 <content>
-                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                    <VBox spacing="18" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
                         <padding>
-                            <Insets top="15" right="15" bottom="15" left="15"/>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
                         </padding>
+
                         <Label fx:id="formTitle" text="Új autó hozzáadása"
-                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #222;"/>
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #222;"/>
 
                         <GridPane hgap="15" vgap="12">
                             <columnConstraints>
@@ -85,17 +115,21 @@
                         </GridPane>
 
                         <Button text="Mentés" onAction="#handleAddOrEditCar"
-                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;
+                                       -fx-background-radius: 8; -fx-font-size: 14px;"/>
                     </VBox>
                 </content>
             </TitledPane>
 
+            <!-- 🔧 ÚJ SZERVIZ HOZZÁADÁSA -->
             <TitledPane fx:id="addServicePane" text="➕ Új szerviz hozzáadása" expanded="false"
-                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;"
+                        maxWidth="850">
                 <content>
-                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
+                                               -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
                         <padding>
-                            <Insets top="15" right="15" bottom="15" left="15"/>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
                         </padding>
 
                         <GridPane hgap="15" vgap="12">
@@ -105,7 +139,7 @@
                             </columnConstraints>
 
                             <Label text="Szerviz típus:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <ChoiceBox fx:id="serviceTypeChoice" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                            <ComboBox fx:id="serviceTypeCombo" editable="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                             <Label text="Szerviz dátuma:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                             <DatePicker fx:id="serviceDatePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
@@ -121,42 +155,36 @@
                         </GridPane>
 
                         <Button text="Szerviz mentése" onAction="#saveService"
-                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-                    </VBox>
-                </content>
-            </TitledPane>
-            <TitledPane fx:id="carDetailsPane" text="Autó részletei" expanded="false"
-                        style="-fx-font-weight: bold; -fx-font-size: 16px;">
-                <content>
-                    <VBox spacing="10" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
-                                  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-                        <padding>
-                            <Insets top="15" right="15" bottom="15" left="15"/>
-                        </padding>
-                        <Label fx:id="carDetailsLabel" text="Válassz egy autót a listából!"
-                               style="-fx-font-size: 14px; -fx-text-fill: #333;"/>
-                        <ListView fx:id="serviceListView" prefHeight="150"/>
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;
+                                       -fx-font-size: 14px; -fx-background-radius: 8;"/>
                     </VBox>
                 </content>
             </TitledPane>
 
+            <!-- 🧾 AUTÓ RÉSZLETEI -->
+            <TitledPane fx:id="carDetailsPane" text="🚘 Autó részletei" expanded="false"
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;"
+                        maxWidth="850">
+                <content>
+                    <VBox spacing="15"
+                          style="-fx-background-color: #ffffff; -fx-background-radius: 12;
+                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 6);">
+                        <padding>
+                            <Insets top="25" right="25" bottom="25" left="25"/>
+                        </padding>
+
+                        <Label fx:id="carDetailsLabel" text="Válassz egy autót a listából!"
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+
+                        <Separator/>
+
+                        <ListView fx:id="serviceListView" prefHeight="200"
+                                  style="-fx-background-radius: 6;"/>
+                    </VBox>
+                </content>
+            </TitledPane>
 
         </VBox>
-    </center>
 
-    <bottom>
-        <HBox spacing="15" alignment="CENTER">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-
-            <Button fx:id="scrollLeftBtn" text="⭠" onAction="#scrollLeft"
-                    style="-fx-background-color: #EEEEEE; -fx-background-radius: 5; -fx-font-weight: bold;"/>
-            <Button fx:id="scrollRightBtn" text="⭢" onAction="#scrollRight"
-                    style="-fx-background-color: #EEEEEE; -fx-background-radius: 5; -fx-font-weight: bold;"/>
-            <Button fx:id="generatePdfBtn" text="PDF generálása" onAction="#handleGeneratePdf"
-                    style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-        </HBox>
-    </bottom>
-
-</BorderPane>
+    </content>
+</ScrollPane>

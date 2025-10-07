@@ -1,0 +1,42 @@
+.settings-root {
+    -fx-background-color: #f4f4f4;
+    -fx-padding: 20;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.settings-header {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.settings-footer {
+    -fx-font-size: 12px;
+    -fx-text-fill: #777777;
+}
+
+.settings-titledpane > .title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222222;
+}
+
+.settings-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 5;
+    -fx-font-size: 14px;
+}
+
+.settings-button:hover {
+    -fx-background-color: #45a049;
+}
+
+.delete-button {
+    -fx-background-color: #f44336;
+}
+
+.delete-button:hover {
+    -fx-background-color: #e53935;
+}

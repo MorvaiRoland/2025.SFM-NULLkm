@@ -3,6 +3,9 @@ package drivesync;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -12,6 +15,8 @@ import javafx.util.Duration;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class SajatAutokController {
@@ -24,7 +29,7 @@ public class SajatAutokController {
     @FXML private ChoiceBox<String> fuelTypeField;
     @FXML private ChoiceBox<Integer> vintageField;
     @FXML private DatePicker serviceDatePickerCar, insuranceDatePicker;
-    @FXML private ChoiceBox<String> serviceTypeChoice;
+    @FXML private ComboBox<String> serviceTypeCombo;
     @FXML private DatePicker serviceDatePicker;
     @FXML private TextField serviceKmField, servicePriceField, replacedPartsField;
     @FXML private ListView<String> serviceListView;
@@ -66,8 +71,10 @@ public class SajatAutokController {
         this.username = username;
         if (welcomeLabel != null) welcomeLabel.setText("Itt a saját autóid listája:");
         loadUserCars();
-        loadServiceTypes();
+        loadServiceTypes(); // kereshető combo feltöltése
     }
+
+    // ----------------------------- AUTÓK -----------------------------
 
     private void loadUserCars() {
         if (carsList == null) return;
@@ -85,7 +92,6 @@ public class SajatAutokController {
                 carsList.getChildren().add(carBox);
             }
 
-            // Automatikusan az első autót mutatja
             if (!carsList.getChildren().isEmpty()) {
                 VBox firstCar = (VBox) carsList.getChildren().get(0);
                 firstCar.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED,
@@ -100,28 +106,77 @@ public class SajatAutokController {
     }
 
     private VBox createCarCard(ResultSet rs, int carId) throws SQLException {
-        VBox box = new VBox(8);
-        box.setStyle("-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 12;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 3); -fx-alignment: center;");
-        box.setPrefWidth(200);
-        box.setMinHeight(120);
-
+        // ---- Adatok lekérése ----
         String brand = rs.getString("brand");
         String type = rs.getString("type");
         String license = rs.getString("license");
         int vintage = rs.getInt("vintage");
         int km = rs.getInt("km");
 
-        Label brandTypeLabel = new Label(brand + " " + type);
-        brandTypeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        // ---- Kártya alap ----
+        VBox box = new VBox(12);
+        box.setPrefWidth(230);
+        box.setMinHeight(150);
+        box.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        box.setStyle("""
+        -fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);
+        -fx-background-radius: 18;
+        -fx-padding: 16;
+        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4);
+        -fx-cursor: hand;
+        -fx-transition: all 0.3s ease-in-out;
+    """);
 
-        Label detailsLabel = new Label("Rendszám: " + license + "\nÉvjárat: " + vintage + "\nKM: " + km);
-        detailsLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
+        // ---- Fejléc: Márka és típus ----
+        Label brandTypeLabel = new Label(brand + " " + type);
+        brandTypeLabel.setStyle("""
+        -fx-font-size: 17px;
+        -fx-font-weight: bold;
+        -fx-text-fill: #1a237e;
+    """);
+
+        // ---- Rendszám badge ----
+        Label licenseLabel = new Label(license);
+        licenseLabel.setStyle("""
+        -fx-font-size: 14px;
+        -fx-font-weight: bold;
+        -fx-text-fill: white;
+        -fx-background-color: #2196F3;
+        -fx-background-radius: 6;
+        -fx-padding: 4 8 4 8;
+    """);
+
+        // ---- Részletek ----
+        Label detailsLabel = new Label("Évjárat: " + vintage + "\nKM: " + km);
+        detailsLabel.setStyle("""
+        -fx-font-size: 14px;
+        -fx-text-fill: #444;
+        -fx-opacity: 0.9;
+    """);
         detailsLabel.setWrapText(true);
         detailsLabel.setMaxWidth(180);
 
-        box.getChildren().addAll(brandTypeLabel, detailsLabel);
+        // ---- Layout összeállítás ----
+        box.getChildren().addAll(brandTypeLabel, licenseLabel, detailsLabel);
 
+        // ---- Hover animáció ----
+        box.setOnMouseEntered(e -> box.setStyle("""
+        -fx-background-color: linear-gradient(to bottom right, #e3f2fd, #ffffff);
+        -fx-background-radius: 18;
+        -fx-padding: 16;
+        -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.4), 15, 0.3, 0, 5);
+        -fx-cursor: hand;
+    """));
+
+        box.setOnMouseExited(e -> box.setStyle("""
+        -fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);
+        -fx-background-radius: 18;
+        -fx-padding: 16;
+        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4);
+        -fx-cursor: hand;
+    """));
+
+        // ---- Kattintás esemény ----
         box.setOnMouseClicked(e -> {
             if (carDetailsPane != null) showCarDetails(carId);
         });
@@ -129,9 +184,9 @@ public class SajatAutokController {
         return box;
     }
 
+
     private void showCarDetails(int carId) {
         selectedCarId = carId;
-
         if (carDetailsPane != null) carDetailsPane.setExpanded(true);
 
         try (Connection conn = Database.getConnection();
@@ -139,15 +194,13 @@ public class SajatAutokController {
 
             stmt.setInt(1, carId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                if (carDetailsLabel != null) {
-                    carDetailsLabel.setText(
-                            rs.getString("brand") + " " + rs.getString("type") +
-                                    " (" + rs.getString("license") + "), " +
-                                    rs.getInt("vintage") + " - " +
-                                    rs.getInt("km") + " km"
-                    );
-                }
+            if (rs.next() && carDetailsLabel != null) {
+                carDetailsLabel.setText(
+                        rs.getString("brand") + " " + rs.getString("type") +
+                                " (" + rs.getString("license") + "), " +
+                                rs.getInt("vintage") + " - " +
+                                rs.getInt("km") + " km"
+                );
             }
         } catch (SQLException e) {
             showAlert("Hiba", "Nem sikerült betölteni az autó részleteit.");
@@ -155,6 +208,8 @@ public class SajatAutokController {
 
         loadServices(carId);
     }
+
+    // ----------------------------- SZERVIZEK -----------------------------
 
     private void loadServices(int carId) {
         if (serviceListView == null) return;
@@ -190,15 +245,29 @@ public class SajatAutokController {
     }
 
     private void loadServiceTypes() {
-        if (serviceTypeChoice == null) return;
-        serviceTypeChoice.getItems().clear();
+        if (serviceTypeCombo == null) return;
+
+        List<String> types = new ArrayList<>();
         try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT name FROM service_types")) {
+             PreparedStatement stmt = conn.prepareStatement("SELECT name FROM service_types ORDER BY name")) {
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) serviceTypeChoice.getItems().add(rs.getString("name"));
+            while (rs.next()) types.add(rs.getString("name"));
         } catch (SQLException e) {
             showAlert("Hiba", "Nem sikerült betölteni a szerviz típusokat.");
+            return;
         }
+
+        ObservableList<String> allItems = FXCollections.observableArrayList(types);
+        FilteredList<String> filteredItems = new FilteredList<>(allItems, p -> true);
+
+        serviceTypeCombo.setEditable(true);
+        serviceTypeCombo.setItems(filteredItems);
+
+        // Gépelésre szűrés
+        serviceTypeCombo.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            final String search = newValue.toLowerCase();
+            filteredItems.setPredicate(item -> item.toLowerCase().contains(search));
+        });
     }
 
     @FXML
@@ -214,7 +283,7 @@ public class SajatAutokController {
                              "VALUES (?, (SELECT id FROM service_types WHERE name=? LIMIT 1), ?, ?, ?, ?)")) {
 
             stmt.setInt(1, selectedCarId);
-            stmt.setString(2, serviceTypeChoice.getValue());
+            stmt.setString(2, serviceTypeCombo.getValue());
             stmt.setInt(3, Integer.parseInt(serviceKmField.getText().trim()));
             stmt.setInt(4, Integer.parseInt(servicePriceField.getText().trim()));
             stmt.setDate(5, Date.valueOf(serviceDatePicker.getValue()));
@@ -230,6 +299,8 @@ public class SajatAutokController {
         }
     }
 
+    // ----------------------------- GÖRGETÉS / SEGÉD -----------------------------
+
     @FXML private void scrollLeft() { animateScroll(-0.2); }
     @FXML private void scrollRight() { animateScroll(0.2); }
 
@@ -242,6 +313,8 @@ public class SajatAutokController {
         );
         timeline.play();
     }
+
+    // ----------------------------- AUTÓ HOZZÁADÁS / SZERKESZTÉS -----------------------------
 
     @FXML
     private void handleAddOrEditCar() {
@@ -310,6 +383,8 @@ public class SajatAutokController {
         }
     }
 
+    // ----------------------------- PDF -----------------------------
+
     @FXML
     private void handleGeneratePdf() {
         if (selectedCarId != -1) {
@@ -317,6 +392,8 @@ public class SajatAutokController {
             showAlert("PDF elkészült", "A PDF jelentés sikeresen létrehozva!");
         } else showAlert("Hiba", "Nincs kiválasztott autó!");
     }
+
+    // ----------------------------- SEGÉD METÓDUSOK -----------------------------
 
     private void clearFields() {
         if (licenseField != null) licenseField.clear();
