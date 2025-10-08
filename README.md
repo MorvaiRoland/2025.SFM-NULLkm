@@ -15,7 +15,7 @@ Csapattagok
 Téma
 ---
 
-Autó szervíz és nyilvántartó alkalmazás ami segíti a papír alapú adminsztráció digitalizációját.   
+Autó szervíz és nyilvántartó alkalmazás ami segíti a papír alapú adminisztráció digitalizációját.   
 
 
 Funkciók (Későbbre a végén a bele írni hogy mik lettek implementálva.)
