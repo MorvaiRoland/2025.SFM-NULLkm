@@ -8,7 +8,6 @@
       fx:controller="drivesync.SettingsController"
       spacing="15" BorderPane.alignment="CENTER">
 
-    <!-- Fő padding -->
     <padding>
         <Insets top="10" right="20" bottom="10" left="20"/>
     </padding>
@@ -26,8 +25,11 @@
             <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Regisztráció dátuma:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <Label fx:id="regDateLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <PasswordField fx:id="passwordField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Regisztráció dátuma:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="regDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
         </GridPane>
     </TitledPane>
 
@@ -38,9 +40,14 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
 
-            <CheckBox fx:id="notificationsCheck" text="Értesítések engedélyezése"/>
             <CheckBox fx:id="darkModeCheck" text="Sötét mód"/>
+            <CheckBox fx:id="notificationsCheck" text="Értesítések engedélyezése"/>
             <CheckBox fx:id="autoSyncCheck" text="Automatikus szinkron"/>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="PDF mentési útvonal:"/>
+                <TextField fx:id="pdfPathField" prefWidth="200"/>
+                <Button text="Tallózás" onAction="#handleBrowsePdfPath"/>
+            </HBox>
         </VBox>
     </TitledPane>
 
@@ -51,7 +58,7 @@
         </padding>
 
         <Button fx:id="saveBtn" text="Mentés" onAction="#handleSave"/>
-        <Button fx:id="deleteBtn" text="Törlés" onAction="#handleDelete"/>
+        <Button fx:id="resetBtn" text="Alapértelmezett" onAction="#handleReset"/>
     </HBox>
 
 </VBox>

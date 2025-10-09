@@ -2,76 +2,70 @@ package drivesync;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 
 public class SettingsController {
 
-    // Felhasználói adatok
-    @FXML
-    private TextField nameField;
+    @FXML private TextField nameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Label regDateLabel;
 
-    @FXML
-    private TextField emailField;
+    @FXML private CheckBox darkModeCheck;
+    @FXML private CheckBox notificationsCheck;
+    @FXML private CheckBox autoSyncCheck;
 
-    @FXML
-    private Label regDateLabel;
+    @FXML private TextField pdfPathField;
 
-    // Alapértelmezett opciók
-    @FXML
-    private CheckBox notificationsCheck;
+    @FXML private Button saveBtn;
+    @FXML private Button resetBtn;
 
-    @FXML
-    private CheckBox darkModeCheck;
+    private Stage primaryStage;
 
-    @FXML
-    private CheckBox autoSyncCheck;
+    // Például a beállításokat tárolhatjuk változókban
+    private String savedName = "példa";
+    private String savedEmail = "példa@example.com";
+    private String savedPassword = "";
+    private boolean savedDarkMode = false;
+    private boolean savedNotifications = true;
+    private boolean savedAutoSync = true;
+    private String savedPdfPath = System.getProperty("user.home");
 
-    // Extra opciók
-    @FXML
-    private CheckBox showTooltipsCheck;
-
-    @FXML
-    private CheckBox enableLogsCheck;
-
-    // Gombok
-    @FXML
-    private Button saveBtn;
-
-    @FXML
-    private Button deleteBtn;
-
-    /**
-     * Inicializálás: például betöltéskor felhasználói adatok beállítása
-     */
     @FXML
     private void initialize() {
-        // Példaértékek betöltése
-        nameField.setText("Morva Péter");
-        emailField.setText("morva@example.com");
-        regDateLabel.setText("2025-01-01");
-
-        notificationsCheck.setSelected(true);
-        darkModeCheck.setSelected(false);
-        autoSyncCheck.setSelected(true);
-
-        showTooltipsCheck.setSelected(true);
-        enableLogsCheck.setSelected(false);
+        loadSettings();
     }
 
-    /**
-     * Mentés gomb kezelő
-     */
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
+    }
+
+    private void loadSettings() {
+        nameField.setText(savedName);
+        emailField.setText(savedEmail);
+        passwordField.setText(savedPassword);
+        regDateLabel.setText("2025-01-01"); // példa
+
+        darkModeCheck.setSelected(savedDarkMode);
+        notificationsCheck.setSelected(savedNotifications);
+        autoSyncCheck.setSelected(savedAutoSync);
+        pdfPathField.setText(savedPdfPath);
+    }
+
     @FXML
     private void handleSave() {
-        System.out.println("Beállítások mentése:");
-        System.out.println("Név: " + nameField.getText());
-        System.out.println("Email: " + emailField.getText());
-        System.out.println("Értesítések: " + notificationsCheck.isSelected());
-        System.out.println("Sötét mód: " + darkModeCheck.isSelected());
-        System.out.println("Automatikus szinkron: " + autoSyncCheck.isSelected());
-        System.out.println("Tooltipok: " + showTooltipsCheck.isSelected());
-        System.out.println("Naplózás: " + enableLogsCheck.isSelected());
+        savedName = nameField.getText();
+        savedEmail = emailField.getText();
+        savedPassword = passwordField.getText();
+        savedDarkMode = darkModeCheck.isSelected();
+        savedNotifications = notificationsCheck.isSelected();
+        savedAutoSync = autoSyncCheck.isSelected();
+        savedPdfPath = pdfPathField.getText();
 
-        // Ide lehet tenni tényleges mentést fájlba vagy adatbázisba
+        // Itt ténylegesen lehet menteni fájlba vagy adatbázisba
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Mentés");
         alert.setHeaderText(null);
@@ -79,24 +73,35 @@ public class SettingsController {
         alert.showAndWait();
     }
 
-    /**
-     * Törlés gomb kezelő
-     */
     @FXML
-    private void handleDelete() {
+    private void handleReset() {
         // Alapértelmezett értékek visszaállítása
-        nameField.setText("");
-        emailField.setText("");
-        notificationsCheck.setSelected(false);
-        darkModeCheck.setSelected(false);
-        autoSyncCheck.setSelected(false);
-        showTooltipsCheck.setSelected(false);
-        enableLogsCheck.setSelected(false);
+        savedName = "";
+        savedEmail = "";
+        savedPassword = "";
+        savedDarkMode = false;
+        savedNotifications = false;
+        savedAutoSync = false;
+        savedPdfPath = System.getProperty("user.home");
+
+        loadSettings();
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Törlés");
+        alert.setTitle("Alapértelmezett");
         alert.setHeaderText(null);
-        alert.setContentText("Beállítások törölve!");
+        alert.setContentText("Beállítások visszaállítva az alapértelmezett értékekre!");
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleBrowsePdfPath() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("PDF mentési útvonal kiválasztása");
+        chooser.setInitialDirectory(new File(pdfPathField.getText()));
+        File selectedDir = chooser.showDialog(primaryStage);
+
+        if (selectedDir != null) {
+            pdfPathField.setText(selectedDir.getAbsolutePath());
+        }
     }
 }
