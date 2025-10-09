@@ -8,10 +8,19 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import javafx.geometry.Insets;
+import javafx.scene.paint.Color;
+
+
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -34,24 +43,37 @@ public class SajatAutokController {
     @FXML private TextField serviceKmField, servicePriceField, replacedPartsField;
     @FXML private ListView<String> serviceListView;
     @FXML private Button scrollLeftBtn, scrollRightBtn, generatePdfBtn;
+    @FXML private ColorPicker colorPicker;
+    @FXML private TextArea notesField;
+
+
 
     private String username;
     private Integer editingCarId = null;
     private int selectedCarId = -1;
 
     @FXML
-    public void initialize() {
-        // Évjáratok 1900-2025
-        if (vintageField != null) {
-            IntStream.rangeClosed(1900, 2025).forEach(vintageField.getItems()::add);
-            vintageField.setValue(2025);
-        }
+    private ComboBox<String> brandCombo;
+    @FXML
+    private ComboBox<String> typeCombo;
 
-        // Üzemanyag típusok
-        if (fuelTypeField != null) {
-            fuelTypeField.getItems().addAll("Benzin", "Dízel", "Elektromos", "Hibrid");
-            fuelTypeField.setValue("Benzin");
-        }
+    @FXML
+    public void initialize() {
+        // Évjáratok
+        IntStream.rangeClosed(1900, 2025).forEach(vintageField.getItems()::add);
+        vintageField.setValue(2025);
+
+        // Üzemanyag
+        fuelTypeField.getItems().addAll("Benzin", "Dízel", "Elektromos", "Hibrid");
+        fuelTypeField.setValue("Benzin");
+
+        // Márkák betöltése az adatbázisból
+        loadBrands();
+
+        // Márka kiválasztásakor frissül a típus lista
+        brandCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) loadTypesForBrand(newVal);
+        });
 
         // TitledPane viselkedés
         if (addCarTitledPane != null) {
@@ -60,12 +82,104 @@ public class SajatAutokController {
                 else {
                     addCarTitledPane.setText("➕ Új autó hozzáadása");
                     clearFields();
-                    editingCarId = null;
-                    if (formTitle != null) formTitle.setText("Új autó hozzáadása");
                 }
             });
         }
     }
+
+// ----------------------------- MÁRKA ÉS TÍPUS BETÖLTÉS -----------------------------
+
+
+    // --- Globális változók a controllerben ---
+    private ObservableList<String> typeItems = FXCollections.observableArrayList(); // típusok alapja
+    private FilteredList<String> filteredTypes; // típusokhoz
+
+    // --- Márkák betöltése ---
+    private void loadBrands() {
+        if (brandCombo == null || typeCombo == null) return;
+
+        brandCombo.getItems().clear();
+        typeCombo.getItems().clear();
+
+        List<String> brands = new ArrayList<>();
+        String sql = "SELECT DISTINCT brand FROM car_types ORDER BY brand";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                brands.add(rs.getString("brand"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Hiba", "Nem sikerült betölteni a márkákat!");
+            return;
+        }
+
+        ObservableList<String> brandItems = FXCollections.observableArrayList(brands);
+        FilteredList<String> filteredBrands = new FilteredList<>(brandItems, p -> true);
+
+        brandCombo.setEditable(true);
+        brandCombo.setItems(filteredBrands);
+
+        // Márkák keresése gépelésre
+        brandCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+            final String search = newVal.toLowerCase();
+            filteredBrands.setPredicate(item -> item.toLowerCase().contains(search));
+        });
+
+        // Típus ComboBox inicializálása egyszer
+        filteredTypes = new FilteredList<>(typeItems, p -> true);
+        typeCombo.setEditable(true);
+        typeCombo.setItems(filteredTypes);
+
+        typeCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+            final String search = newVal.toLowerCase();
+            filteredTypes.setPredicate(item -> item.toLowerCase().contains(search));
+        });
+
+        // Márka kiválasztásakor frissítjük a típusokat
+        brandCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            loadTypesForBrand(newVal);
+        });
+    }
+
+    // --- Típusok betöltése adott márkához ---
+    private void loadTypesForBrand(String brand) {
+        typeItems.clear(); // előző típusok törlése
+
+        if (brand == null || brand.isEmpty()) {
+            typeCombo.getSelectionModel().clearSelection();
+            typeCombo.getEditor().clear();
+            return;
+        }
+
+        List<String> types = new ArrayList<>();
+        String sql = "SELECT DISTINCT type FROM car_types WHERE brand=? ORDER BY type";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, brand);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                types.add(rs.getString("type"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Hiba", "Nem sikerült betölteni a típusokat!");
+            return;
+        }
+
+        typeItems.setAll(types); // frissítjük az ObservableList-et
+        typeCombo.getSelectionModel().clearSelection();
+        typeCombo.getEditor().clear();
+    }
+
+
+
 
     public void setUsername(String username) {
         this.username = username;
@@ -323,23 +437,44 @@ public class SajatAutokController {
     }
 
     private void addCar() {
-        String sql = "INSERT INTO cars (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance) " +
-                "VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cars (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes) " +
+                "VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            String selectedBrand = brandCombo.getEditor().getText().trim();
+            String selectedType = typeCombo.getEditor().getText().trim();
+
+            if (selectedBrand.isEmpty() || selectedType.isEmpty()) {
+                showAlert("Hiba", "Kérlek válassz márkát és típust!");
+                return;
+            }
+
+            // Szín HEX kód
+            String color = "";
+            if (colorPicker != null && colorPicker.getValue() != null) {
+                javafx.scene.paint.Color c = colorPicker.getValue();
+                color = String.format("#%02X%02X%02X",
+                        (int)(c.getRed() * 255),
+                        (int)(c.getGreen() * 255),
+                        (int)(c.getBlue() * 255));
+            }
+
             stmt.setString(1, username);
             stmt.setString(2, licenseField.getText().trim());
-            stmt.setString(3, brandField.getText().trim());
-            stmt.setString(4, typeField.getText().trim());
-            stmt.setInt(5, vintageField.getValue());
+            stmt.setString(3, selectedBrand);
+            stmt.setString(4, selectedType);
+            stmt.setInt(5, vintageField.getValue() != null ? vintageField.getValue() : 0);
             stmt.setString(6, engineTypeField.getText().trim());
-            stmt.setString(7, fuelTypeField.getValue());
-            stmt.setInt(8, Integer.parseInt(kmField.getText().trim()));
+            stmt.setString(7, fuelTypeField.getValue() != null ? fuelTypeField.getValue() : "");
+            stmt.setInt(8, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(9, oilField.getText().trim());
             stmt.setString(10, tireSizeField.getText().trim());
-            stmt.setDate(11, serviceDatePickerCar.getValue() != null ? Date.valueOf(serviceDatePickerCar.getValue()) : null);
-            stmt.setDate(12, insuranceDatePicker.getValue() != null ? Date.valueOf(insuranceDatePicker.getValue()) : null);
+            stmt.setDate(11, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
+            stmt.setDate(12, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
+            stmt.setString(13, color);
+            stmt.setString(14, notesField.getText().trim());
 
             stmt.executeUpdate();
             showAlert("Sikeres", "Autó hozzáadva!");
@@ -352,23 +487,44 @@ public class SajatAutokController {
         }
     }
 
+
     private void editCar(int carId) {
-        String sql = "UPDATE cars SET license=?, brand=?, type=?, vintage=?, engine_type=?, fuel_type=?, km=?, oil=?, tire_size=?, service=?, insurance=? WHERE id=?";
+        String sql = "UPDATE cars SET license=?, brand=?, type=?, vintage=?, engine_type=?, fuel_type=?, km=?, oil=?, tire_size=?, service=?, insurance=?, color=?, notes=? WHERE id=?";
+
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            String selectedBrand = brandCombo.getEditor().getText().trim();
+            String selectedType = typeCombo.getEditor().getText().trim();
+
+            if (selectedBrand.isEmpty() || selectedType.isEmpty()) {
+                showAlert("Hiba", "Kérlek válassz márkát és típust!");
+                return;
+            }
+
+            String color = "";
+            if (colorPicker != null && colorPicker.getValue() != null) {
+                javafx.scene.paint.Color c = colorPicker.getValue();
+                color = String.format("#%02X%02X%02X",
+                        (int)(c.getRed() * 255),
+                        (int)(c.getGreen() * 255),
+                        (int)(c.getBlue() * 255));
+            }
+
             stmt.setString(1, licenseField.getText().trim());
-            stmt.setString(2, brandField.getText().trim());
-            stmt.setString(3, typeField.getText().trim());
-            stmt.setInt(4, vintageField.getValue());
+            stmt.setString(2, selectedBrand);
+            stmt.setString(3, selectedType);
+            stmt.setInt(4, vintageField.getValue() != null ? vintageField.getValue() : 0);
             stmt.setString(5, engineTypeField.getText().trim());
-            stmt.setString(6, fuelTypeField.getValue());
-            stmt.setInt(7, Integer.parseInt(kmField.getText().trim()));
+            stmt.setString(6, fuelTypeField.getValue() != null ? fuelTypeField.getValue() : "");
+            stmt.setInt(7, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(8, oilField.getText().trim());
             stmt.setString(9, tireSizeField.getText().trim());
-            stmt.setDate(10, serviceDatePickerCar.getValue() != null ? Date.valueOf(serviceDatePickerCar.getValue()) : null);
-            stmt.setDate(11, insuranceDatePicker.getValue() != null ? Date.valueOf(insuranceDatePicker.getValue()) : null);
-            stmt.setInt(12, carId);
+            stmt.setDate(10, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
+            stmt.setDate(11, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
+            stmt.setString(12, color);
+            stmt.setString(13, notesField.getText().trim());
+            stmt.setInt(14, carId);
 
             stmt.executeUpdate();
             showAlert("Sikeres", "Az autó adatai frissítve!");
@@ -383,15 +539,117 @@ public class SajatAutokController {
         }
     }
 
+
+
     // ----------------------------- PDF -----------------------------
 
     @FXML
     private void handleGeneratePdf() {
-        if (selectedCarId != -1) {
-            PdfGenerator.generateCarReport(selectedCarId, username);
-            showAlert("PDF elkészült", "A PDF jelentés sikeresen létrehozva!");
-        } else showAlert("Hiba", "Nincs kiválasztott autó!");
+        showPdfSelectionDialog();
     }
+
+    /**
+     * Felugró ablak: autóválasztás PDF generáláshoz
+     */
+    private void showPdfSelectionDialog() {
+        Dialog<List<Integer>> dialog = new Dialog<>();
+        dialog.setTitle("PDF generálás");
+        dialog.setHeaderText("Válaszd ki, melyik autó(k)ról szeretnél PDF-et generálni:");
+
+        ButtonType generateButtonType = new ButtonType("Generálás", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(generateButtonType, ButtonType.CANCEL);
+
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(10));
+        List<CheckBox> checkBoxes = new ArrayList<>();
+
+        // 🔹 Autók betöltése az adatbázisból
+        String sql = "SELECT id, brand, type, license FROM cars WHERE owner_id = (SELECT id FROM users WHERE username = ?)";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            boolean vanAuto = false;
+            while (rs.next()) {
+                vanAuto = true;
+                int carId = rs.getInt("id");
+                String brand = rs.getString("brand");
+                String type = rs.getString("type");
+                String license = rs.getString("license");
+
+                CheckBox cb = new CheckBox(brand + " " + type + " (" + license + ")");
+                cb.setUserData(carId);
+                cb.setStyle("-fx-font-size: 14px;");
+                container.getChildren().add(cb);
+                checkBoxes.add(cb);
+            }
+
+            if (!vanAuto) {
+                Label empty = new Label("Nincs még autód az adatbázisban.");
+                empty.setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+                container.getChildren().add(empty);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Hiba", "Nem sikerült betölteni az autókat a PDF generáláshoz!");
+            return;
+        }
+
+        ScrollPane scrollPane = new ScrollPane(container);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefHeight(300);
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+        dialog.getDialogPane().setContent(scrollPane);
+
+        // Stílus
+        dialog.getDialogPane().setStyle("""
+        -fx-background-color: white;
+        -fx-border-color: #ccc;
+        -fx-border-radius: 10;
+        -fx-background-radius: 10;
+    """);
+
+        Button generateButton = (Button) dialog.getDialogPane().lookupButton(generateButtonType);
+        generateButton.setStyle("""
+        -fx-background-color: #FF5722;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-background-radius: 8;
+    """);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == generateButtonType) {
+                List<Integer> selected = new ArrayList<>();
+                for (CheckBox cb : checkBoxes)
+                    if (cb.isSelected()) selected.add((Integer) cb.getUserData());
+                return selected;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(selectedIds -> {
+            if (selectedIds == null || selectedIds.isEmpty()) {
+                showAlert("Figyelem", "Nem választottál ki egy autót sem!");
+                return;
+            }
+
+            for (int id : selectedIds) {
+                try {
+                    PdfGenerator.generateCarReport(id, username);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült PDF-et készíteni az egyik autóra!");
+                    return;
+                }
+            }
+            showAlert("Siker", "A PDF(ek) sikeresen létrehozva!");
+        });
+    }
+
 
     // ----------------------------- SEGÉD METÓDUSOK -----------------------------
 
