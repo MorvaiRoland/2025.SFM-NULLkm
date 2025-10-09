@@ -23,7 +23,7 @@
             <!-- Autó kártyák -->
             <ScrollPane fx:id="carsScrollPane" fitToHeight="false" fitToWidth="true"
                         hbarPolicy="NEVER" vbarPolicy="NEVER"
-                        style="-fx-background-color: transparent; -fx-background: transparent;"
+                        style="-fx-background-color: transparent;"
                         maxHeight="250">
                 <content>
                     <FlowPane fx:id="carsList" hgap="24" vgap="24" alignment="CENTER"
@@ -34,7 +34,6 @@
                     </FlowPane>
                 </content>
             </ScrollPane>
-
 
             <!-- Navigáció gombok -->
             <HBox spacing="15" alignment="CENTER">
@@ -61,46 +60,46 @@
 
                         <GridPane hgap="15" vgap="12">
                             <columnConstraints>
-                                <ColumnConstraints halignment="RIGHT"/>
-                                <ColumnConstraints hgrow="ALWAYS"/>
+                                <ColumnConstraints halignment="RIGHT" maxWidth="150"/>
+                                <ColumnConstraints hgrow="ALWAYS" maxWidth="400"/>
                             </columnConstraints>
 
-                            <Label text="Rendszám:*" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <TextField fx:id="licenseField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                            <!-- Autó mezők -->
+                            <Label text="Rendszám:*" GridPane.rowIndex="0" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="licenseField" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="400"/>
 
-                            <Label text="Márka:*" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <ComboBox fx:id="brandCombo" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                            <Label text="Márka:*" GridPane.rowIndex="1" GridPane.columnIndex="0" wrapText="true"/>
+                            <ComboBox fx:id="brandCombo" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="400"/>
 
-                            <Label text="Típus:*" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                            <ComboBox fx:id="typeCombo" editable="true" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                            <Label text="Típus:*" GridPane.rowIndex="2" GridPane.columnIndex="0" wrapText="true"/>
+                            <ComboBox fx:id="typeCombo" editable="true" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="400"/>
 
-                            <Label text="Évjárat:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                            <ChoiceBox fx:id="vintageField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                            <Label text="Évjárat:" GridPane.rowIndex="3" GridPane.columnIndex="0" wrapText="true"/>
+                            <ChoiceBox fx:id="vintageField" GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Motor típusa:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                            <TextField fx:id="engineTypeField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            <Label text="Motor típusa:" GridPane.rowIndex="4" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="engineTypeField" GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="200"/>
 
-                            <Label text="Üzemanyag:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                            <ChoiceBox fx:id="fuelTypeField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                            <Label text="Üzemanyag:" GridPane.rowIndex="5" GridPane.columnIndex="0" wrapText="true"/>
+                            <ChoiceBox fx:id="fuelTypeField" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Futásteljesítmény:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                            <TextField fx:id="kmField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                            <Label text="Futásteljesítmény:" GridPane.rowIndex="6" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="kmField" GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Olaj mennyiség (ml):" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-                            <TextField fx:id="oilField" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                            <Label text="Olaj mennyiség (ml):" GridPane.rowIndex="7" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="oilField" GridPane.rowIndex="7" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Gumi méret:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-                            <TextField fx:id="tireSizeField" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                            <Label text="Gumi méret:" GridPane.rowIndex="8" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="tireSizeField" GridPane.rowIndex="8" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Szín:" GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-                            <ColorPicker fx:id="colorPicker" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                            <Label text="Szín:" GridPane.rowIndex="9" GridPane.columnIndex="0" wrapText="true"/>
+                            <ColorPicker fx:id="colorPicker" GridPane.rowIndex="9" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Megjegyzés:" GridPane.rowIndex="10" GridPane.columnIndex="0"/>
-                            <TextArea fx:id="notesField" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                            <Label text="Megjegyzés:" GridPane.rowIndex="10" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextArea fx:id="notesField" GridPane.rowIndex="10" GridPane.columnIndex="1" maxWidth="400" prefRowCount="3"/>
 
-                            <!-- Biztosítás dátuma -->
-                            <Label text="Biztosítás dátuma:" GridPane.rowIndex="11" GridPane.columnIndex="0"/>
-                            <DatePicker fx:id="insuranceDatePicker" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+                            <Label text="Biztosítás dátuma:" GridPane.rowIndex="11" GridPane.columnIndex="0" wrapText="true"/>
+                            <DatePicker fx:id="insuranceDatePicker" GridPane.rowIndex="11" GridPane.columnIndex="1" maxWidth="200"/>
                         </GridPane>
 
                         <Button text="Mentés" onAction="#handleAddOrEditCar"
@@ -115,40 +114,44 @@
                         style="-fx-font-weight: bold; -fx-font-size: 16px;" maxWidth="850">
                 <content>
                     <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
-                                               -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                                   -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
                         <padding>
                             <Insets top="20" right="20" bottom="20" left="20"/>
                         </padding>
 
+                        <!-- Kijelölt autó label -->
+                        <Label fx:id="selectedCarLabel" text="Válassz egy autót a listából!"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+
                         <GridPane hgap="15" vgap="12">
                             <columnConstraints>
-                                <ColumnConstraints halignment="RIGHT"/>
-                                <ColumnConstraints hgrow="ALWAYS"/>
+                                <ColumnConstraints halignment="RIGHT" maxWidth="150"/>
+                                <ColumnConstraints hgrow="ALWAYS" maxWidth="300"/>
                             </columnConstraints>
 
-                            <Label text="Szerviz típus:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                            <ComboBox fx:id="serviceTypeCombo" editable="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                            <Label text="Szerviz típus:" GridPane.rowIndex="0" GridPane.columnIndex="0" wrapText="true"/>
+                            <ComboBox fx:id="serviceTypeCombo" editable="true" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="300"/>
 
-                            <Label text="KM:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                            <TextField fx:id="serviceKmField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                            <Label text="KM:" GridPane.rowIndex="1" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="serviceKmField" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Ár (Ft):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                            <TextField fx:id="servicePriceField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                            <Label text="Ár (Ft):" GridPane.rowIndex="2" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="servicePriceField" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="150"/>
 
-                            <Label text="Cserélt alkatrészek:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                            <TextField fx:id="replacedPartsField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                            <Label text="Cserélt alkatrészek:" GridPane.rowIndex="3" GridPane.columnIndex="0" wrapText="true"/>
+                            <TextField fx:id="replacedPartsField" GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="300"/>
 
-                            <!-- Szerviz dátuma -->
-                            <Label text="Szerviz dátuma:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                            <DatePicker fx:id="serviceDatePickerCar" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            <Label text="Szerviz dátuma:" GridPane.rowIndex="4" GridPane.columnIndex="0" wrapText="true"/>
+                            <DatePicker fx:id="serviceDatePicker" GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="200"/>
                         </GridPane>
 
                         <Button text="Szerviz mentése" onAction="#saveService"
                                 style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;
-                                       -fx-font-size: 14px; -fx-background-radius: 8;"/>
+                           -fx-font-size: 14px; -fx-background-radius: 8;"/>
                     </VBox>
                 </content>
             </TitledPane>
+
 
             <!-- Autó részletei -->
             <TitledPane fx:id="carDetailsPane" text="🚘 Autó részletei" expanded="false"

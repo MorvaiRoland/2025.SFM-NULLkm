@@ -45,6 +45,9 @@ public class SajatAutokController {
     @FXML private Button scrollLeftBtn, scrollRightBtn, generatePdfBtn;
     @FXML private ColorPicker colorPicker;
     @FXML private TextArea notesField;
+    @FXML
+    private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
+
 
 
 
@@ -190,6 +193,8 @@ public class SajatAutokController {
 
     // ----------------------------- AUTÓK -----------------------------
 
+    private VBox currentlySelectedCard = null; // a kijelölt kártya referenciája
+
     private void loadUserCars() {
         if (carsList == null) return;
         carsList.getChildren().clear();
@@ -206,6 +211,7 @@ public class SajatAutokController {
                 carsList.getChildren().add(carBox);
             }
 
+            // Ha van legalább egy autó, jelöljük ki az elsőt
             if (!carsList.getChildren().isEmpty()) {
                 VBox firstCar = (VBox) carsList.getChildren().get(0);
                 firstCar.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED,
@@ -220,82 +226,74 @@ public class SajatAutokController {
     }
 
     private VBox createCarCard(ResultSet rs, int carId) throws SQLException {
-        // ---- Adatok lekérése ----
         String brand = rs.getString("brand");
         String type = rs.getString("type");
         String license = rs.getString("license");
         int vintage = rs.getInt("vintage");
         int km = rs.getInt("km");
 
-        // ---- Kártya alap ----
         VBox box = new VBox(12);
         box.setPrefWidth(230);
         box.setMinHeight(150);
         box.setAlignment(javafx.geometry.Pos.TOP_CENTER);
-        box.setStyle("""
-        -fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);
-        -fx-background-radius: 18;
-        -fx-padding: 16;
-        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4);
-        -fx-cursor: hand;
-        -fx-transition: all 0.3s ease-in-out;
-    """);
+        box.setStyle(getDefaultCardStyle());
 
-        // ---- Fejléc: Márka és típus ----
         Label brandTypeLabel = new Label(brand + " " + type);
-        brandTypeLabel.setStyle("""
-        -fx-font-size: 17px;
-        -fx-font-weight: bold;
-        -fx-text-fill: #1a237e;
-    """);
+        brandTypeLabel.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #1a237e;");
 
-        // ---- Rendszám badge ----
         Label licenseLabel = new Label(license);
-        licenseLabel.setStyle("""
-        -fx-font-size: 14px;
-        -fx-font-weight: bold;
-        -fx-text-fill: white;
-        -fx-background-color: #2196F3;
-        -fx-background-radius: 6;
-        -fx-padding: 4 8 4 8;
-    """);
+        licenseLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white; " +
+                "-fx-background-color: #2196F3; -fx-background-radius: 6; -fx-padding: 4 8 4 8;");
 
-        // ---- Részletek ----
         Label detailsLabel = new Label("Évjárat: " + vintage + "\nKM: " + km);
-        detailsLabel.setStyle("""
-        -fx-font-size: 14px;
-        -fx-text-fill: #444;
-        -fx-opacity: 0.9;
-    """);
+        detailsLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #444; -fx-opacity: 0.9;");
         detailsLabel.setWrapText(true);
         detailsLabel.setMaxWidth(180);
 
-        // ---- Layout összeállítás ----
         box.getChildren().addAll(brandTypeLabel, licenseLabel, detailsLabel);
 
-        // ---- Hover animáció ----
-        box.setOnMouseEntered(e -> box.setStyle("""
-        -fx-background-color: linear-gradient(to bottom right, #e3f2fd, #ffffff);
-        -fx-background-radius: 18;
-        -fx-padding: 16;
-        -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.4), 15, 0.3, 0, 5);
-        -fx-cursor: hand;
-    """));
+        // Hover effekt
+        box.setOnMouseEntered(e -> {
+            if (box != currentlySelectedCard) box.setStyle(getHoverCardStyle());
+        });
+        box.setOnMouseExited(e -> {
+            if (box != currentlySelectedCard) box.setStyle(getDefaultCardStyle());
+        });
 
-        box.setOnMouseExited(e -> box.setStyle("""
-        -fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);
-        -fx-background-radius: 18;
-        -fx-padding: 16;
-        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4);
-        -fx-cursor: hand;
-    """));
-
-        // ---- Kattintás esemény ----
+        // Kattintás: kiválasztás
         box.setOnMouseClicked(e -> {
-            if (carDetailsPane != null) showCarDetails(carId);
+            // előző kijelölés visszaállítása
+            if (currentlySelectedCard != null) currentlySelectedCard.setStyle(getDefaultCardStyle());
+            currentlySelectedCard = box;
+            box.setStyle(getSelectedCardStyle());
+
+            selectedCarId = carId;
+            if (selectedCarLabel != null)
+                selectedCarLabel.setText(brand + " " + type + " (" + license + ")");
+
+            if (carDetailsPane != null) carDetailsPane.setExpanded(true);
+            showCarDetails(carId);
         });
 
         return box;
+    }
+
+    private String getDefaultCardStyle() {
+        return "-fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);" +
+                "-fx-background-radius: 18; -fx-padding: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4); -fx-cursor: hand;";
+    }
+
+    private String getHoverCardStyle() {
+        return "-fx-background-color: linear-gradient(to bottom right, #e3f2fd, #ffffff);" +
+                "-fx-background-radius: 18; -fx-padding: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(33,150,243,0.4), 15, 0.3, 0, 5); -fx-cursor: hand;";
+    }
+
+    private String getSelectedCardStyle() {
+        return "-fx-background-color: linear-gradient(to bottom right, #bbdefb, #90caf9);" +
+                "-fx-background-radius: 18; -fx-padding: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(33,150,243,0.6), 18, 0.3, 0, 6); -fx-cursor: hand;";
     }
 
 
@@ -391,6 +389,12 @@ public class SajatAutokController {
             return;
         }
 
+        if (serviceTypeCombo.getValue() == null || serviceKmField.getText().isEmpty() || servicePriceField.getText().isEmpty()
+                || serviceDatePicker.getValue() == null) {
+            showAlert("Hiba", "Kérlek töltsd ki a kötelező mezőket!");
+            return;
+        }
+
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO services (car_id, service_type_id, km, price, service_date, replaced_parts) " +
@@ -407,11 +411,19 @@ public class SajatAutokController {
             showAlert("Sikeres", "A szerviz rögzítve!");
             loadServices(selectedCarId);
 
+            // mezők törlése
+            serviceTypeCombo.getSelectionModel().clearSelection();
+            serviceKmField.clear();
+            servicePriceField.clear();
+            replacedPartsField.clear();
+            serviceDatePicker.setValue(null);
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Hiba", "Nem sikerült menteni a szervizt!");
         }
     }
+
 
     // ----------------------------- GÖRGETÉS / SEGÉD -----------------------------
 
@@ -649,6 +661,7 @@ public class SajatAutokController {
             showAlert("Siker", "A PDF(ek) sikeresen létrehozva!");
         });
     }
+
 
 
     // ----------------------------- SEGÉD METÓDUSOK -----------------------------
