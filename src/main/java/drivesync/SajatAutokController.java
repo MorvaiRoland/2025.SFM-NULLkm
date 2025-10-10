@@ -324,37 +324,40 @@ public class SajatAutokController {
     // ----------------------------- SZERVIZEK -----------------------------
 
     private void loadServices(int carId) {
-        if (serviceListView == null) return;
         serviceListView.getItems().clear();
-        if (carId <= 0) return;
-
-        String sql = """
-                SELECT s.service_date, t.name AS service_type, s.km, s.price, s.replaced_parts
-                FROM services s
-                LEFT JOIN service_types t ON s.service_type_id = t.id
-                WHERE s.car_id = ?
-                ORDER BY s.service_date DESC
-                """;
-
         try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT s.id, s.service_date, t.name AS service_type, s.km, s.price, s.replaced_parts " +
+                             "FROM services s " +
+                             "LEFT JOIN service_types t ON s.service_type_id = t.id " +
+                             "WHERE s.car_id = ? " +
+                             "ORDER BY s.service_date DESC")) {
+
             stmt.setInt(1, carId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
-                String date = rs.getDate("service_date") != null ? rs.getDate("service_date").toString() : "N/A";
-                String type = rs.getString("service_type") != null ? rs.getString("service_type") : "Ismeretlen";
+                int serviceId = rs.getInt("id");
+                String date = rs.getString("service_date");
+                String type = rs.getString("service_type");
                 int km = rs.getInt("km");
                 int price = rs.getInt("price");
-                String replacedParts = rs.getString("replaced_parts") != null ? rs.getString("replaced_parts") : "";
-                String row = date + " - " + type + " (" + km + " km, " + price + " Ft)";
-                if (!replacedParts.isEmpty()) row += " | Cserélt alkatrészek: " + replacedParts;
+                String replacedParts = rs.getString("replaced_parts");
+
+                String row = "[" + serviceId + "] " + date + " - " + type + " (" + km + " km, " + price + " Ft)";
+                if (replacedParts != null && !replacedParts.isEmpty()) {
+                    row += " | Cserélt alkatrészek: " + replacedParts;
+                }
+
                 serviceListView.getItems().add(row);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Hiba", "Nem sikerült betölteni a szervizeket.");
+            showAlert("Hiba", "Nem sikerült betölteni a szerviz adatokat!");
         }
     }
+
 
     private void loadServiceTypes() {
         if (serviceTypeCombo == null) return;
@@ -381,6 +384,49 @@ public class SajatAutokController {
             filteredItems.setPredicate(item -> item.toLowerCase().contains(search));
         });
     }
+    @FXML
+    private void handleDeleteService() {
+        String selectedItem = serviceListView.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            showAlert("Hiba", "Nincs kiválasztott szerviz!");
+            return;
+        }
+
+        // Azonosító kinyerése: a sor elején lévő [id] rész
+        int serviceId;
+        try {
+            serviceId = Integer.parseInt(
+                    selectedItem.substring(selectedItem.indexOf('[') + 1, selectedItem.indexOf(']'))
+            );
+        } catch (Exception e) {
+            showAlert("Hiba", "Nem sikerült azonosítani a szervizt!");
+            return;
+        }
+
+        // Megerősítés
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Szerviz törlése");
+        confirm.setHeaderText("Biztosan törölni szeretnéd ezt a szervizt?");
+        confirm.setContentText("A törlés végleges és nem visszavonható!");
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM services WHERE id = ?")) {
+
+                    stmt.setInt(1, serviceId);
+                    stmt.executeUpdate();
+
+                    showAlert("Siker", "A szerviz törölve!");
+                    loadServices(selectedCarId); // frissíti a listát
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült törölni a szervizt!");
+                }
+            }
+        });
+    }
+
 
     @FXML
     private void saveService() {
@@ -659,6 +705,38 @@ public class SajatAutokController {
                 }
             }
             showAlert("Siker", "A PDF(ek) sikeresen létrehozva!");
+        });
+    }
+
+    @FXML
+    private void handleDeleteCar() {
+        if (selectedCarId == -1) {
+            showAlert("Hiba", "Nincs kiválasztott autó!");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Autó törlése");
+        confirm.setHeaderText("Biztosan törölni szeretnéd ezt az autót?");
+        confirm.setContentText("A törlés minden hozzá tartozó szervizt is eltávolít!");
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM cars WHERE id = ?")) {
+                    stmt.setInt(1, selectedCarId);
+                    stmt.executeUpdate();
+                    showAlert("Siker", "Az autó törölve!");
+                    selectedCarId = -1;
+                    currentlySelectedCard = null;
+                    loadUserCars();
+                    serviceListView.getItems().clear();
+                    carDetailsLabel.setText("Válassz egy autót a listából!");
+                    selectedCarLabel.setText("Válassz egy autót a listából!");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült törölni az autót!");
+                }
+            }
         });
     }
 

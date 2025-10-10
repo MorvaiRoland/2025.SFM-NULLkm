@@ -41,6 +41,10 @@
                         style="-fx-background-color: #e0e0e0; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 8;"/>
                 <Button fx:id="scrollRightBtn" text="⭢" onAction="#scrollRight"
                         style="-fx-background-color: #e0e0e0; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 8;"/>
+                <Button fx:id="deleteCarBtn" text="Autó törlése" onAction="#handleDeleteCar"
+                        style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;
+               -fx-font-size: 14px; -fx-background-radius: 8;"/>
+
                 <Button fx:id="generatePdfBtn" text="PDF generálása" onAction="#handleGeneratePdf"
                         style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 8;"/>
             </HBox>
@@ -171,6 +175,10 @@
 
                         <ListView fx:id="serviceListView" prefHeight="200"
                                   style="-fx-background-radius: 6;"/>
+                        <Button fx:id="deleteServiceBtn" text="Kiválasztott szerviz törlése" onAction="#handleDeleteService"
+                                style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-font-weight: bold;
+               -fx-font-size: 14px; -fx-background-radius: 8;"/>
+
                     </VBox>
                 </content>
             </TitledPane>
