@@ -1,107 +1,83 @@
 package drivesync;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
-import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class SettingsController {
 
-    @FXML private TextField nameField;
+    @FXML private TextField usernameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private Label regDateLabel;
 
-    @FXML private CheckBox darkModeCheck;
-    @FXML private CheckBox notificationsCheck;
-    @FXML private CheckBox autoSyncCheck;
+    private int currentUserId; // Aktuális felhasználó ID
+    private Connection conn;   // SQL kapcsolat
 
-    @FXML private TextField pdfPathField;
-
-    @FXML private Button saveBtn;
-    @FXML private Button resetBtn;
-
-    private Stage primaryStage;
-
-    // Például a beállításokat tárolhatjuk változókban
-    private String savedName = "példa";
-    private String savedEmail = "példa@example.com";
-    private String savedPassword = "";
-    private boolean savedDarkMode = false;
-    private boolean savedNotifications = true;
-    private boolean savedAutoSync = true;
-    private String savedPdfPath = System.getProperty("user.home");
-
-    @FXML
-    private void initialize() {
-        loadSettings();
+    // Beállítja az SQL kapcsolatot és az aktuális felhasználót
+    public void setConnection(Connection connection, int userId) {
+        this.conn = connection;
+        this.currentUserId = userId;
+        loadUserData();
     }
 
-    public void setPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
+    // Adatok betöltése a users táblából
+    private void loadUserData() {
+        if (conn == null) return;
+        String sql = "SELECT username, email, password, reg_date FROM users WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, currentUserId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                usernameField.setText(rs.getString("username"));
+                emailField.setText(rs.getString("email"));
+                passwordField.setText(rs.getString("password"));
+                regDateLabel.setText(rs.getString("reg_date"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült betölteni az adatokat.");
+        }
     }
 
-    private void loadSettings() {
-        nameField.setText(savedName);
-        emailField.setText(savedEmail);
-        passwordField.setText(savedPassword);
-        regDateLabel.setText("2025-01-01"); // példa
-
-        darkModeCheck.setSelected(savedDarkMode);
-        notificationsCheck.setSelected(savedNotifications);
-        autoSyncCheck.setSelected(savedAutoSync);
-        pdfPathField.setText(savedPdfPath);
-    }
-
+    // Mentés gomb kezelése
     @FXML
     private void handleSave() {
-        savedName = nameField.getText();
-        savedEmail = emailField.getText();
-        savedPassword = passwordField.getText();
-        savedDarkMode = darkModeCheck.isSelected();
-        savedNotifications = notificationsCheck.isSelected();
-        savedAutoSync = autoSyncCheck.isSelected();
-        savedPdfPath = pdfPathField.getText();
-
-        // Itt ténylegesen lehet menteni fájlba vagy adatbázisba
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mentés");
-        alert.setHeaderText(null);
-        alert.setContentText("Beállítások elmentve!");
-        alert.showAndWait();
+        if (conn == null) return;
+        String sql = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usernameField.getText());
+            stmt.setString(2, emailField.getText());
+            stmt.setString(3, passwordField.getText());
+            stmt.setInt(4, currentUserId);
+            stmt.executeUpdate();
+            showAlert(Alert.AlertType.INFORMATION, "Siker", "Adatok sikeresen mentve.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült menteni az adatokat.");
+        }
     }
 
+    // Visszaállítás gomb kezelése
     @FXML
     private void handleReset() {
-        // Alapértelmezett értékek visszaállítása
-        savedName = "";
-        savedEmail = "";
-        savedPassword = "";
-        savedDarkMode = false;
-        savedNotifications = false;
-        savedAutoSync = false;
-        savedPdfPath = System.getProperty("user.home");
-
-        loadSettings();
-
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Alapértelmezett");
-        alert.setHeaderText(null);
-        alert.setContentText("Beállítások visszaállítva az alapértelmezett értékekre!");
-        alert.showAndWait();
+        loadUserData();
+        showAlert(Alert.AlertType.INFORMATION, "Visszaállítás", "Az adatok visszaállítva.");
     }
 
-    @FXML
-    private void handleBrowsePdfPath() {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("PDF mentési útvonal kiválasztása");
-        chooser.setInitialDirectory(new File(pdfPathField.getText()));
-        File selectedDir = chooser.showDialog(primaryStage);
-
-        if (selectedDir != null) {
-            pdfPathField.setText(selectedDir.getAbsolutePath());
-        }
+    // Segédmetódus alert megjelenítéséhez
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

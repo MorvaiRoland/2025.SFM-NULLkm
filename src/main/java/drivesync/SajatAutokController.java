@@ -39,14 +39,12 @@ public class SajatAutokController {
     @FXML private ChoiceBox<Integer> vintageField;
     @FXML private DatePicker serviceDatePickerCar, insuranceDatePicker;
     @FXML private ComboBox<String> serviceTypeCombo;
-    @FXML private DatePicker serviceDatePicker;
     @FXML private TextField serviceKmField, servicePriceField, replacedPartsField;
     @FXML private ListView<String> serviceListView;
     @FXML private Button scrollLeftBtn, scrollRightBtn, generatePdfBtn;
     @FXML private ColorPicker colorPicker;
     @FXML private TextArea notesField;
-    @FXML
-    private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
+    @FXML private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
 
 
 
@@ -436,7 +434,7 @@ public class SajatAutokController {
         }
 
         if (serviceTypeCombo.getValue() == null || serviceKmField.getText().isEmpty() || servicePriceField.getText().isEmpty()
-                || serviceDatePicker.getValue() == null) {
+               ) {
             showAlert("Hiba", "Kérlek töltsd ki a kötelező mezőket!");
             return;
         }
@@ -450,7 +448,7 @@ public class SajatAutokController {
             stmt.setString(2, serviceTypeCombo.getValue());
             stmt.setInt(3, Integer.parseInt(serviceKmField.getText().trim()));
             stmt.setInt(4, Integer.parseInt(servicePriceField.getText().trim()));
-            stmt.setDate(5, Date.valueOf(serviceDatePicker.getValue()));
+
             stmt.setString(6, replacedPartsField.getText().trim());
             stmt.executeUpdate();
 
@@ -462,7 +460,7 @@ public class SajatAutokController {
             serviceKmField.clear();
             servicePriceField.clear();
             replacedPartsField.clear();
-            serviceDatePicker.setValue(null);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -495,8 +493,11 @@ public class SajatAutokController {
     }
 
     private void addCar() {
-        String sql = "INSERT INTO cars (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes) " +
-                "VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = """
+        INSERT INTO cars 
+        (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes)
+        VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -509,17 +510,23 @@ public class SajatAutokController {
                 return;
             }
 
-            // Szín HEX kód
+            // Szín HEX formátumban
             String color = "";
             if (colorPicker != null && colorPicker.getValue() != null) {
                 javafx.scene.paint.Color c = colorPicker.getValue();
                 color = String.format("#%02X%02X%02X",
-                        (int)(c.getRed() * 255),
-                        (int)(c.getGreen() * 255),
-                        (int)(c.getBlue() * 255));
+                        (int) (c.getRed() * 255),
+                        (int) (c.getGreen() * 255),
+                        (int) (c.getBlue() * 255));
             }
 
-            stmt.setString(1, username);
+            // Kötelező mezők ellenőrzése
+            if (licenseField.getText().trim().isEmpty()) {
+                showAlert("Hiba", "Rendszám megadása kötelező!");
+                return;
+            }
+
+            stmt.setString(1, username); // owner
             stmt.setString(2, licenseField.getText().trim());
             stmt.setString(3, selectedBrand);
             stmt.setString(4, selectedType);
@@ -529,21 +536,30 @@ public class SajatAutokController {
             stmt.setInt(8, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(9, oilField.getText().trim());
             stmt.setString(10, tireSizeField.getText().trim());
-            stmt.setDate(11, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
-            stmt.setDate(12, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
+
+            // 🔹 11. paraméter: service (nincs dátum picker, így NULL)
+            stmt.setNull(11, Types.DATE);
+
+            // 🔹 12. paraméter: insurance (dátum, ha van)
+            if (insuranceDatePicker != null && insuranceDatePicker.getValue() != null)
+                stmt.setDate(12, java.sql.Date.valueOf(insuranceDatePicker.getValue()));
+            else
+                stmt.setNull(12, Types.DATE);
+
             stmt.setString(13, color);
-            stmt.setString(14, notesField.getText().trim());
+            stmt.setString(14, notesField != null ? notesField.getText().trim() : "");
 
             stmt.executeUpdate();
-            showAlert("Sikeres", "Autó hozzáadva!");
+            showAlert("Sikeres", "Az autó hozzáadva!");
             loadUserCars();
             clearFields();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Hiba", "Nem sikerült az autó hozzáadása!");
+            showAlert("Hiba", "Nem sikerült az autó hozzáadása!\n" + e.getMessage());
         }
     }
+
 
 
     private void editCar(int carId) {
@@ -578,7 +594,6 @@ public class SajatAutokController {
             stmt.setInt(7, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(8, oilField.getText().trim());
             stmt.setString(9, tireSizeField.getText().trim());
-            stmt.setDate(10, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
             stmt.setDate(11, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
             stmt.setString(12, color);
             stmt.setString(13, notesField.getText().trim());
@@ -765,4 +780,6 @@ public class SajatAutokController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
 }
