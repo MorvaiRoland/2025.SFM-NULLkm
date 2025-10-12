@@ -33,7 +33,7 @@
         <Hyperlink fx:id="linkHAHU" layoutX="50.0" layoutY="100.0"
                    text="🚗  Használt Autó"
                    styleClass="modern-link" />
-        <Hyperlink fx:id="linkAUTODOC" layoutX="50.0" layoutY="155.0"
+        <Hyperlink fx:id="linkFEKMESTER" layoutX="50.0" layoutY="155.0"
                    text="🔧  Alkatrész Áruház"
                    styleClass="modern-link" />
         <Hyperlink fx:id="linkHOLTANKOLJAK" layoutX="50.0" layoutY="210.0"

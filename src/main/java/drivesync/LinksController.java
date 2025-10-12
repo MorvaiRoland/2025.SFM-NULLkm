@@ -12,7 +12,7 @@ public class LinksController {
     @FXML
     private Hyperlink linkHAHU;
     @FXML
-    private Hyperlink linkAUTODOC;
+    private Hyperlink linkFEKMESTER;
     @FXML
     private Hyperlink linkHOLTANKOLJAK;
     @FXML
@@ -22,7 +22,7 @@ public class LinksController {
 
     // Linkekhez tartozó URL-ek
     private static final String URL_HAHU = "https://www.hasznaltauto.hu/";
-    private static final String URL_AUTODOC = "https://www.autodoc.hu/jarmu-alkatreszek/fogasszij-keszlet-10553";
+    private static final String URL_FEKMESTER = "https://www.fekmester.hu/";
     private static final String URL_HOLTANKOLJAK = "https://holtankoljak.hu/#!";
     private static final String URL_WAZE = "https://www.waze.com/hu/live-map/";
     private static final String URL_GARVISOR = "https://garvisor.com/";
@@ -30,7 +30,7 @@ public class LinksController {
     @FXML
     private void initialize() {
         linkHAHU.setOnAction(e -> openLink(URL_HAHU));
-        linkAUTODOC.setOnAction(e -> openLink(URL_AUTODOC));
+        linkFEKMESTER.setOnAction(e -> openLink(URL_FEKMESTER));
         linkHOLTANKOLJAK.setOnAction(e -> openLink(URL_HOLTANKOLJAK));
         linkWAZE.setOnAction(e -> openLink(URL_WAZE));
         linkGARVISOR.setOnAction(e -> openLink(URL_GARVISOR));
