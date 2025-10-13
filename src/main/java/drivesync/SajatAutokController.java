@@ -39,14 +39,12 @@ public class SajatAutokController {
     @FXML private ChoiceBox<Integer> vintageField;
     @FXML private DatePicker serviceDatePickerCar, insuranceDatePicker;
     @FXML private ComboBox<String> serviceTypeCombo;
-    @FXML private DatePicker serviceDatePicker;
     @FXML private TextField serviceKmField, servicePriceField, replacedPartsField;
     @FXML private ListView<String> serviceListView;
     @FXML private Button scrollLeftBtn, scrollRightBtn, generatePdfBtn;
     @FXML private ColorPicker colorPicker;
     @FXML private TextArea notesField;
-    @FXML
-    private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
+    @FXML private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
 
 
 
@@ -324,37 +322,40 @@ public class SajatAutokController {
     // ----------------------------- SZERVIZEK -----------------------------
 
     private void loadServices(int carId) {
-        if (serviceListView == null) return;
         serviceListView.getItems().clear();
-        if (carId <= 0) return;
-
-        String sql = """
-                SELECT s.service_date, t.name AS service_type, s.km, s.price, s.replaced_parts
-                FROM services s
-                LEFT JOIN service_types t ON s.service_type_id = t.id
-                WHERE s.car_id = ?
-                ORDER BY s.service_date DESC
-                """;
-
         try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT s.id, s.service_date, t.name AS service_type, s.km, s.price, s.replaced_parts " +
+                             "FROM services s " +
+                             "LEFT JOIN service_types t ON s.service_type_id = t.id " +
+                             "WHERE s.car_id = ? " +
+                             "ORDER BY s.service_date DESC")) {
+
             stmt.setInt(1, carId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
-                String date = rs.getDate("service_date") != null ? rs.getDate("service_date").toString() : "N/A";
-                String type = rs.getString("service_type") != null ? rs.getString("service_type") : "Ismeretlen";
+                int serviceId = rs.getInt("id");
+                String date = rs.getString("service_date");
+                String type = rs.getString("service_type");
                 int km = rs.getInt("km");
                 int price = rs.getInt("price");
-                String replacedParts = rs.getString("replaced_parts") != null ? rs.getString("replaced_parts") : "";
-                String row = date + " - " + type + " (" + km + " km, " + price + " Ft)";
-                if (!replacedParts.isEmpty()) row += " | Cserélt alkatrészek: " + replacedParts;
+                String replacedParts = rs.getString("replaced_parts");
+
+                String row = "[" + serviceId + "] " + date + " - " + type + " (" + km + " km, " + price + " Ft)";
+                if (replacedParts != null && !replacedParts.isEmpty()) {
+                    row += " | Cserélt alkatrészek: " + replacedParts;
+                }
+
                 serviceListView.getItems().add(row);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Hiba", "Nem sikerült betölteni a szervizeket.");
+            showAlert("Hiba", "Nem sikerült betölteni a szerviz adatokat!");
         }
     }
+
 
     private void loadServiceTypes() {
         if (serviceTypeCombo == null) return;
@@ -381,6 +382,49 @@ public class SajatAutokController {
             filteredItems.setPredicate(item -> item.toLowerCase().contains(search));
         });
     }
+    @FXML
+    private void handleDeleteService() {
+        String selectedItem = serviceListView.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            showAlert("Hiba", "Nincs kiválasztott szerviz!");
+            return;
+        }
+
+        // Azonosító kinyerése: a sor elején lévő [id] rész
+        int serviceId;
+        try {
+            serviceId = Integer.parseInt(
+                    selectedItem.substring(selectedItem.indexOf('[') + 1, selectedItem.indexOf(']'))
+            );
+        } catch (Exception e) {
+            showAlert("Hiba", "Nem sikerült azonosítani a szervizt!");
+            return;
+        }
+
+        // Megerősítés
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Szerviz törlése");
+        confirm.setHeaderText("Biztosan törölni szeretnéd ezt a szervizt?");
+        confirm.setContentText("A törlés végleges és nem visszavonható!");
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM services WHERE id = ?")) {
+
+                    stmt.setInt(1, serviceId);
+                    stmt.executeUpdate();
+
+                    showAlert("Siker", "A szerviz törölve!");
+                    loadServices(selectedCarId); // frissíti a listát
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült törölni a szervizt!");
+                }
+            }
+        });
+    }
+
 
     @FXML
     private void saveService() {
@@ -390,7 +434,7 @@ public class SajatAutokController {
         }
 
         if (serviceTypeCombo.getValue() == null || serviceKmField.getText().isEmpty() || servicePriceField.getText().isEmpty()
-                || serviceDatePicker.getValue() == null) {
+               ) {
             showAlert("Hiba", "Kérlek töltsd ki a kötelező mezőket!");
             return;
         }
@@ -404,7 +448,7 @@ public class SajatAutokController {
             stmt.setString(2, serviceTypeCombo.getValue());
             stmt.setInt(3, Integer.parseInt(serviceKmField.getText().trim()));
             stmt.setInt(4, Integer.parseInt(servicePriceField.getText().trim()));
-            stmt.setDate(5, Date.valueOf(serviceDatePicker.getValue()));
+
             stmt.setString(6, replacedPartsField.getText().trim());
             stmt.executeUpdate();
 
@@ -416,7 +460,7 @@ public class SajatAutokController {
             serviceKmField.clear();
             servicePriceField.clear();
             replacedPartsField.clear();
-            serviceDatePicker.setValue(null);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -449,8 +493,11 @@ public class SajatAutokController {
     }
 
     private void addCar() {
-        String sql = "INSERT INTO cars (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes) " +
-                "VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = """
+        INSERT INTO cars 
+        (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes)
+        VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -463,17 +510,23 @@ public class SajatAutokController {
                 return;
             }
 
-            // Szín HEX kód
+            // Szín HEX formátumban
             String color = "";
             if (colorPicker != null && colorPicker.getValue() != null) {
                 javafx.scene.paint.Color c = colorPicker.getValue();
                 color = String.format("#%02X%02X%02X",
-                        (int)(c.getRed() * 255),
-                        (int)(c.getGreen() * 255),
-                        (int)(c.getBlue() * 255));
+                        (int) (c.getRed() * 255),
+                        (int) (c.getGreen() * 255),
+                        (int) (c.getBlue() * 255));
             }
 
-            stmt.setString(1, username);
+            // Kötelező mezők ellenőrzése
+            if (licenseField.getText().trim().isEmpty()) {
+                showAlert("Hiba", "Rendszám megadása kötelező!");
+                return;
+            }
+
+            stmt.setString(1, username); // owner
             stmt.setString(2, licenseField.getText().trim());
             stmt.setString(3, selectedBrand);
             stmt.setString(4, selectedType);
@@ -483,21 +536,30 @@ public class SajatAutokController {
             stmt.setInt(8, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(9, oilField.getText().trim());
             stmt.setString(10, tireSizeField.getText().trim());
-            stmt.setDate(11, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
-            stmt.setDate(12, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
+
+            // 🔹 11. paraméter: service (nincs dátum picker, így NULL)
+            stmt.setNull(11, Types.DATE);
+
+            // 🔹 12. paraméter: insurance (dátum, ha van)
+            if (insuranceDatePicker != null && insuranceDatePicker.getValue() != null)
+                stmt.setDate(12, java.sql.Date.valueOf(insuranceDatePicker.getValue()));
+            else
+                stmt.setNull(12, Types.DATE);
+
             stmt.setString(13, color);
-            stmt.setString(14, notesField.getText().trim());
+            stmt.setString(14, notesField != null ? notesField.getText().trim() : "");
 
             stmt.executeUpdate();
-            showAlert("Sikeres", "Autó hozzáadva!");
+            showAlert("Sikeres", "Az autó hozzáadva!");
             loadUserCars();
             clearFields();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Hiba", "Nem sikerült az autó hozzáadása!");
+            showAlert("Hiba", "Nem sikerült az autó hozzáadása!\n" + e.getMessage());
         }
     }
+
 
 
     private void editCar(int carId) {
@@ -532,7 +594,6 @@ public class SajatAutokController {
             stmt.setInt(7, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(8, oilField.getText().trim());
             stmt.setString(9, tireSizeField.getText().trim());
-            stmt.setDate(10, serviceDatePickerCar.getValue() != null ? java.sql.Date.valueOf(serviceDatePickerCar.getValue()) : null);
             stmt.setDate(11, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
             stmt.setString(12, color);
             stmt.setString(13, notesField.getText().trim());
@@ -662,6 +723,38 @@ public class SajatAutokController {
         });
     }
 
+    @FXML
+    private void handleDeleteCar() {
+        if (selectedCarId == -1) {
+            showAlert("Hiba", "Nincs kiválasztott autó!");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Autó törlése");
+        confirm.setHeaderText("Biztosan törölni szeretnéd ezt az autót?");
+        confirm.setContentText("A törlés minden hozzá tartozó szervizt is eltávolít!");
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM cars WHERE id = ?")) {
+                    stmt.setInt(1, selectedCarId);
+                    stmt.executeUpdate();
+                    showAlert("Siker", "Az autó törölve!");
+                    selectedCarId = -1;
+                    currentlySelectedCard = null;
+                    loadUserCars();
+                    serviceListView.getItems().clear();
+                    carDetailsLabel.setText("Válassz egy autót a listából!");
+                    selectedCarLabel.setText("Válassz egy autót a listából!");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült törölni az autót!");
+                }
+            }
+        });
+    }
+
 
 
     // ----------------------------- SEGÉD METÓDUSOK -----------------------------
@@ -687,4 +780,6 @@ public class SajatAutokController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
 }

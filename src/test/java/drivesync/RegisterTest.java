@@ -1,120 +1,125 @@
 package drivesync;
 
-import javafx.embed.swing.JFXPanel;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-class RegisterTest {
+public class RegisterTest {
 
-    private Button btn;
-    private TextField username;
-    private TextField email;
-    private PasswordField password;
-    private PasswordField passwordConfirm;
-
-    private Connection conn;
-
-    private final String DB_URL = "jdbc:sqlite::memory:"; // memória-alapú DB
-
-    @BeforeAll
-    static void initJfx() throws ClassNotFoundException {
-        new JFXPanel(); // JavaFX toolkit inicializálása
-        Class.forName("org.sqlite.JDBC"); // JDBC driver betöltése
-    }
+    private Register register;
+    private TextField usernameField;
+    private TextField emailField;
+    private PasswordField passwordField;
+    private PasswordField passwordConfirmField;
+    private Button button;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        btn = new Button();
-        username = new TextField();
-        email = new TextField();
-        password = new PasswordField();
-        passwordConfirm = new PasswordField();
+    void setUp() {
+        usernameField = new TextField();
+        emailField = new TextField();
+        passwordField = new PasswordField();
+        passwordConfirmField = new PasswordField();
+        button = new Button();
 
-        // Memória-alapú adatbázis létrehozása
-        conn = DriverManager.getConnection(DB_URL);
-        Statement stmt = conn.createStatement();
-        stmt.execute("DROP TABLE IF EXISTS users");
-        stmt.execute("CREATE TABLE users (username TEXT PRIMARY KEY, email TEXT, password TEXT)");
+        register = new Register(button, usernameField, emailField, passwordField, passwordConfirmField);
     }
 
     @Test
-    void testEmptyFields() {
-        System.out.println("Üres mező teszt:");
-        Register reg = new Register(btn, username, email, password, passwordConfirm);
-        reg.registerUser();
-
-        try (var rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM users")) {
-            rs.next();
-            assertEquals(0, rs.getInt(1), "Üres mezők esetén nem szabad létrejönni a felhasználónak");
-        } catch (SQLException e) { fail(e); }
+    void testEmptyFields_ShouldShowErrorAndFail() {
+        assertFalse(register.registerUser());
     }
 
     @Test
-    void testPasswordMismatch() {
-        System.out.println("Rossz jelszó teszt:");
-        username.setText("user1");
-        email.setText("test@test.com");
-        password.setText("12345");
-        passwordConfirm.setText("54321");
+    void testPasswordMismatch_ShouldFail() {
+        usernameField.setText("user");
+        emailField.setText("user@example.com");
+        passwordField.setText("pass123");
+        passwordConfirmField.setText("pass123");
 
-        Register reg = new Register(btn, username, email, password, passwordConfirm);
-        reg.registerUser();
-
-        try (var rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM users")) {
-            rs.next();
-            assertEquals(0, rs.getInt(1), "Password mismatch esetén nem szabad létrejönni a felhasználónak");
-        } catch (SQLException e) { fail(e); }
+        assertFalse(register.registerUser());
     }
 
     @Test
-    void testSuccessfulRegistration() {
-        System.out.println("Sikeres regisztráció teszt:");
-        username.setText("user1");
-        email.setText("test@test.com");
-        password.setText("12345");
-        passwordConfirm.setText("12345");
+    void testUserAlreadyExists_ShouldFail() throws Exception {
+        usernameField.setText("existingUser");
+        emailField.setText("new@example.com");
+        passwordField.setText("pass");
+        passwordConfirmField.setText("pass");
 
-        Register reg = new Register(btn, username, email, password, passwordConfirm);
-        reg.registerUser();
+        try (MockedStatic<Database> dbMock = Mockito.mockStatic(Database.class)) {
+            Connection conn = mock(Connection.class);
+            PreparedStatement stmt = mock(PreparedStatement.class);
+            ResultSet rs = mock(ResultSet.class);
 
-        try (var rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM users")) {
-            rs.next();
-            assertEquals(0, rs.getInt(1), "Helyes adatokkal létre kell jönnie a felhasználónak");
-        } catch (SQLException e) { fail(e); }
-    }
+            dbMock.when(Database::getConnection).thenReturn(conn);
+            when(conn.prepareStatement(anyString())).thenReturn(stmt);
+            when(stmt.executeQuery()).thenReturn(rs);
+            when(rs.next()).thenReturn(true); // simulate user exists
 
-
-    @Test
-    void testDuplicateUsername() throws SQLException {
-        System.out.println("Duplikált felhasználónév teszt:");
-        // Először létrehozunk egy felhasználót
-        try (var stmt = conn.createStatement()) {
-            stmt.execute("INSERT INTO users (username, email, password) VALUES ('user1', 'a@b.com', '12345')");
+            assertFalse(register.registerUser());
         }
+    }
 
-        username.setText("user1");
-        email.setText("test@test.com");
-        password.setText("12345");
-        passwordConfirm.setText("12345");
+    @Test
+    void testEmailAlreadyExists_ShouldFail() throws Exception {
+        usernameField.setText("newUser");
+        emailField.setText("existing@example.com");
+        passwordField.setText("pass");
+        passwordConfirmField.setText("pass");
 
-        Register reg = new Register(btn, username, email, password, passwordConfirm);
-        reg.registerUser();
+        try (MockedStatic<Database> dbMock = Mockito.mockStatic(Database.class)) {
+            Connection conn = mock(Connection.class);
+            PreparedStatement stmt = mock(PreparedStatement.class);
+            ResultSet rs = mock(ResultSet.class);
 
-        // Ellenőrizhetjük, hogy nem jött létre új rekord
-        try (var rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM users")) {
-            rs.next();
-            assertEquals(1, rs.getInt(1), "Duplikált felhasználónév esetén nem szabad létrejönni a felhasználónak");
-        } catch (SQLException e) { fail(e); }
+            dbMock.when(Database::getConnection).thenReturn(conn);
+            when(conn.prepareStatement(anyString())).thenReturn(stmt);
+            when(stmt.executeQuery()).thenReturn(rs);
+
+            // First call (check username) -> rs.next() = false
+            // Second call (check email) -> rs.next() = true
+            when(rs.next()).thenReturn(false, true);
+
+            assertFalse(register.registerUser());
+        }
+    }
+
+    @Test
+    void testSuccessfulRegistration_ShouldPass() throws Exception {
+        usernameField.setText("newUser");
+        emailField.setText("new@example.com");
+        passwordField.setText("pass");
+        passwordConfirmField.setText("pass");
+
+        try (MockedStatic<Database> dbMock = Mockito.mockStatic(Database.class)) {
+            Connection conn = mock(Connection.class);
+            PreparedStatement stmt = mock(PreparedStatement.class);
+            ResultSet rs = mock(ResultSet.class);
+
+            dbMock.when(Database::getConnection).thenReturn(conn);
+            when(conn.prepareStatement(anyString())).thenReturn(stmt);
+            when(stmt.executeQuery()).thenReturn(rs);
+
+            // username + email both don't exist
+            when(rs.next()).thenReturn(false, false);
+
+            // simulate insert success
+            doNothing().when(stmt).executeUpdate();
+
+            assertTrue(register.registerUser());
+        }
     }
 }

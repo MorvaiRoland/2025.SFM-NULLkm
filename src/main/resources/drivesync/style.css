@@ -87,6 +87,25 @@
     -fx-background-color: black;       /* pipaszín */
 }
 
+.modern-link {
+    -fx-text-fill: #007bff;
+    -fx-font-size: 20px;
+    -fx-underline: false;
+    -fx-background-color: transparent;
+    -fx-padding: 6 10;
+    -fx-background-radius: 8;
+    -fx-font-weight: 500;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.modern-link:hover {
+    -fx-text-fill: white;
+    -fx-background-color: #007bff;
+    -fx-underline: false;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.2, 0, 2);
+}
+
 
 
 

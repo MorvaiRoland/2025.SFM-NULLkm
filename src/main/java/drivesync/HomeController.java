@@ -94,6 +94,7 @@ public class HomeController {
         }
     }
 
+
     private void setActiveMenu(Button activeBtn) {
         for (Button btn : menuButtons) {
             if (btn == activeBtn) {
