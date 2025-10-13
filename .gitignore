@@ -1,1 +1,5 @@
 /target
+# Google API secrets
+src/main/resources/drivesync/client_secret.json
+# MySQL credentials
+src/main/resources/drivesync/db_config.properties

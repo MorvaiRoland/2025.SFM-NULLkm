@@ -13,9 +13,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -39,22 +41,42 @@ public class MainController {
     @FXML private CheckBox showLoginPasswordCheck, showPasswordCheck, rememberMeCheck;
     @FXML private ImageView logoImage;
 
-    private final String DB_URL = "jdbc:mysql://mysql.nethely.hu:3306/drivesync";
-    private final String DB_USER = "drivesync";
-    private final String DB_PASS = "Kirajok123";
+    private String DB_URL;
+    private String DB_USER;
+    private String DB_PASS;
 
     @FXML
     private void initialize() {
+        loadDBConfig();
+        setupPasswordToggle();
+        autoLoginIfPossible();
+
         try {
             Image logo = new Image(getClass().getResourceAsStream("/drivesync/logo.png"));
             logoImage.setImage(logo);
         } catch (Exception e) {
             System.err.println("Logo betöltése sikertelen: " + e.getMessage());
         }
-        setupPasswordToggle();
-        autoLoginIfPossible();
     }
 
+    // ---------------- DB CONFIG ----------------
+    private void loadDBConfig() {
+        try (InputStream input = getClass().getResourceAsStream("/drivesync/db_config.properties")) {
+            if (input == null) {
+                System.err.println("Nem található a db_config.properties!");
+                return;
+            }
+            Properties props = new Properties();
+            props.load(input);
+            DB_URL = props.getProperty("db.url");
+            DB_USER = props.getProperty("db.user");
+            DB_PASS = props.getProperty("db.password");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ---------------- PASSWORD TOGGLE ----------------
     private void setupPasswordToggle() {
         loginPasswordVisible.managedProperty().bind(showLoginPasswordCheck.selectedProperty());
         loginPasswordVisible.visibleProperty().bind(showLoginPasswordCheck.selectedProperty());
@@ -75,7 +97,7 @@ public class MainController {
         regPasswordConfirm.textProperty().bindBidirectional(regPasswordConfirmVisible.textProperty());
     }
 
-    // ------------------ Sima Login ------------------
+    // ---------------- LOGIN ----------------
     @FXML
     private void handleLogin() {
         String username = loginUsername.getText().trim();
@@ -110,7 +132,7 @@ public class MainController {
         }
     }
 
-    // ------------------ Register ------------------
+    // ---------------- REGISTER ----------------
     @FXML
     private void handleRegister() {
         String username = regUsername.getText().trim();
@@ -163,11 +185,11 @@ public class MainController {
         alert.showAndWait();
     }
 
-    // ------------------ Google Login ------------------
+    // ---------------- GOOGLE LOGIN ----------------
     @FXML
     private void handleGoogleLogin() {
         try {
-            var stream = getClass().getResourceAsStream("/drivesync/client_secret.json");
+            InputStream stream = getClass().getResourceAsStream("/drivesync/client_secret.json");
             if (stream == null) {
                 showAlert(Alert.AlertType.ERROR, "Hiba", "A client_secret.json nem található!");
                 return;
@@ -188,13 +210,9 @@ public class MainController {
                     clientSecrets,
                     Arrays.asList(
                             "https://www.googleapis.com/auth/userinfo.profile",
-                            "https://www.googleapis.com/auth/userinfo.email" // ez kell az emailhez
+                            "https://www.googleapis.com/auth/userinfo.email"
                     )
-            )
-                    .setAccessType("offline")
-                    .setDataStoreFactory(dataStoreFactory)
-                    .build();
-
+            ).setAccessType("offline").setDataStoreFactory(dataStoreFactory).build();
 
             LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
 
@@ -220,7 +238,6 @@ public class MainController {
                 return;
             }
 
-
             // Mentés az adatbázisba, ha még nincs ott
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
                 PreparedStatement checkStmt = conn.prepareStatement("SELECT * FROM users WHERE email=?");
@@ -238,7 +255,6 @@ public class MainController {
                 }
             }
 
-            // Mentés a Preferences-be az automatikus belépéshez
             Preferences prefs = Preferences.userNodeForPackage(MainController.class);
             prefs.put("google_email", email);
 
@@ -254,14 +270,13 @@ public class MainController {
         }
     }
 
-    // ------------------ Autologin ------------------
+    // ---------------- AUTOLOGIN ----------------
     private void autoLoginIfPossible() {
         Preferences prefs = Preferences.userNodeForPackage(MainController.class);
         String savedUsername = prefs.get("username", null);
         String savedGoogleEmail = prefs.get("google_email", null);
 
         if (savedUsername != null) {
-            // Simán belépés
             Platform.runLater(() -> {
                 try {
                     Stage stage = (Stage) loginPane.getScene().getWindow();
@@ -269,12 +284,11 @@ public class MainController {
                 } catch (Exception e) { e.printStackTrace(); }
             });
         } else if (savedGoogleEmail != null) {
-            // Google autologin
             Platform.runLater(this::handleGoogleLogin);
         }
     }
 
-    // ------------------ Load Home ------------------
+    // ---------------- LOAD HOME ----------------
     public void loadHomeSceneAfterStageShown(String username, Stage stage) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/Home.fxml"));
