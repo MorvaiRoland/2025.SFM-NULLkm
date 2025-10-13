@@ -3,40 +3,112 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="drivesync.SettingsController"
-      spacing="15">
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.SettingsController"
+            fitToWidth="true">
+    <content>
+        <VBox spacing="20">
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+            <!-- Cím -->
+            <Label text="Beállítások" style="-fx-font-size: 24px; -fx-font-weight: bold;">
+                <padding>
+                    <Insets top="10" right="0" bottom="10" left="0"/>
+                </padding>
+            </Label>
 
-    <Label text="Felhasználói fiók beállítások" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <!-- FELHASZNÁLÓI FIÓK -->
+            <TitledPane text="Felhasználói fiók" expanded="true">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <GridPane hgap="10" vgap="10">
+                        <padding>
+                            <Insets top="5" right="5" bottom="5" left="5"/>
+                        </padding>
+                        <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-    <GridPane hgap="10" vgap="15">
-        <padding>
-            <Insets top="10" right="10" bottom="10" left="10"/>
-        </padding>
+                        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <PasswordField fx:id="passwordField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="Regisztráció dátuma:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="regDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    </GridPane>
+                </VBox>
+            </TitledPane>
 
-        <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <PasswordField fx:id="passwordField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <!-- ÉRTESÍTÉSEK -->
+            <TitledPane text="Értesítések" expanded="false">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <CheckBox fx:id="emailNotifications" text="Email értesítések"/>
+                    <CheckBox fx:id="smsNotifications" text="SMS értesítések"/>
+                    <CheckBox fx:id="pushNotifications" text="Push értesítések"/>
+                </VBox>
+            </TitledPane>
 
-        <Label text="Regisztráció dátuma:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <Label fx:id="regDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-    </GridPane>
+            <!-- MEGJELENÉS -->
+            <TitledPane text="Megjelenés" expanded="false">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <Label text="Téma:"/>
+                    <ChoiceBox fx:id="themeChoiceBox">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Világos"/>
+                                <String fx:value="Sötét"/>
+                                <String fx:value="Rendszer alapértelmezett"/>
+                            </FXCollections>
+                        </items>
+                    </ChoiceBox>
 
-    <HBox spacing="15">
-        <padding>
-            <Insets top="10" right="0" bottom="0" left="0"/>
-        </padding>
+                    <Label text="Betűméret:"/>
+                    <Slider fx:id="fontSizeSlider" min="10" max="24" value="14" showTickLabels="true" showTickMarks="true"/>
+                </VBox>
+            </TitledPane>
 
-        <Button text="Mentés" fx:id="saveBtn" onAction="#handleSave" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-        <Button text="Visszaállítás" fx:id="resetBtn" onAction="#handleReset" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
-    </HBox>
-</VBox>
+            <!-- BIZTONSÁG -->
+            <TitledPane text="Biztonság" expanded="false">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <CheckBox fx:id="twoFactorAuth" text="Kétlépcsős azonosítás engedélyezése"/>
+                    <Button text="Jelszó megváltoztatása" fx:id="changePasswordBtn" onAction="#handleChangePassword"/>
+                </VBox>
+            </TitledPane>
+
+            <!-- ÁLTALÁNOS BEÁLLÍTÁSOK -->
+            <TitledPane text="Általános" expanded="false">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <CheckBox fx:id="autoUpdate" text="Automatikus frissítések engedélyezése"/>
+                    <CheckBox fx:id="sendUsageStats" text="Használati statisztikák küldése"/>
+                    <CheckBox fx:id="enableLogging" text="Részletes naplózás engedélyezése"/>
+                </VBox>
+            </TitledPane>
+
+            <!-- GOMBOK -->
+            <HBox spacing="15">
+                <padding>
+                    <Insets top="10" right="0" bottom="0" left="0"/>
+                </padding>
+                <Button text="Mentés" fx:id="saveBtn" onAction="#handleSave" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                <Button text="Visszaállítás" fx:id="resetBtn" onAction="#handleReset" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+            </HBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

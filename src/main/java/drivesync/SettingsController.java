@@ -18,28 +18,27 @@ public class SettingsController {
     @FXML private PasswordField passwordField;
     @FXML private Label regDateLabel;
 
-    private int currentUserId; // Aktuális felhasználó ID
-    private Connection conn;   // SQL kapcsolat
+    private int currentUserId;
+    private Connection conn;
 
-    // Beállítja az SQL kapcsolatot és az aktuális felhasználót
     public void setConnection(Connection connection, int userId) {
         this.conn = connection;
         this.currentUserId = userId;
         loadUserData();
     }
 
-    // Adatok betöltése a users táblából
     private void loadUserData() {
         if (conn == null) return;
-        String sql = "SELECT username, email, password, reg_date FROM users WHERE id=?";
+
+        String sql = "SELECT username, email, reg_date FROM users WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, currentUserId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 usernameField.setText(rs.getString("username"));
                 emailField.setText(rs.getString("email"));
-                passwordField.setText(rs.getString("password"));
                 regDateLabel.setText(rs.getString("reg_date"));
+                passwordField.clear(); // Jelszót nem töltünk be biztonsági okokból
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,32 +46,61 @@ public class SettingsController {
         }
     }
 
-    // Mentés gomb kezelése
     @FXML
     private void handleSave() {
         if (conn == null) return;
-        String sql = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, usernameField.getText());
-            stmt.setString(2, emailField.getText());
-            stmt.setString(3, passwordField.getText());
-            stmt.setInt(4, currentUserId);
-            stmt.executeUpdate();
-            showAlert(Alert.AlertType.INFORMATION, "Siker", "Adatok sikeresen mentve.");
+
+        String username = usernameField.getText().trim();
+        String email = emailField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        if (username.isEmpty() || email.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Hiányzó adat", "A felhasználónév és email kötelező!");
+            return;
+        }
+
+        try {
+            String sql;
+            if (password.isEmpty()) {
+                // Ha a jelszó mező üres, ne változtassuk meg a jelszót
+                sql = "UPDATE users SET username=?, email=? WHERE id=?";
+            } else {
+                sql = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, username);
+                stmt.setString(2, email);
+
+                if (password.isEmpty()) {
+                    stmt.setInt(3, currentUserId);
+                } else {
+                    stmt.setString(3, password); // Itt érdemes lenne hash-elni a jelszót!
+                    stmt.setInt(4, currentUserId);
+                }
+
+                int rows = stmt.executeUpdate();
+                if (rows > 0) {
+                    showAlert(Alert.AlertType.INFORMATION, "Siker", "Adatok sikeresen mentve.");
+                    passwordField.clear(); // Jelszó mező törlése mentés után
+                } else {
+                    showAlert(Alert.AlertType.WARNING, "Figyelem", "Nem történt változtatás.");
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült menteni az adatokat.");
         }
     }
 
-    // Visszaállítás gomb kezelése
     @FXML
     private void handleReset() {
         loadUserData();
+        passwordField.clear();
         showAlert(Alert.AlertType.INFORMATION, "Visszaállítás", "Az adatok visszaállítva.");
     }
 
-    // Segédmetódus alert megjelenítéséhez
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -80,4 +108,14 @@ public class SettingsController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    @FXML
+    private void handleChangePassword() {
+        // Például egy alert, később ide jöhet a jelszóváltoztatás logikája
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Jelszó módosítás");
+        alert.setHeaderText(null);
+        alert.setContentText("Itt lehet a jelszó megváltoztatását kezelni.");
+        alert.showAndWait();
+    }
+
 }
