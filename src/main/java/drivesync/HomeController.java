@@ -69,20 +69,30 @@ public class HomeController {
             contentContainer.getChildren().setAll(pane);
 
             Object controller = loader.getController();
-            if (controller instanceof SajatAutokController sa) sa.setUsername(username);
-            else if (controller instanceof HomeDashboardController hd) hd.setUsername(username);
+            if (controller != null) {
+                if (controller instanceof SajatAutokController) {
+                    ((SajatAutokController) controller).setUsername(username);
+                } else if (controller instanceof HomeDashboardController) {
+                    ((HomeDashboardController) controller).setUsername(username);
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
     private void setActiveMenu(Button activeBtn) {
         for (Button btn : menuButtons) {
             if (btn == activeBtn) {
-                btn.setStyle("-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-weight: bold; -fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; -fx-padding: 10 20 10 20;");
+                btn.setStyle("-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-weight: bold; "
+                        + "-fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; "
+                        + "-fx-padding: 10 20 10 20;");
             } else {
-                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: gold; -fx-font-weight: bold; -fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; -fx-padding: 10 20 10 20;");
+                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: gold; -fx-font-weight: bold; "
+                        + "-fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; "
+                        + "-fx-padding: 10 20 10 20;");
             }
         }
     }
@@ -90,10 +100,14 @@ public class HomeController {
     private void addHoverEffectToMenu() {
         for (Button btn : menuButtons) {
             btn.setOnMouseEntered(e -> {
-                if (!btn.getStyle().contains("#FFD700")) btn.setStyle(btn.getStyle() + "-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;");
+                if (!btn.getStyle().contains("#FFD700")) {
+                    btn.setStyle(btn.getStyle() + "-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;");
+                }
             });
             btn.setOnMouseExited(e -> {
-                if (!btn.getStyle().contains("#FFD700")) btn.setStyle(btn.getStyle().replace("-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;", ""));
+                if (!btn.getStyle().contains("#FFD700")) {
+                    btn.setStyle(btn.getStyle().replace("-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;", ""));
+                }
             });
         }
     }

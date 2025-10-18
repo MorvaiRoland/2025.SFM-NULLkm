@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="drivesync.Főoldal.HomeDashboardController"
-            style="-fx-background-color: #f0f4f8;" prefWidth="1000" prefHeight="700">
+            style="-fx-background-color: #f0f4f8;" prefWidth="1200" prefHeight="700">
 
     <!-- Bal oldali összecsukható menü -->
     <left>
@@ -18,19 +16,18 @@
 
             <VBox fx:id="buttonsVBox" spacing="10">
 
-                <!-- Időjárás gomb -->
                 <Button fx:id="weatherBtn" maxWidth="Infinity" prefHeight="50"
                         style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🌤 Időjárás</Button>
 
-                <!-- Autók gomb -->
+                <Button fx:id="fuelBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">⛽ Üzemanyag</Button>
+
                 <Button fx:id="carsBtn" maxWidth="Infinity" prefHeight="50"
                         style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🚗 Autók</Button>
 
-                <!-- Költségvetés gomb -->
                 <Button fx:id="budgetBtn" maxWidth="Infinity" prefHeight="50"
                         style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">💰 Költségvetés</Button>
 
-                <!-- Linkek gomb -->
                 <Button fx:id="linksBtn" maxWidth="Infinity" prefHeight="50"
                         style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🔗 Linkek</Button>
 
@@ -41,7 +38,7 @@
     <!-- Jobb oldali widget tartalom -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
-            <FlowPane fx:id="widgetContainer" hgap="20" vgap="20" prefWrapLength="900"
+            <FlowPane fx:id="widgetContainer" hgap="20" vgap="20" prefWrapLength="1000"
                       style="-fx-padding: 25; -fx-background-color: transparent;"/>
         </ScrollPane>
     </center>
