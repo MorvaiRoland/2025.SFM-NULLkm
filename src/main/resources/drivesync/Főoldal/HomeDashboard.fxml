@@ -1,23 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="drivesync.Főoldal.HomeDashboardController"
-      spacing="30"
-      alignment="TOP_CENTER"
-      style="-fx-padding: 40; -fx-background-color: linear-gradient(to bottom, #f0f4f8, #ffffff);">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.Főoldal.HomeDashboardController"
+            style="-fx-background-color: #f0f4f8;" prefWidth="1000" prefHeight="700">
 
-    <!-- Üdvözlés -->
-    <VBox spacing="15" alignment="CENTER">
-        <Label fx:id="welcomeLabel" text="Üdvözöllek a DriveSync-ben!"
-               style="-fx-font-size: 34; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
-        <Label fx:id="dateLabel"
-               style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;" />
-    </VBox>
+    <!-- Bal oldali összecsukható menü -->
+    <left>
+        <VBox fx:id="menuVBox" spacing="10" style="-fx-background-color: #222222; -fx-padding: 10;" prefWidth="220">
 
-    <!-- Autók kártyák -->
-    <FlowPane fx:id="carsFlowPane" hgap="20" vgap="20" prefWrapLength="800" alignment="CENTER" />
-</VBox>
+            <!-- Összecsukás gomb -->
+            <Button fx:id="toggleMenuBtn" text="Widgetek ⏴"
+                    style="-fx-background-color: black; -fx-text-fill: white; -fx-font-size: 18;" maxWidth="Infinity"/>
+
+            <VBox fx:id="buttonsVBox" spacing="10">
+
+                <!-- Időjárás gomb -->
+                <Button fx:id="weatherBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🌤 Időjárás</Button>
+
+                <!-- Autók gomb -->
+                <Button fx:id="carsBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🚗 Autók</Button>
+
+                <!-- Költségvetés gomb -->
+                <Button fx:id="budgetBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">💰 Költségvetés</Button>
+
+                <!-- Linkek gomb -->
+                <Button fx:id="linksBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🔗 Linkek</Button>
+
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Jobb oldali widget tartalom -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+            <FlowPane fx:id="widgetContainer" hgap="20" vgap="20" prefWrapLength="900"
+                      style="-fx-padding: 25; -fx-background-color: transparent;"/>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

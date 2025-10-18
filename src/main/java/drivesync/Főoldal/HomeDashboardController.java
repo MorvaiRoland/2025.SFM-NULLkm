@@ -1,137 +1,185 @@
 package drivesync.Főoldal;
 
-import drivesync.AutóModell.Car;
-import drivesync.Adatbázis.Database;
+import drivesync.Időjárás.WeatherService;
+import drivesync.Időjárás.WeatherService.Weather;
+import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeDashboardController {
 
-    @FXML private FlowPane carsFlowPane;
-    @FXML private Label welcomeLabel;
-    @FXML private Label dateLabel;
+    @FXML private FlowPane widgetContainer;
+    @FXML private VBox menuVBox, buttonsVBox;
+    @FXML private Button toggleMenuBtn, weatherBtn, carsBtn, budgetBtn, linksBtn;
 
-    private static String username;
+    private boolean isCollapsed = false;
+    private final Map<String, VBox> activeWidgets = new HashMap<>();
+    private String username;
 
-    public void setUsername(String user) {
-        username = user;
-        welcomeLabel.setText("Üdvözöllek, " + user + "!");
-        dateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        loadCars();
+    // ---------------- Felhasználónév ----------------
+    public void setUsername(String username) { this.username = username; }
+    public String getUsername() { return username; }
+
+    // ---------------- Inicializálás ----------------
+    @FXML
+    public void initialize() {
+        // Menü összecsukás gomb
+        toggleMenuBtn.setOnAction(e -> toggleMenu());
+
+        // Hover animáció minden gombra
+        addHoverAnimation(weatherBtn);
+        addHoverAnimation(carsBtn);
+        addHoverAnimation(budgetBtn);
+        addHoverAnimation(linksBtn);
+
+        // Gomb események
+        weatherBtn.setOnAction(e -> toggleWidget("weather", this::createWeatherWidget));
+        carsBtn.setOnAction(e -> toggleWidget("cars", this::createCarsWidget));
+        budgetBtn.setOnAction(e -> toggleWidget("budget", this::createBudgetWidget));
+        linksBtn.setOnAction(e -> toggleWidget("links", this::createLinksWidget));
     }
 
-    public static String getUsername() { return username; }
+    // ---------------- Hover animáció ----------------
+    private void addHoverAnimation(Button btn) {
+        ScaleTransition grow = new ScaleTransition(Duration.millis(150), btn);
+        ScaleTransition shrink = new ScaleTransition(Duration.millis(150), btn);
 
-    private void loadCars() {
-        carsFlowPane.getChildren().clear();
-        List<Car> cars = new ArrayList<>();
-        String sql = "SELECT * FROM cars WHERE owner_id = (SELECT id FROM users WHERE username = ?)";
+        btn.setOnMouseEntered(e -> {
+            grow.setToX(1.05);
+            grow.setToY(1.05);
+            grow.playFromStart();
+        });
+        btn.setOnMouseExited(e -> {
+            shrink.setToX(1);
+            shrink.setToY(1);
+            shrink.playFromStart();
+        });
+    }
 
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    // ---------------- Menü összecsukás ----------------
+    private void toggleMenu() {
+        if(isCollapsed) {
+            menuVBox.setPrefWidth(220);
+            buttonsVBox.setVisible(true);
+            toggleMenuBtn.setText("Widgetek ⏴");
+            isCollapsed = false;
+        } else {
+            menuVBox.setPrefWidth(60);
+            buttonsVBox.setVisible(false);
+            toggleMenuBtn.setText("⏵");
+            isCollapsed = true;
+        }
+    }
 
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+    // ---------------- Widget toggle ----------------
+    private void toggleWidget(String key, WidgetCreator creator) {
+        if(activeWidgets.containsKey(key)) {
+            widgetContainer.getChildren().remove(activeWidgets.get(key));
+            activeWidgets.remove(key);
+        } else {
+            VBox widget = creator.create();
+            widgetContainer.getChildren().add(widget);
+            activeWidgets.put(key, widget);
+        }
+    }
 
-            while (rs.next()) {
-                Car car = new Car(
-                        rs.getInt("id"),
-                        rs.getInt("owner_id"),
-                        rs.getString("license"),
-                        rs.getString("brand"),
-                        rs.getString("type"),
-                        rs.getInt("vintage"),
-                        rs.getString("engine_type"),
-                        rs.getString("fuel_type"),
-                        rs.getInt("km"),
-                        rs.getInt("oil"),
-                        rs.getInt("tire_size"),
-                        rs.getDate("service").toLocalDate(),
-                        rs.getDate("insurance").toLocalDate()
-                );
-                cars.add(car);
+    // ---------------- Widget létrehozók ----------------
+    private VBox createWeatherWidget() {
+        VBox box = baseWidget("🌤 Időjárás", "#f1c40f");
+
+        // Város beírása
+        TextField cityInput = new TextField();
+        cityInput.setPromptText("Írd be a várost");
+        cityInput.setPrefWidth(200);
+
+        Label cityLabel = new Label();
+        cityLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
+
+        Label tempLabel = new Label();
+        tempLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
+        Label feelsLikeLabel = new Label();
+        Label humidityLabel = new Label();
+        Label windLabel = new Label();
+        Label descLabel = new Label();
+        descLabel.setFont(Font.font("Segoe UI", 16));
+        descLabel.setTextFill(Color.DARKSLATEGRAY);
+
+        Runnable updateWeather = () -> {
+            String city = cityInput.getText().isEmpty() ? "Budapest" : cityInput.getText();
+            Weather weather = WeatherService.getWeather(city);
+            if(weather != null) {
+                cityLabel.setText(city);
+                tempLabel.setText(String.format("🌡 Hőmérséklet: %.1f°C", weather.getTemperature()));
+                feelsLikeLabel.setText(String.format("🤗 Hőérzet: %.1f°C", weather.getFeelsLike()));
+                humidityLabel.setText(String.format("💧 Páratartalom: %d%%", weather.getHumidity()));
+                windLabel.setText(String.format("🌬 Szél: %.1f m/s", weather.getWindSpeed()));
+                descLabel.setText("Leírás: " + weather.getDescription());
+            } else {
+                cityLabel.setText(city);
+                tempLabel.setText("Nem sikerült lekérni az adatokat");
+                feelsLikeLabel.setText("");
+                humidityLabel.setText("");
+                windLabel.setText("");
+                descLabel.setText("");
             }
+        };
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // Frissítés amikor várost írunk be
+        cityInput.setOnAction(e -> updateWeather.run());
+        updateWeather.run();
 
-        for (Car car : cars) {
-            carsFlowPane.getChildren().add(createCarWidget(car));
-        }
+        box.getChildren().addAll(cityInput, cityLabel, tempLabel, feelsLikeLabel, humidityLabel, windLabel, descLabel);
+        return box;
     }
 
-    private VBox createCarWidget(Car car) {
-        VBox box = new VBox(12);
-        box.setAlignment(Pos.TOP_CENTER);
-        box.setStyle(
-                "-fx-padding: 20; " +
-                        "-fx-background-radius: 15; " +
-                        "-fx-background-color: linear-gradient(to bottom right, #ffffff, #e6f2ff);" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 3);"
-        );
+    private VBox createCarsWidget() {
+        VBox box = baseWidget("🚗 Autók", "#f1c40f");
+        box.getChildren().add(new Label("Saját autók listája és statisztikák jelennek meg itt."));
+        return box;
+    }
 
-        // Hover effekt
-        box.setOnMouseEntered(e -> { box.setScaleX(1.03); box.setScaleY(1.03); });
-        box.setOnMouseExited(e -> { box.setScaleX(1); box.setScaleY(1); });
+    private VBox createBudgetWidget() {
+        VBox box = baseWidget("💰 Költségvetés", "#f1c40f");
+        box.getChildren().add(new Label("Kiadások és bevételek összegzése."));
+        return box;
+    }
 
-        Image carIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/car.png"), 60, 60, true, true);
-        Image oilIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/oil.png"), 24, 24, true, true);
-        Image insuranceIcon = new Image(getClass().getResourceAsStream("/drivesync/icons/insurance.png"), 24, 24, true, true);
+    private VBox createLinksWidget() {
+        VBox box = baseWidget("🔗 Linkek", "#f1c40f");
+        box.getChildren().add(new Label("Gyakran használt hivatkozások."));
+        return box;
+    }
 
-        ImageView carView = new ImageView(carIcon);
-        ImageView oilView = new ImageView(oilIcon);
-        ImageView insuranceView = new ImageView(insuranceIcon);
+    // ---------------- Widget stílus ----------------
+    private VBox baseWidget(String title, String color) {
+        VBox box = new VBox(8);
+        box.setPrefWidth(300);
+        box.setStyle("-fx-background-color: white; -fx-border-radius: 12; -fx-background-radius: 12;"
+                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 5); -fx-padding: 15;");
+        Label header = new Label(title);
+        header.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
+        header.setTextFill(Color.web(color));
+        box.getChildren().add(header);
 
-        Label licenseLbl = new Label(car.getLicense());
-        licenseLbl.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        Label brandTypeLbl = new Label(car.getBrand() + " " + car.getType());
-        brandTypeLbl.setStyle("-fx-font-size: 14; -fx-text-fill: #34495e;");
-
-        Label vintageLbl = new Label("Évjárat: " + car.getVintage());
-        Label kmLbl = new Label("Km: " + car.getKm());
-        vintageLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
-        kmLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
-
-        double serviceProgress = calculateProgress(car.getService());
-        ProgressBar serviceBar = new ProgressBar(serviceProgress);
-        serviceBar.setStyle("-fx-accent: #27ae60;");
-
-        Label serviceLbl = new Label("Szerviz: " + car.getService().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        serviceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-
-        double insuranceProgress = calculateProgress(car.getInsurance());
-        ProgressBar insuranceBar = new ProgressBar(insuranceProgress);
-        insuranceBar.setStyle("-fx-accent: #e74c3c;");
-
-        Label insuranceLbl = new Label("Bizt.: " + car.getInsurance().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        insuranceLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-
-        box.getChildren().addAll(carView, licenseLbl, brandTypeLbl, vintageLbl, kmLbl,
-                oilView, serviceLbl, serviceBar,
-                insuranceView, insuranceLbl, insuranceBar);
+        box.setOnMouseEntered(e -> box.setStyle("-fx-background-color: #f8fbff; -fx-border-radius: 12;"
+                + "-fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0, 0, 5); -fx-padding: 15;"));
+        box.setOnMouseExited(e -> box.setStyle("-fx-background-color: white; -fx-border-radius: 12;"
+                + "-fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 5); -fx-padding: 15;"));
 
         return box;
     }
 
-    private double calculateProgress(LocalDate date) {
-        LocalDate today = LocalDate.now();
-        long totalDays = ChronoUnit.DAYS.between(today, date);
-        double progress = 1.0 - Math.min(Math.max(totalDays / 365.0, 0), 1);
-        return progress;
-    }
+    @FunctionalInterface
+    private interface WidgetCreator { VBox create(); }
 }
