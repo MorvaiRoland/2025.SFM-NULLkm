@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="drivesync.SajatAutokController"
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="drivesync.SajátAutók.SajatAutokController"
             fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
             style="-fx-background: #f4f4f4;" prefWidth="1000" prefHeight="700">
 

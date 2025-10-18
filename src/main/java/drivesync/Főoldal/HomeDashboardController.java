@@ -1,5 +1,7 @@
-package drivesync;
+package drivesync.Főoldal;
 
+import drivesync.AutóModell.Car;
+import drivesync.Adatbázis.Database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;

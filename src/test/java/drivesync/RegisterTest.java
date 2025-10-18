@@ -1,6 +1,7 @@
 package drivesync;
 
-import javafx.scene.control.Alert;
+import drivesync.Adatbázis.Database;
+import drivesync.Regisztráció.Register;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;

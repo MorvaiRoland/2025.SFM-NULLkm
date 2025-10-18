@@ -52,7 +52,7 @@ public class MainController {
         autoLoginIfPossible();
 
         try {
-            Image logo = new Image(getClass().getResourceAsStream("/drivesync/logo.png"));
+            Image logo = new Image(getClass().getResourceAsStream("/drivesync/icons/logo.png"));
             logoImage.setImage(logo);
         } catch (Exception e) {
             System.err.println("Logo betöltése sikertelen: " + e.getMessage());
@@ -61,7 +61,7 @@ public class MainController {
 
     // ---------------- DB CONFIG ----------------
     private void loadDBConfig() {
-        try (InputStream input = getClass().getResourceAsStream("/drivesync/db_config.properties")) {
+        try (InputStream input = getClass().getResourceAsStream("/drivesync/NO-GITHUB/db_config.properties")) {
             if (input == null) {
                 System.err.println("Nem található a db_config.properties!");
                 return;
@@ -189,7 +189,7 @@ public class MainController {
     @FXML
     private void handleGoogleLogin() {
         try {
-            InputStream stream = getClass().getResourceAsStream("/drivesync/client_secret.json");
+            InputStream stream = getClass().getResourceAsStream("/drivesync/NO-GITHUB/client_secret.json");
             if (stream == null) {
                 showAlert(Alert.AlertType.ERROR, "Hiba", "A client_secret.json nem található!");
                 return;
@@ -291,7 +291,7 @@ public class MainController {
     // ---------------- LOAD HOME ----------------
     public void loadHomeSceneAfterStageShown(String username, Stage stage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/Home.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/Menü/Home.fxml"));
             Scene homeScene = new Scene(loader.load(), 1200, 700);
 
             HomeController homeController = loader.getController();

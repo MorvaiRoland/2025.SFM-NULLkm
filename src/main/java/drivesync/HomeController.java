@@ -1,5 +1,6 @@
 package drivesync;
 
+import drivesync.SajátAutók.SajatAutokController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -69,12 +70,12 @@ public class HomeController {
         stage.setTitle("DriveSync");
     }
 
-    @FXML private void showHome() { loadFXMLToContent("/drivesync/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
-    @FXML private void showCars() { loadFXMLToContent("/drivesync/SajatAutok.fxml"); setActiveMenu(carsBtn); }
-    @FXML private void showBudget() { loadFXMLToContent("/drivesync/Budget.fxml"); setActiveMenu(budgetBtn); }
-    @FXML private void showLinks() { loadFXMLToContent("/drivesync/Links.fxml"); setActiveMenu(linksBtn); }
-    @FXML private void showCalculator() { loadFXMLToContent("/drivesync/CalculatorController.fxml"); setActiveMenu(calculatorBtn); }
-    @FXML private void showSettings() { loadFXMLToContent("/drivesync/Settings.fxml"); setActiveMenu(settingsBtn); }
+    @FXML private void showHome() { loadFXMLToContent("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
+    @FXML private void showCars() { loadFXMLToContent("/drivesync/Sajátautók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
+    @FXML private void showBudget() { loadFXMLToContent("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
+    @FXML private void showLinks() { loadFXMLToContent("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
+    @FXML private void showCalculator() { loadFXMLToContent("/drivesync/Kalkulátor/Calculator.fxml"); setActiveMenu(calculatorBtn); }
+    @FXML private void showSettings() { loadFXMLToContent("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
 
     private void loadFXMLToContent(String fxmlPath) {
         try {

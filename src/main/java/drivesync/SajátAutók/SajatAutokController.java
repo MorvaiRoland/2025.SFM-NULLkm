@@ -1,5 +1,7 @@
-package drivesync;
+package drivesync.SajátAutók;
 
+import drivesync.Adatbázis.Database;
+import drivesync.PDF.PdfGenerator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -18,12 +20,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
-
 
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;

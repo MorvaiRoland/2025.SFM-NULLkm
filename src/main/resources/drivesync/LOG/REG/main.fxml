@@ -52,7 +52,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitWidth="20" fitHeight="20" preserveRatio="true" pickOnBounds="true">
                                 <image>
-                                    <Image url="@/drivesync/google_logo.png" />
+                                    <Image url="@/drivesync/Logók/google_logo.png" />
                                 </image>
                             </ImageView>
                             <Label text="Google-fiókkal" style="-fx-text-fill:black; -fx-font-weight:bold;" />

@@ -1,4 +1,4 @@
-package drivesync;
+package drivesync.Adatbázis;
 import java.sql.*;
 
 public class Database {

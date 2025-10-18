@@ -1,4 +1,4 @@
-package drivesync;
+package drivesync.Kalkulátor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

@@ -5,7 +5,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="drivesync.HomeDashboardController"
+      fx:controller="drivesync.Főoldal.HomeDashboardController"
       spacing="30"
       alignment="TOP_CENTER"
       style="-fx-padding: 40; -fx-background-color: linear-gradient(to bottom, #f0f4f8, #ffffff);">

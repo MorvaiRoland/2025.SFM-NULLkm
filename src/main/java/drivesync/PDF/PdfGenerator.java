@@ -1,4 +1,4 @@
-package drivesync;
+package drivesync.PDF;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import drivesync.Adatbázis.Database;
 
 import java.io.File;
 import java.io.InputStream;

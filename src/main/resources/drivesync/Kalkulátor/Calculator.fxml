@@ -10,7 +10,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="drivesync.CalculatorController"
+            fx:controller="drivesync.Kalkulátor.CalculatorController"
             fitToHeight="true"
             fitToWidth="true"
             style="-fx-background: transparent;">

@@ -1,4 +1,4 @@
-package drivesync;
+package drivesync.Linkek;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;

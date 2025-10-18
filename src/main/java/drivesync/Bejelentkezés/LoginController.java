@@ -1,5 +1,8 @@
-package drivesync;
+package drivesync.Bejelentkezés;
 
+import drivesync.Adatbázis.Database;
+import drivesync.App;
+import drivesync.HomeController;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;

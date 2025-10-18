@@ -1,4 +1,4 @@
-package drivesync;
+package drivesync.Beállítások;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
