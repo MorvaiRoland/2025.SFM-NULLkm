@@ -114,7 +114,7 @@
             </TitledPane>
 
             <!-- Új szerviz hozzáadása -->
-            <TitledPane fx:id="addServicePane" text="➕ Új szerviz hozzáadása" expanded="false"
+            <TitledPane fx:id="addServicePane" text="➕ Szervíz rögzítése" expanded="false"
                         style="-fx-font-weight: bold; -fx-font-size: 16px;" maxWidth="850">
                 <content>
                     <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
@@ -152,6 +152,46 @@
                         <Button text="Szerviz mentése" onAction="#saveService"
                                 style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;
                            -fx-font-size: 14px; -fx-background-radius: 8;"/>
+                    </VBox>
+                </content>
+            </TitledPane>
+
+            <!-- Következő szerviz rögzítése -->
+            <TitledPane fx:id="upcomingServicePane" text="➕ Következő szerviz rögzítése" expanded="false"
+                        style="-fx-font-weight: bold; -fx-font-size: 16px;" maxWidth="850">
+                <content>
+                    <VBox spacing="15" style="-fx-background-color: #ffffff; -fx-background-radius: 10;
+                       -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+
+                        <Label text="Add meg a következő tervezett szerviz adatait:"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <GridPane hgap="15" vgap="12">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT" maxWidth="150"/>
+                                <ColumnConstraints hgrow="ALWAYS" maxWidth="300"/>
+                            </columnConstraints>
+
+                            <Label text="Dátum:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                            <DatePicker fx:id="upcomingServiceDatePicker" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="200"/>
+
+                            <Label text="Helyszín:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                            <TextField fx:id="upcomingServiceLocation" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="300"/>
+
+                            <Label text="Megjegyzés:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                            <TextArea fx:id="upcomingServiceNotes" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                      maxWidth="400" prefRowCount="3"/>
+
+                            <CheckBox fx:id="upcomingServiceReminder" text="Küldjön emlékeztetőt"
+                                      GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        </GridPane>
+
+                        <Button text="Következő szerviz mentése" onAction="#saveUpcomingService"
+                                style="-fx-background-color: #009688; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-font-size: 14px;"/>
                     </VBox>
                 </content>
             </TitledPane>

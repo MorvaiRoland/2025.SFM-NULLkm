@@ -1,5 +1,6 @@
 package drivesync.Főoldal;
 
+import com.itextpdf.layout.properties.TextAlignment;
 import drivesync.Időjárás.WeatherService;
 import drivesync.Időjárás.WeatherService.Weather;
 import drivesync.FuelService.FuelService;
@@ -7,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -14,9 +16,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,6 +146,11 @@ public class HomeDashboardController {
                 "100-as benzin", "/drivesync/icons/benzin-100.png"
         );
 
+        Label lastUpdatedLabel = new Label();
+        lastUpdatedLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 12));
+        lastUpdatedLabel.setStyle("-fx-text-fill: gray;");
+        lastUpdatedLabel.setAlignment(Pos.CENTER);
+
         Runnable updateFuelPrices = () -> {
             Map<String, String[]> prices = FuelService.getFuelPrices();
 
@@ -150,28 +160,31 @@ public class HomeDashboardController {
                 return;
             }
 
-            HBox fuelRow = new HBox(20); // távolság az oszlopok között
-            fuelRow.setStyle("-fx-alignment: center;");
+            HBox fuelRow = new HBox(20);
+            fuelRow.setAlignment(Pos.CENTER);
 
             for (String fuel : fuelOrder) {
                 VBox fuelBox = new VBox(10);
                 fuelBox.setStyle("-fx-background-color: #f8f8f8; -fx-padding: 15; -fx-border-radius: 12; -fx-background-radius: 12;");
-                fuelBox.setPrefWidth(150);  // szélesebb kártya
+                fuelBox.setPrefWidth(150);
                 fuelBox.setMinWidth(150);
+                fuelBox.setAlignment(Pos.CENTER);
 
                 // Ikon
                 ImageView icon = new ImageView(getClass().getResource(fuelIcons.get(fuel)).toExternalForm());
                 icon.setFitWidth(48);
                 icon.setFitHeight(48);
 
-                // Név
+                // Üzemanyag név
                 Label fuelLabel = new Label(fuel);
                 fuelLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
                 fuelLabel.setWrapText(true);
+                // fully-qualified név, így nincs importütközés
                 fuelLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+                fuelLabel.setAlignment(Pos.CENTER);
 
                 VBox headerBox = new VBox(5, icon, fuelLabel);
-                headerBox.setStyle("-fx-alignment: center;");
+                headerBox.setAlignment(Pos.CENTER);
 
                 // Ár sorok
                 String[] fuelPrices = prices.getOrDefault(fuel, new String[]{"-", "-", "-"});
@@ -183,14 +196,20 @@ public class HomeDashboardController {
                 maxLabel.setFont(Font.font("Segoe UI", 14));
 
                 VBox pricesBox = new VBox(4, minLabel, avgLabel, maxLabel);
-                pricesBox.setStyle("-fx-alignment: center;");
+                pricesBox.setAlignment(Pos.CENTER);
 
                 fuelBox.getChildren().addAll(headerBox, pricesBox);
                 fuelRow.getChildren().add(fuelBox);
             }
 
+            // Frissítés idejének beállítása
+            String formattedTime = LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm"));
+            lastUpdatedLabel.setText("Utoljára frissítve: " + formattedTime);
+
+            // Frissített elrendezés megjelenítése
             box.getChildren().clear();
-            box.getChildren().add(fuelRow);
+            box.getChildren().addAll(fuelRow, lastUpdatedLabel);
         };
 
         updateFuelPrices.run();

@@ -23,6 +23,9 @@ import javafx.geometry.Insets;
 
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -44,6 +47,14 @@ public class SajatAutokController {
     @FXML private ColorPicker colorPicker;
     @FXML private TextArea notesField;
     @FXML private Label selectedCarLabel; // ez mutatja a kiválasztott autót a szerviz hozzáadásnál
+    @FXML private DatePicker serviceDatePicker; // FXML-ben is szerepel!
+    @FXML private TitledPane upcomingServicePane;
+    @FXML private DatePicker upcomingServiceDatePicker;
+    @FXML private TextField upcomingServiceLocation;
+    @FXML private TextArea upcomingServiceNotes;
+    @FXML private CheckBox upcomingServiceReminder;
+    @FXML private Label selectedCarLabelUpcoming;
+
 
 
 
@@ -84,6 +95,38 @@ public class SajatAutokController {
                     clearFields();
                 }
             });
+        }
+        checkUpcomingReminders();
+    }
+    private void checkUpcomingReminders() {
+        String sql = "SELECT u.service_date, u.location, u.notes, c.license " +
+                "FROM upcoming_services u " +
+                "JOIN cars c ON u.car_id = c.id " +
+                "WHERE u.reminder = TRUE";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            LocalDate today = LocalDate.now();
+            StringBuilder sb = new StringBuilder();
+
+            while (rs.next()) {
+                LocalDate serviceDate = rs.getDate("service_date").toLocalDate();
+                long days = java.time.temporal.ChronoUnit.DAYS.between(today, serviceDate);
+
+                if (days >= 0 && days <= 3) { // 3 napon belül
+                    sb.append("Autó: ").append(rs.getString("license"))
+                            .append("\nDátum: ").append(serviceDate)
+                            .append("\nHelyszín: ").append(rs.getString("location"))
+                            .append("\nMegjegyzés: ").append(rs.getString("notes"))
+                            .append("\n\n");
+                }
+            }
+
+            if (sb.length() > 0) showAlert("Közelgő szervizek", sb.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -265,8 +308,9 @@ public class SajatAutokController {
             box.setStyle(getSelectedCardStyle());
 
             selectedCarId = carId;
-            if (selectedCarLabel != null)
-                selectedCarLabel.setText(brand + " " + type + " (" + license + ")");
+            String carLabel = brand + " " + type + " (" + license + ")";
+            if (selectedCarLabel != null) selectedCarLabel.setText(carLabel);
+            if (selectedCarLabelUpcoming != null) selectedCarLabelUpcoming.setText(carLabel);
 
             if (carDetailsPane != null) carDetailsPane.setExpanded(true);
             showCarDetails(carId);
@@ -432,8 +476,7 @@ public class SajatAutokController {
             return;
         }
 
-        if (serviceTypeCombo.getValue() == null || serviceKmField.getText().isEmpty() || servicePriceField.getText().isEmpty()
-               ) {
+        if (serviceTypeCombo.getValue() == null || serviceKmField.getText().isEmpty() || servicePriceField.getText().isEmpty()) {
             showAlert("Hiba", "Kérlek töltsd ki a kötelező mezőket!");
             return;
         }
@@ -448,7 +491,18 @@ public class SajatAutokController {
             stmt.setInt(3, Integer.parseInt(serviceKmField.getText().trim()));
             stmt.setInt(4, Integer.parseInt(servicePriceField.getText().trim()));
 
+            // --- 5. paraméter: Szerviz dátuma (a DatePicker-ből vagy mostani dátum) ---
+            LocalDate date = serviceDatePicker.getValue();
+            if (date != null) {
+                stmt.setString(5, date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            } else {
+                // ha nincs kiválasztva, akkor az aktuális dátumot tesszük be
+                stmt.setString(5, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+
+            // --- 6. paraméter: cserélt alkatrészek ---
             stmt.setString(6, replacedPartsField.getText().trim());
+
             stmt.executeUpdate();
 
             showAlert("Sikeres", "A szerviz rögzítve!");
@@ -459,7 +513,7 @@ public class SajatAutokController {
             serviceKmField.clear();
             servicePriceField.clear();
             replacedPartsField.clear();
-
+            serviceDatePicker.setValue(null);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -752,6 +806,45 @@ public class SajatAutokController {
                 }
             }
         });
+    }
+    @FXML
+    private void saveUpcomingService() {
+        if (selectedCarId == -1) {
+            showAlert("Hiba", "Nincs kiválasztott autó!");
+            return;
+        }
+
+        LocalDate date = upcomingServiceDatePicker.getValue();
+        if (date == null) {
+            showAlert("Hiba", "Kérlek válassz dátumot!");
+            return;
+        }
+
+        String location = upcomingServiceLocation.getText().trim();
+        String notes = upcomingServiceNotes.getText().trim();
+        boolean reminder = upcomingServiceReminder.isSelected();
+
+        String sql = "INSERT INTO upcoming_services (car_id, service_date, location, notes, reminder) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, selectedCarId);
+            stmt.setDate(2, java.sql.Date.valueOf(date));
+            stmt.setString(3, location);
+            stmt.setString(4, notes);
+            stmt.setBoolean(5, reminder);
+
+            stmt.executeUpdate();
+            showAlert("Sikeres", "Következő szerviz rögzítve!");
+            upcomingServiceDatePicker.setValue(null);
+            upcomingServiceLocation.clear();
+            upcomingServiceNotes.clear();
+            upcomingServiceReminder.setSelected(false);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Hiba", "Nem sikerült menteni a következő szervizt!");
+        }
     }
 
 
