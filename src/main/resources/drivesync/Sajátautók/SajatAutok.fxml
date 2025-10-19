@@ -203,7 +203,7 @@
                 <content>
                     <VBox spacing="15"
                           style="-fx-background-color: #ffffff; -fx-background-radius: 12;
-                                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 6);">
+                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 6);">
                         <padding>
                             <Insets top="25" right="25" bottom="25" left="25"/>
                         </padding>
@@ -213,15 +213,25 @@
 
                         <Separator/>
 
+                        <!-- Régi ListView maradhat a múltbeli szervizekhez -->
                         <ListView fx:id="serviceListView" prefHeight="200"
                                   style="-fx-background-radius: 6;"/>
                         <Button fx:id="deleteServiceBtn" text="Kiválasztott szerviz törlése" onAction="#handleDeleteService"
                                 style="-fx-background-color: #e53935; -fx-text-fill: white; -fx-font-weight: bold;
-               -fx-font-size: 14px; -fx-background-radius: 8;"/>
+                           -fx-font-size: 14px; -fx-background-radius: 8;"/>
+
+                        <Separator/>
+
+                        <!-- Ide kerülnek a közelgő szervizek widgetek -->
+                        <Label text="Közelgő szervizek:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <VBox fx:id="servicesContainer" spacing="10">
+                            <!-- A Controller tölti fel a widgeteket -->
+                        </VBox>
 
                     </VBox>
                 </content>
             </TitledPane>
+
 
         </VBox>
     </content>

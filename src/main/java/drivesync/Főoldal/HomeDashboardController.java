@@ -19,10 +19,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
+import drivesync.Adatbázis.ServiceDAO;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HomeDashboardController {
@@ -30,6 +33,8 @@ public class HomeDashboardController {
     @FXML private FlowPane widgetContainer;
     @FXML private VBox menuVBox, buttonsVBox;
     @FXML private Button toggleMenuBtn, weatherBtn, fuelBtn, carsBtn, budgetBtn, linksBtn;
+    @FXML private Button notificationsBtn;
+
 
     private boolean isCollapsed = false;
     private final Map<String, VBox> activeWidgets = new HashMap<>();
@@ -55,6 +60,9 @@ public class HomeDashboardController {
         carsBtn.setOnAction(e -> toggleWidget("cars", this::createCarsWidget));
         budgetBtn.setOnAction(e -> toggleWidget("budget", this::createBudgetWidget));
         linksBtn.setOnAction(e -> toggleWidget("links", this::createLinksWidget));
+        notificationsBtn.setOnAction(e -> toggleWidget("notifications", this::createNotificationWidgets));
+        addHoverAnimation(notificationsBtn);
+
     }
 
     // ---------------- Hover animáció ----------------
@@ -239,6 +247,57 @@ public class HomeDashboardController {
         box.getChildren().add(new Label("Gyakran használt hivatkozások."));
         return box;
     }
+
+    private VBox createNotificationWidgets() {
+        VBox container = new VBox(15); // távolság a kártyák között
+        container.setPrefWidth(400);
+
+        ServiceDAO dao = new ServiceDAO();
+        List<ServiceDAO.Service> services = dao.getUpcomingServices();
+
+        if (services.isEmpty()) {
+            Label emptyLabel = new Label("Nincs elérhető szerviz információ.");
+            emptyLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 14));
+            emptyLabel.setTextFill(Color.GRAY);
+            container.getChildren().add(emptyLabel);
+            return container;
+        }
+
+        for (ServiceDAO.Service s : services) {
+            // Szöveg összeállítása: márka + típus
+            StringBuilder textBuilder = new StringBuilder();
+            textBuilder.append("Autó: ").append(s.brand).append(" ").append(s.type).append("\n");
+            textBuilder.append("Dátum: ").append(s.serviceDate).append("\n");
+            textBuilder.append("Helyszín: ").append(s.location);
+            if (s.notes != null && !s.notes.isEmpty()) {
+                textBuilder.append("\nMegjegyzés: ").append(s.notes);
+            }
+            textBuilder.append("\nEmlékeztető: ").append(s.reminder ? "Igen" : "Nem");
+
+            VBox widget = new VBox(8);
+            widget.setPrefWidth(350);
+            widget.setStyle("-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-radius: 12; -fx-background-radius: 12;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 5);");
+
+            // Fejléc
+            Label header = new Label("🔔 Szerviz értesítés");
+            header.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+            header.setTextFill(Color.web("#f1c40f"));
+
+            // Részletek
+            Label serviceLabel = new Label(textBuilder.toString());
+            serviceLabel.setFont(Font.font("Segoe UI", 14));
+            serviceLabel.setTextFill(Color.DARKSLATEGRAY);
+            serviceLabel.setWrapText(true);
+
+            widget.getChildren().addAll(header, serviceLabel);
+            container.getChildren().add(widget);
+        }
+
+        return container;
+    }
+
+
 
     // ---------------- Widget stílus ----------------
     private VBox baseWidget(String title, String color) {

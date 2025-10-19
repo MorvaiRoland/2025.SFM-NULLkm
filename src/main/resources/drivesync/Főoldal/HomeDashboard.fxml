@@ -31,6 +31,10 @@
                 <Button fx:id="linksBtn" maxWidth="Infinity" prefHeight="50"
                         style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🔗 Linkek</Button>
 
+                <Button fx:id="notificationsBtn" maxWidth="Infinity" prefHeight="50"
+                        style="-fx-background-color: #f1c40f; -fx-text-fill: black; -fx-background-radius: 10;">🔔 Szerviz értesítések</Button>
+
+
             </VBox>
         </VBox>
     </left>

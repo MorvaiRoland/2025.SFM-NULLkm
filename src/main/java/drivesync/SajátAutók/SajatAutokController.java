@@ -1,6 +1,7 @@
 package drivesync.SajátAutók;
 
 import drivesync.Adatbázis.Database;
+import drivesync.Adatbázis.ServiceDAO;
 import drivesync.PDF.PdfGenerator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -9,19 +10,28 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.FontPosture;
 import javafx.util.Duration;
 import javafx.geometry.Insets;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.paint.Color;
 
 
+
+import java.awt.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,6 +64,8 @@ public class SajatAutokController {
     @FXML private TextArea upcomingServiceNotes;
     @FXML private CheckBox upcomingServiceReminder;
     @FXML private Label selectedCarLabelUpcoming;
+    @FXML private VBox servicesContainer; // ide töltjük a közelgő szervizek widgeteket
+
 
 
 
@@ -340,6 +352,8 @@ public class SajatAutokController {
 
     private void showCarDetails(int carId) {
         selectedCarId = carId;
+
+        // Autó részletek megjelenítése
         if (carDetailsPane != null) carDetailsPane.setExpanded(true);
 
         try (Connection conn = Database.getConnection();
@@ -347,20 +361,186 @@ public class SajatAutokController {
 
             stmt.setInt(1, carId);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next() && carDetailsLabel != null) {
-                carDetailsLabel.setText(
-                        rs.getString("brand") + " " + rs.getString("type") +
-                                " (" + rs.getString("license") + "), " +
-                                rs.getInt("vintage") + " - " +
-                                rs.getInt("km") + " km"
-                );
+                String brand = rs.getString("brand");
+                String type = rs.getString("type");
+                String license = rs.getString("license");
+                int vintage = rs.getInt("vintage");
+                int km = rs.getInt("km");
+
+                carDetailsLabel.setText(String.format("%s %s (%s), %d - %d km",
+                        brand, type, license, vintage, km));
             }
+
         } catch (SQLException e) {
+            e.printStackTrace();
             showAlert("Hiba", "Nem sikerült betölteni az autó részleteit.");
         }
 
-        loadServices(carId);
+        // ----------------- Közelgő szervizek betöltése -----------------
+        ServiceDAO dao = new ServiceDAO();
+        List<ServiceDAO.Service> upcomingServices = dao.getUpcomingServices()
+                .stream()
+                .filter(s -> s.carId == carId) // csak a kiválasztott autóhoz
+                .toList();
+
+        servicesContainer.getChildren().clear(); // előző tartalom törlése
+
+        if (upcomingServices.isEmpty()) {
+            Label emptyLabel = new Label("Nincs közelgő szerviz erre az autóra.");
+            emptyLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 14));
+            emptyLabel.setTextFill(Color.GRAY);
+            servicesContainer.getChildren().add(emptyLabel);
+        } else {
+            for (ServiceDAO.Service s : upcomingServices) {
+                VBox widget = createServiceWidget(s);
+                servicesContainer.getChildren().add(widget);
+            }
+        }
     }
+
+    /**
+     * Widget létrehozása egy közelgő szervizhez
+     */
+    private VBox createServiceWidget(ServiceDAO.Service service) {
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append("Dátum: ").append(service.serviceDate).append("\n");
+        textBuilder.append("Helyszín: ").append(service.location);
+        if (service.notes != null && !service.notes.isEmpty()) {
+            textBuilder.append("\nMegjegyzés: ").append(service.notes);
+        }
+        textBuilder.append("\nEmlékeztető: ").append(service.reminder ? "Igen" : "Nem");
+
+        VBox widget = new VBox(8);
+        widget.setPrefWidth(350);
+        widget.setStyle(
+                "-fx-background-color: #ffffff;" +
+                        "-fx-padding: 15;" +
+                        "-fx-border-radius: 12;" +
+                        "-fx-background-radius: 12;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 5);"
+        );
+
+        Label header = new Label("🔧 Közelgő szerviz");
+        header.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        header.setTextFill(Color.web("#f1c40f"));
+
+        Label serviceLabel = new Label(textBuilder.toString());
+        serviceLabel.setFont(Font.font("Segoe UI", 14));
+        serviceLabel.setTextFill(Color.DARKSLATEGRAY);
+        serviceLabel.setWrapText(true);
+
+        // --- Gombok hozzáadása ---
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Button editBtn = new Button("Szerkesztés");
+        editBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 6;");
+        editBtn.setOnAction(e -> openEditServiceDialog(service));
+
+        Button deleteBtn = new Button("Törlés");
+        deleteBtn.setStyle("-fx-background-color: #e53935; -fx-text-fill: white; -fx-background-radius: 6;");
+        deleteBtn.setOnAction(e -> {
+            // A metódus most két paramétert vár: carId és serviceDate
+            deleteUpcomingService(service.carId, service.serviceDate);
+        });
+
+
+        buttonBox.getChildren().addAll(editBtn, deleteBtn);
+
+        widget.getChildren().addAll(header, serviceLabel, buttonBox);
+        return widget;
+    }
+
+
+    private void deleteUpcomingService(int carId, String serviceDate) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Szerviz törlése");
+        confirm.setHeaderText("Biztosan törölni szeretnéd ezt a szervizt?");
+        confirm.setContentText("A törlés végleges és nem visszavonható!");
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                             "DELETE FROM upcoming_services WHERE car_id = ? AND service_date = ?")) {
+
+                    stmt.setInt(1, carId);
+                    stmt.setString(2, serviceDate);
+                    stmt.executeUpdate();
+                    showAlert("Siker", "A szerviz törölve!");
+                    showCarDetails(carId); // frissítjük a listát
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült törölni a szervizt!");
+                }
+            }
+        });
+    }
+
+    private void openEditServiceDialog(ServiceDAO.Service service) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Szerviz szerkesztése");
+
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(15));
+
+        // --- String -> LocalDate konverzió ---
+        LocalDate date = null;
+        if (service.serviceDate != null && !service.serviceDate.isEmpty()) {
+            date = LocalDate.parse(service.serviceDate); // "YYYY-MM-DD" formátumot vár
+        }
+        DatePicker datePicker = new DatePicker(date);
+
+        TextField locationField = new TextField(service.location);
+        TextArea notesArea = new TextArea(service.notes);
+        CheckBox reminderCheck = new CheckBox("Küldjön emlékeztetőt");
+        reminderCheck.setSelected(service.reminder);
+
+        container.getChildren().addAll(
+                new Label("Dátum:"), datePicker,
+                new Label("Helyszín:"), locationField,
+                new Label("Megjegyzés:"), notesArea,
+                reminderCheck
+        );
+
+        dialog.getDialogPane().setContent(container);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                try (Connection conn = Database.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                             "UPDATE upcoming_services SET service_date=?, location=?, notes=?, reminder=? WHERE car_id=? AND service_date=?")) {
+
+                    // --- LocalDate -> String konverzió ---
+                    String dateStr = datePicker.getValue().toString();
+
+                    stmt.setString(1, dateStr);
+                    stmt.setString(2, locationField.getText().trim());
+                    stmt.setString(3, notesArea.getText().trim());
+                    stmt.setBoolean(4, reminderCheck.isSelected());
+                    stmt.setInt(5, service.carId);
+                    stmt.setString(6, service.serviceDate); // az eredeti dátum a WHERE feltételhez
+                    stmt.executeUpdate();
+
+                    showAlert("Siker", "A szerviz frissítve!");
+                    showCarDetails(service.carId); // frissítés
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Hiba", "Nem sikerült frissíteni a szervizt!");
+                }
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+    }
+
+
+
+
 
     // ----------------------------- SZERVIZEK -----------------------------
 
