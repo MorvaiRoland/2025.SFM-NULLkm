@@ -2,6 +2,7 @@ package drivesync.SajátAutók;
 
 import drivesync.Adatbázis.Database;
 import drivesync.Adatbázis.ServiceDAO;
+import drivesync.Email.EmailService;
 import drivesync.PDF.PdfGenerator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -29,7 +30,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
 
-
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import java.util.Properties;
 
 import java.awt.*;
 import java.sql.*;
@@ -83,7 +86,7 @@ public class SajatAutokController {
     @FXML
     public void initialize() {
         // Évjáratok
-        IntStream.rangeClosed(1900, 2025).forEach(vintageField.getItems()::add);
+        IntStream.rangeClosed(1960, 2025).forEach(vintageField.getItems()::add);
         vintageField.setValue(2025);
 
         // Üzemanyag
@@ -108,39 +111,112 @@ public class SajatAutokController {
                 }
             });
         }
-        checkUpcomingReminders();
     }
-    private void checkUpcomingReminders() {
-        String sql = "SELECT u.service_date, u.location, u.notes, c.license " +
-                "FROM upcoming_services u " +
-                "JOIN cars c ON u.car_id = c.id " +
-                "WHERE u.reminder = TRUE";
+
+    /**
+     * Beállítja a bejelentkezett felhasználót, betölti az autókat és szervizeket,
+     * valamint ellenőrzi a közelgő szerviz emlékeztetőket.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+
+        if (welcomeLabel != null) welcomeLabel.setText("Itt a saját autóid listája:");
+        loadUserCars();
+        loadServiceTypes(); // kereshető combo feltöltése
+
+        // --- Közelgő szerviz ellenőrzés indítása ---
+        if (this.username != null && !this.username.isEmpty()) {
+            new Thread(() -> {
+                try {
+                    checkUpcomingReminders(this.username);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } else {
+            System.err.println("⚠️ Nincs bejelentkezett felhasználó — emlékeztető ellenőrzés kihagyva.");
+        }
+    }
+
+
+
+    /**
+     * Közelgő szerviz emlékeztetők ellenőrzése és e-mail küldés
+     */
+    private void checkUpcomingReminders(String username) {
+        String sql = """
+        SELECT u.service_date, u.location, u.notes, c.license, usr.email
+        FROM upcoming_services u
+        JOIN cars c ON u.car_id = c.id
+        JOIN users usr ON c.owner_id = usr.id
+        WHERE u.reminder = TRUE AND usr.username = ?
+    """;
+
         try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            LocalDate today = LocalDate.now();
-            StringBuilder sb = new StringBuilder();
+            stmt.setString(1, username);
 
-            while (rs.next()) {
-                LocalDate serviceDate = rs.getDate("service_date").toLocalDate();
-                long days = java.time.temporal.ChronoUnit.DAYS.between(today, serviceDate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                LocalDate today = LocalDate.now();
+                boolean foundReminder = false;
 
-                if (days >= 0 && days <= 3) { // 3 napon belül
-                    sb.append("Autó: ").append(rs.getString("license"))
-                            .append("\nDátum: ").append(serviceDate)
-                            .append("\nHelyszín: ").append(rs.getString("location"))
-                            .append("\nMegjegyzés: ").append(rs.getString("notes"))
-                            .append("\n\n");
+                while (rs.next()) {
+                    LocalDate serviceDate = rs.getDate("service_date").toLocalDate();
+                    long days = java.time.temporal.ChronoUnit.DAYS.between(today, serviceDate);
+
+                    if (days >= 0 && days <= 3) {
+                        foundReminder = true;
+
+                        String license = rs.getString("license");
+                        String location = rs.getString("location");
+                        String notes = rs.getString("notes");
+                        String ownerEmail = rs.getString("email");
+
+                        String messageBody = """
+                        Közelgő szerviz:
+
+                        Autó: %s
+                        Dátum: %s
+                        Helyszín: %s
+                        Megjegyzés: %s
+
+                        Üdvözlettel:
+                        DriveSync rendszer
+                        """.formatted(license, serviceDate, location, (notes != null ? notes : "-"));
+
+                        boolean success = EmailService.sendEmail(
+                                ownerEmail,
+                                "Közelgő szerviz emlékeztető",
+                                messageBody
+                        );
+
+                        if (success) {
+                            System.out.println("✅ Emlékeztető elküldve: " + ownerEmail + " (" + license + ")");
+                        } else {
+                            System.err.println("❌ Hiba az email küldésénél: " + ownerEmail);
+                        }
+                    }
+                }
+
+                if (!foundReminder) {
+                    System.out.println("ℹ️ Nincs közelgő szerviz a felhasználónál: " + username);
                 }
             }
 
-            if (sb.length() > 0) showAlert("Közelgő szervizek", sb.toString());
-
         } catch (SQLException e) {
+            System.err.println("❌ Adatbázis hiba az emlékeztetők lekérdezésekor:");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Váratlan hiba az emlékeztetők feldolgozásakor:");
             e.printStackTrace();
         }
     }
+
+
+
+
+
 
 // ----------------------------- MÁRKA ÉS TÍPUS BETÖLTÉS -----------------------------
 
@@ -236,12 +312,7 @@ public class SajatAutokController {
 
 
 
-    public void setUsername(String username) {
-        this.username = username;
-        if (welcomeLabel != null) welcomeLabel.setText("Itt a saját autóid listája:");
-        loadUserCars();
-        loadServiceTypes(); // kereshető combo feltöltése
-    }
+
 
     // ----------------------------- AUTÓK -----------------------------
 
