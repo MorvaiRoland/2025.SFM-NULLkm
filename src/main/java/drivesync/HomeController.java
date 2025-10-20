@@ -76,6 +76,9 @@ public class HomeController {
                     ((HomeDashboardController) controller).setUsername(username);
                 }
             }
+            if (controller instanceof BudgetController) {
+                ((BudgetController) controller).setUsername(username);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
