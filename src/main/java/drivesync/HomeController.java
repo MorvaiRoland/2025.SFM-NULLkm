@@ -88,6 +88,9 @@ public class HomeController {
             if (controller instanceof SajatAutokController) {
                 ((SajatAutokController) controller).setUsername(username);
             }
+            if (controller instanceof BudgetController) {
+                ((BudgetController) controller).setUsername(username);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
