@@ -1,5 +1,7 @@
 package drivesync;
 
+import drivesync.SajátAutók.SajatAutokController;
+import drivesync.Főoldal.HomeDashboardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -34,29 +36,13 @@ public class HomeController {
         menuButtons.add(calculatorBtn);
         menuButtons.add(settingsBtn);
 
-        // alapértelmezett aktív gomb
         setActiveMenu(homeBtn);
-
-        // Hover effekt
-        for (Button btn : menuButtons) {
-            btn.setOnMouseEntered(e -> {
-                if (!btn.getStyle().contains("#4CAF50")) {
-                    btn.setStyle(btn.getStyle() + "-fx-background-color: #FFD700; -fx-text-fill: black;");
-                }
-            });
-            btn.setOnMouseExited(e -> {
-                if (!btn.getStyle().contains("#4CAF50")) {
-                    btn.setStyle(btn.getStyle().replace("-fx-background-color: #FFD700; -fx-text-fill: black;", ""));
-                }
-            });
-        }
+        addHoverEffectToMenu();
     }
 
     public void setUsername(String username) {
         this.username = username;
-        if (usernameLabel != null) {
-            usernameLabel.setText(username);
-        }
+        if (usernameLabel != null) usernameLabel.setText(username);
         showHome();
     }
 
@@ -69,24 +55,26 @@ public class HomeController {
         stage.setTitle("DriveSync");
     }
 
-    @FXML private void showHome() { loadFXMLToContent("/drivesync/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
-    @FXML private void showCars() { loadFXMLToContent("/drivesync/SajatAutok.fxml"); setActiveMenu(carsBtn); }
-    @FXML private void showBudget() { loadFXMLToContent("/drivesync/Budget.fxml"); setActiveMenu(budgetBtn); }
-    @FXML private void showLinks() { loadFXMLToContent("/drivesync/Links.fxml"); setActiveMenu(linksBtn); }
-    @FXML private void showCalculator() { loadFXMLToContent("/drivesync/CalculatorController.fxml"); setActiveMenu(calculatorBtn); }
-    @FXML private void showSettings() { loadFXMLToContent("/drivesync/Settings.fxml"); setActiveMenu(settingsBtn); }
+    @FXML private void showHome() { loadFXML("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
+    @FXML private void showCars() { loadFXML("/drivesync/SajátAutók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
+    @FXML private void showBudget() { loadFXML("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
+    @FXML private void showLinks() { loadFXML("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
+    @FXML private void showCalculator() { loadFXML("/drivesync/Kalkulátor/Calculator.fxml"); setActiveMenu(calculatorBtn); }
+    @FXML private void showSettings() { loadFXML("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
 
-    private void loadFXMLToContent(String fxmlPath) {
+    private void loadFXML(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent pane = loader.load();
-
-            contentContainer.getChildren().clear();
-            contentContainer.getChildren().add(pane);
+            contentContainer.getChildren().setAll(pane);
 
             Object controller = loader.getController();
-            if (controller instanceof SajatAutokController) {
-                ((SajatAutokController) controller).setUsername(username);
+            if (controller != null) {
+                if (controller instanceof SajatAutokController) {
+                    ((SajatAutokController) controller).setUsername(username);
+                } else if (controller instanceof HomeDashboardController) {
+                    ((HomeDashboardController) controller).setUsername(username);
+                }
             }
 
         } catch (IOException e) {
@@ -98,26 +86,29 @@ public class HomeController {
     private void setActiveMenu(Button activeBtn) {
         for (Button btn : menuButtons) {
             if (btn == activeBtn) {
-                btn.setStyle(
-                        "-fx-background-color: #FFD700;" + // arany
-                                "-fx-text-fill: black;" +
-                                "-fx-font-weight: bold;" +
-                                "-fx-background-radius: 12;" +
-                                "-fx-font-size: 16px;" +
-                                "-fx-alignment: CENTER_LEFT;" +
-                                "-fx-padding: 10 20 10 20;"
-                );
+                btn.setStyle("-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-weight: bold; "
+                        + "-fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; "
+                        + "-fx-padding: 10 20 10 20;");
             } else {
-                btn.setStyle(
-                        "-fx-background-color: transparent;" +
-                                "-fx-text-fill: gold;" +
-                                "-fx-font-weight: bold;" +
-                                "-fx-background-radius: 12;" +
-                                "-fx-font-size: 16px;" +
-                                "-fx-alignment: CENTER_LEFT;" +
-                                "-fx-padding: 10 20 10 20;"
-                );
+                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: gold; -fx-font-weight: bold; "
+                        + "-fx-background-radius: 12; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT; "
+                        + "-fx-padding: 10 20 10 20;");
             }
+        }
+    }
+
+    private void addHoverEffectToMenu() {
+        for (Button btn : menuButtons) {
+            btn.setOnMouseEntered(e -> {
+                if (!btn.getStyle().contains("#FFD700")) {
+                    btn.setStyle(btn.getStyle() + "-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;");
+                }
+            });
+            btn.setOnMouseExited(e -> {
+                if (!btn.getStyle().contains("#FFD700")) {
+                    btn.setStyle(btn.getStyle().replace("-fx-background-color: rgba(255,215,0,0.3); -fx-text-fill: white;", ""));
+                }
+            });
         }
     }
 }

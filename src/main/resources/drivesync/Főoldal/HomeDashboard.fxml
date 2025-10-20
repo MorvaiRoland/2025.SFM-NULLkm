@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.Főoldal.HomeDashboardController"
+            style="-fx-background-color: #f0f4f8;" prefWidth="1200" prefHeight="700">
+
+    <!-- Középső widget terület -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+            <FlowPane fx:id="widgetContainer" hgap="20" vgap="20" prefWrapLength="1000"
+                      style="-fx-padding: 25; -fx-background-color: transparent;"/>
+        </ScrollPane>
+    </center>
+
+    <!-- Modern, mindig látható alsó menü -->
+    <bottom>
+        <HBox fx:id="menuHBox" spacing="15" style="-fx-background-color: #2c2c2c; -fx-padding: 10;" alignment="CENTER">
+
+            <!-- Összecsukás gomb -->
+            <Button fx:id="toggleMenuBtn" text="☰" style="-fx-background-color: none; -fx-text-fill: gold; -fx-font-size: 22;" />
+
+            <!-- Menü gombok felirattal -->
+            <Button fx:id="weatherBtn" text="Időjárás" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="fuelBtn" text="Üzemanyag" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="carsBtn" text="Autók" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="budgetBtn" text="Költségvetés" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="linksBtn" text="Linkek" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="notificationsBtn" text="Értesítések" contentDisplay="TOP" style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+
+        </HBox>
+
+    </bottom>
+
+</BorderPane>
