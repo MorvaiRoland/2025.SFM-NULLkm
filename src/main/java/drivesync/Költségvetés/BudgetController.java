@@ -1,6 +1,5 @@
-package drivesync;
+package drivesync.Költségvetés;
 
-import com.mysql.cj.protocol.Resultset;
 import drivesync.Adatbázis.Database;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;

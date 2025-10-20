@@ -1,5 +1,6 @@
 package drivesync;
 
+import drivesync.Költségvetés.BudgetController;
 import drivesync.SajátAutók.SajatAutokController;
 import drivesync.Főoldal.HomeDashboardController;
 import javafx.fxml.FXML;
