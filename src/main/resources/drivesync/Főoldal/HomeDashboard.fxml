@@ -15,7 +15,7 @@
         <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true"
                     style="-fx-background-color: transparent; -fx-border-color: transparent;">
             <FlowPane fx:id="widgetContainer"
-                      hgap="20" vgap="20" prefWrapLength="1000"
+                      hgap="25" vgap="25" prefWrapLength="1000"
                       style="-fx-padding: 25; -fx-background-color: transparent;"/>
         </ScrollPane>
     </center>
