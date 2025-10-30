@@ -9,10 +9,17 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
 import javafx.animation.KeyValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,8 +29,16 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +48,9 @@ public class HomeDashboardController {
     @FXML private FlowPane widgetContainer;
     @FXML private HBox menuHBox;
     @FXML private Button toggleMenuBtn, weatherBtn, fuelBtn, carsBtn, budgetBtn, linksBtn, notificationsBtn;
+    @FXML
+    private BorderPane mainLayout; // a fő BorderPane, az FXML gyökerében
+
 
     private boolean isCollapsed = false;
     private final Map<String, VBox> activeWidgets = new HashMap<>();
@@ -193,8 +211,169 @@ public class HomeDashboardController {
         return box;
     }
 
-    private VBox createCarsWidget() { VBox box = baseWidget("🚗 Autók", "#f1c40f"); box.getChildren().add(new Label("Saját autók listája és statisztikák.")); return box; }
-    private VBox createBudgetWidget() { VBox box = baseWidget("💰 Költségvetés", "#f1c40f"); box.getChildren().add(new Label("Kiadások és bevételek összegzése.")); return box; }
+    private VBox createCarsWidget() {
+        VBox box = baseWidget("🚗 Autók", "#f1c40f");
+
+        Label infoLabel = new Label("Saját autók listája:");
+        infoLabel.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
+
+        VBox carsContainer = new VBox(10);
+        carsContainer.setAlignment(Pos.CENTER_LEFT);
+        carsContainer.setPrefWidth(380);
+
+
+
+
+
+        // Háttérszál az autók adatainak lekérésére
+        new Thread(() -> {
+            List<Map<String, Object>> cars = new ArrayList<>();
+
+            try (Connection conn = drivesync.Adatbázis.Database.getConnection()) {
+                String sql = """
+                SELECT license, brand, type, vintage, fuel_type, km, color
+                FROM cars
+                WHERE owner_id = (SELECT id FROM users WHERE username = ?)
+                """;
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+
+                // 🔹 Itt még háttérszálon olvassuk a ResultSet-et
+                while (rs.next()) {
+                    Map<String, Object> car = new HashMap<>();
+                    car.put("brand", rs.getString("brand"));
+                    car.put("type", rs.getString("type"));
+                    car.put("license", rs.getString("license"));
+                    car.put("vintage", rs.getString("vintage"));
+                    car.put("fuel", rs.getString("fuel_type"));
+                    car.put("km", rs.getInt("km"));
+                    car.put("color", rs.getString("color"));
+                    cars.add(car);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            // 🔹 UI-frissítés már csak az összegyűjtött adatokból
+            javafx.application.Platform.runLater(() -> {
+                if (cars.isEmpty()) {
+                    Label noCars = new Label("Nincs regisztrált autó.");
+                    noCars.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 14));
+                    noCars.setTextFill(Color.GRAY);
+                    carsContainer.getChildren().add(noCars);
+                } else {
+                    for (Map<String, Object> car : cars) {
+                        VBox carBox = new VBox(4);
+                        carBox.setStyle(
+                                "-fx-background-color: #f9f9f9; -fx-padding: 12; " +
+                                        "-fx-border-radius: 10; -fx-background-radius: 10; " +
+                                        "-fx-border-color: #f1c40f; -fx-border-width: 1;"
+                        );
+
+                        Label title = new Label(car.get("brand") + " " + car.get("type"));
+                        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+                        title.setTextFill(Color.web("#2c3e50"));
+
+                        Label details = new Label(
+                                "Rendszám: " + car.get("license") +
+                                        "\nÉvjárat: " + car.get("vintage") +
+                                        "\nÜzemanyag: " + car.get("fuel") +
+                                        "\nKm: " + String.format("%,d km", car.get("km")) +
+                                        (car.get("color") != null && !((String) car.get("color")).isEmpty()
+                                                ? "\nSzín: " + car.get("color") : "")
+                        );
+                        details.setFont(Font.font("Segoe UI", 14));
+                        details.setTextFill(Color.DARKSLATEGRAY);
+
+                        carBox.getChildren().addAll(title, details);
+                        carsContainer.getChildren().add(carBox);
+                    }
+                }
+            });
+        }).start();
+
+
+        box.getChildren().addAll(infoLabel, carsContainer);
+        return box;
+    }
+
+
+
+    private VBox createBudgetWidget() {
+        VBox box = baseWidget("💰 Költségvetés", "#f1c40f");
+
+        Label infoLabel = new Label("Kiadások és bevételek összegzése:");
+        infoLabel.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
+
+        Label monthlyLabel = new Label("Havi összesítés: ...");
+        monthlyLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        monthlyLabel.setTextFill(Color.web("#2c3e50"));
+
+        Label yearlyLabel = new Label("Éves összesítés: ...");
+        yearlyLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        yearlyLabel.setTextFill(Color.web("#2c3e50"));
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
+        chart.setTitle("Havi költések (Ft)");
+        xAxis.setLabel("Hónap");
+        yAxis.setLabel("Összeg (Ft)");
+        chart.setPrefHeight(200);
+        chart.setLegendVisible(false);
+
+        new Thread(() -> {
+            try (Connection conn = drivesync.Adatbázis.Database.getConnection()) {
+                String sql = "SELECT price, datet FROM expense WHERE owner_id = (SELECT id FROM users WHERE username = ?)";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+
+                int yearlySumTemp = 0;
+                int[] monthlySumTemp = new int[12];
+
+                while (rs.next()) {
+                    int amount = rs.getInt("price");
+                    LocalDate date = rs.getDate("datet").toLocalDate();
+                    yearlySumTemp += amount;
+                    if (date.getYear() == LocalDate.now().getYear()) {
+                        monthlySumTemp[date.getMonthValue() - 1] += amount;
+                    }
+                }
+
+                // final változók a lambdához
+                final int yearlySum = yearlySumTemp;
+                final int[] monthlySum = monthlySumTemp;
+
+                DecimalFormat df = new DecimalFormat("#,###");
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                String[] months = {"Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Szep", "Okt", "Nov", "Dec"};
+
+                for (int i = 0; i < 12; i++) {
+                    series.getData().add(new XYChart.Data<>(months[i], monthlySum[i]));
+                }
+
+                javafx.application.Platform.runLater(() -> {
+                    monthlyLabel.setText("Havi összesítés: " +
+                            df.format(monthlySum[LocalDate.now().getMonthValue() - 1]) + " Ft");
+                    yearlyLabel.setText("Éves összesítés: " + df.format(yearlySum) + " Ft");
+                    chart.getData().add(series);
+                });
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() ->
+                        infoLabel.setText("Hiba az adatok betöltésekor."));
+            }
+        }).start();
+
+        box.getChildren().addAll(infoLabel, monthlyLabel, yearlyLabel, chart);
+        return box;
+    }
+
+
     private VBox createLinksWidget() { VBox box = baseWidget("🔗 Linkek", "#f1c40f"); box.getChildren().add(new Label("Gyakran használt linkek.")); return box; }
 
     private VBox createNotificationWidgets() {
@@ -228,6 +407,25 @@ public class HomeDashboardController {
     }
 
     private Label baseWidgetHeader(String title) { Label header = new Label(title); header.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20)); header.setTextFill(Color.web("#f1c40f")); return header; }
+
+    private void openServicePage() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/SajátAutók/SajatAutok.fxml"));
+            Parent servicePage = loader.load();
+
+            // Tartalom frissítése a középső részben
+            mainLayout.setCenter(servicePage);
+
+            // (opcionális) adatok átadása a SajátAutók controllernek
+            Object controller = loader.getController();
+            if (controller instanceof drivesync.SajátAutók.SajatAutokController sc) {
+                sc.setUsername(username);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FunctionalInterface
     private interface WidgetCreator { VBox create(); }

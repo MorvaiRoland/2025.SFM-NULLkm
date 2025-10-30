@@ -1,5 +1,6 @@
 package drivesync;
 
+import drivesync.Költségvetés.BudgetController;
 import drivesync.SajátAutók.SajatAutokController;
 import drivesync.Főoldal.HomeDashboardController;
 import javafx.fxml.FXML;
@@ -75,6 +76,9 @@ public class HomeController {
                 } else if (controller instanceof HomeDashboardController) {
                     ((HomeDashboardController) controller).setUsername(username);
                 }
+            }
+            if (controller instanceof BudgetController) {
+                ((BudgetController) controller).setUsername(username);
             }
 
         } catch (IOException e) {
