@@ -1,7 +1,10 @@
-package drivesync.Linkek;
-
+package  drivesync.Linkek;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
@@ -9,44 +12,46 @@ import java.net.URISyntaxException;
 
 public class LinksController {
 
-    @FXML
-    private Hyperlink linkHAHU;
-    @FXML
-    private Hyperlink linkFEKMESTER;
-    @FXML
-    private Hyperlink linkHOLTANKOLJAK;
-    @FXML
-    private Hyperlink linkWAZE;
-    @FXML
-    private Hyperlink linkGARVISOR;
+    @FXML private Hyperlink linkHAHU;
+    @FXML private Hyperlink linkFEKMESTER;
+    @FXML private Hyperlink linkHOLTANKOLJAK;
+    @FXML private Hyperlink linkWAZE;
+    @FXML private Hyperlink linkGARVISOR;
 
-    // Linkekhez tartozó URL-ek
-    private static final String URL_HAHU = "https://www.hasznaltauto.hu/";
-    private static final String URL_FEKMESTER = "https://www.fekmester.hu/";
-    private static final String URL_HOLTANKOLJAK = "https://holtankoljak.hu/#!";
-    private static final String URL_WAZE = "https://www.waze.com/hu/live-map/";
-    private static final String URL_GARVISOR = "https://garvisor.com/";
+    @FXML private ImageView imgHAHU;
+    @FXML private ImageView imgFEKMESTER;
+    @FXML private ImageView imgHOLTANKOLJAK;
+    @FXML private ImageView imgWAZE;
+    @FXML private ImageView imgGARVISOR;
 
     @FXML
     private void initialize() {
-        linkHAHU.setOnAction(e -> openLink(URL_HAHU));
-        linkFEKMESTER.setOnAction(e -> openLink(URL_FEKMESTER));
-        linkHOLTANKOLJAK.setOnAction(e -> openLink(URL_HOLTANKOLJAK));
-        linkWAZE.setOnAction(e -> openLink(URL_WAZE));
-        linkGARVISOR.setOnAction(e -> openLink(URL_GARVISOR));
+        // Képek betöltése classpath-ról
+        imgHAHU.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/hasznaltauto.png")));
+        imgFEKMESTER.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/fekmester.png")));
+        imgHOLTANKOLJAK.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/holtankoljak.png")));
+        imgWAZE.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/waze.png")));
+        imgGARVISOR.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/garvisor.png")));
+
+        // Tooltip-ek beállítása programból
+        linkHAHU.setTooltip(new Tooltip("Használt autók keresése"));
+        linkFEKMESTER.setTooltip(new Tooltip("Autóalkatrész áruház"));
+        linkHOLTANKOLJAK.setTooltip(new Tooltip("Üzemanyag árak országosan"));
+        linkWAZE.setTooltip(new Tooltip("Valós idejű navigáció"));
+        linkGARVISOR.setTooltip(new Tooltip("Szervizek, értékelések"));
+
+        // Linkek akciói
+        linkHAHU.setOnAction(e -> openLink("https://www.hasznaltauto.hu/"));
+        linkFEKMESTER.setOnAction(e -> openLink("https://www.fekmester.hu/"));
+        linkHOLTANKOLJAK.setOnAction(e -> openLink("https://holtankoljak.hu/#!"));
+        linkWAZE.setOnAction(e -> openLink("https://www.waze.com/hu/live-map/"));
+        linkGARVISOR.setOnAction(e -> openLink("https://garvisor.com/"));
     }
 
     private void openLink(String url) {
-        if (url == null || url.isBlank()) {
-            return;
-        }
-
         if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().browse(new URI(url));
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
+            try { Desktop.getDesktop().browse(new URI(url)); }
+            catch (IOException | URISyntaxException ex) { ex.printStackTrace(); }
         }
     }
 }
