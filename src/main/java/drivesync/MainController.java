@@ -291,13 +291,17 @@ public class MainController {
     // ---------------- LOAD HOME ----------------
     public void loadHomeSceneAfterStageShown(String username, Stage stage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/Menü/Home.fxml"));
-            Scene homeScene = new Scene(loader.load(), 1200, 700);
+            // Használjuk az App által előre betöltött és stílusozott fő jelenetet,
+            // így garantált a style.css és a globális beállítások (téma, betűméret) alkalmazása.
+            Scene homeScene = App.getHomeScene();
+            HomeController homeController = App.getHomeController();
+            if (homeController != null) {
+                homeController.setUsername(username);
+            }
 
-            HomeController homeController = loader.getController();
-            homeController.setUsername(username);
-
-            stage.setScene(homeScene);
+            if (homeScene != null) {
+                stage.setScene(homeScene);
+            }
             stage.setTitle("DriveSync - Főoldal");
 
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();

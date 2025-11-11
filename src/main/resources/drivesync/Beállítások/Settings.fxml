@@ -7,12 +7,12 @@
 <?import java.lang.String?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="drivesync.Beállítások.SettingsController"
-            fitToWidth="true">
+            fitToWidth="true" styleClass="app-bg">
     <content>
         <VBox spacing="20">
 
             <!-- Cím -->
-            <Label text="Beállítások" style="-fx-font-size: 24px; -fx-font-weight: bold;">
+            <Label text="Beállítások" styleClass="page-title">
                 <padding>
                     <Insets top="10" right="0" bottom="10" left="0"/>
                 </padding>
@@ -105,8 +105,8 @@
                 <padding>
                     <Insets top="10" right="0" bottom="0" left="0"/>
                 </padding>
-                <Button text="Mentés" fx:id="saveBtn" onAction="#handleSave" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-                <Button text="Visszaállítás" fx:id="resetBtn" onAction="#handleReset" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+                <Button text="Mentés" fx:id="saveBtn" onAction="#handleSave" styleClass="btn-primary"/>
+                <Button text="Visszaállítás" fx:id="resetBtn" onAction="#handleReset" styleClass="btn-danger"/>
             </HBox>
 
         </VBox>

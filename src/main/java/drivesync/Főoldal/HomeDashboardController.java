@@ -1,5 +1,6 @@
 package drivesync.Főoldal;
 
+import com.itextpdf.layout.properties.TextAlignment;
 import drivesync.Időjárás.WeatherService;
 import drivesync.Időjárás.WeatherService.Weather;
 import drivesync.FuelService.FuelService;
@@ -17,18 +18,20 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
+
+import java.awt.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -171,45 +174,88 @@ public class HomeDashboardController {
                 "100-as benzin", "/drivesync/icons/benzin-100.png"
         );
 
-        Label lastUpdatedLabel = new Label(); lastUpdatedLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 12));
-        lastUpdatedLabel.setStyle("-fx-text-fill: gray;"); lastUpdatedLabel.setAlignment(Pos.CENTER);
+        Label lastUpdatedLabel = new Label();
+        lastUpdatedLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 12));
+        lastUpdatedLabel.setStyle("-fx-text-fill: gray;");
+        lastUpdatedLabel.setAlignment(Pos.CENTER);
 
         Runnable updateFuelPrices = () -> {
             Map<String, String[]> prices = FuelService.getFuelPrices();
-            if(prices.isEmpty()) { box.getChildren().setAll(new Label("Nem sikerült lekérni az adatokat")); return; }
+            if (prices.isEmpty()) {
+                box.getChildren().setAll(new Label("Nem sikerült lekérni az adatokat"));
+                return;
+            }
 
-            HBox fuelRow = new HBox(20); fuelRow.setAlignment(Pos.CENTER);
+            HBox fuelRow = new HBox(40); // több tér a dobozok között
+            fuelRow.setAlignment(Pos.CENTER);
 
-            for(String fuel : fuelOrder){
-                VBox fuelBox = new VBox(10); fuelBox.setAlignment(Pos.CENTER);
-                fuelBox.setStyle("-fx-background-color: #f8f8f8; -fx-padding: 15; -fx-border-radius: 12; -fx-background-radius: 12;");
-                fuelBox.setPrefWidth(150);
+            for (String fuel : fuelOrder) {
+                VBox fuelBox = new VBox(15);
+                fuelBox.setAlignment(Pos.CENTER);
+                fuelBox.setStyle(
+                        "-fx-background-color: #f9f9f9; " +
+                                "-fx-padding: 20; " +
+                                "-fx-border-color: #cccccc; " +
+                                "-fx-border-radius: 14; " +
+                                "-fx-background-radius: 14; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 1);"
+                );
+
+                fuelBox.setPrefWidth(260);  // 🔹 Szélesebb kártya, hogy minden szöveg kiférjen
+                fuelBox.setMinWidth(240);   // biztos minimumszélesség
+                fuelBox.setMaxWidth(300);   // ne nőjön túl
 
                 ImageView icon = new ImageView(getClass().getResource(fuelIcons.get(fuel)).toExternalForm());
-                icon.setFitWidth(48); icon.setFitHeight(48);
+                icon.setFitWidth(50);
+                icon.setFitHeight(50);
 
-                Label fuelLabel = new Label(fuel); fuelLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-                fuelLabel.setWrapText(true); fuelLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER); fuelLabel.setAlignment(Pos.CENTER);
+                Label fuelLabel = new Label(fuel);
+                fuelLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+                fuelLabel.setWrapText(true);
+                fuelLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+                fuelLabel.setAlignment(Pos.CENTER);
 
-                VBox headerBox = new VBox(5, icon, fuelLabel); headerBox.setAlignment(Pos.CENTER);
+                VBox headerBox = new VBox(8, icon, fuelLabel);
+                headerBox.setAlignment(Pos.CENTER);
 
                 String[] fuelPrices = prices.getOrDefault(fuel, new String[]{"-", "-", "-"});
-                Label minLabel = new Label("Min: " + fuelPrices[0]); Label avgLabel = new Label("Átlag: " + fuelPrices[1]); Label maxLabel = new Label("Max: " + fuelPrices[2]);
-                minLabel.setFont(Font.font("Segoe UI", 14)); avgLabel.setFont(Font.font("Segoe UI", 14)); maxLabel.setFont(Font.font("Segoe UI", 14));
+                Label minLabel = new Label("Min: " + fuelPrices[0] );
+                Label avgLabel = new Label("Átlag: " + fuelPrices[1] );
+                Label maxLabel = new Label("Max: " + fuelPrices[2] );
 
-                VBox pricesBox = new VBox(4, minLabel, avgLabel, maxLabel); pricesBox.setAlignment(Pos.CENTER);
+                for (Label lbl : new Label[]{minLabel, avgLabel, maxLabel}) {
+                    lbl.setFont(Font.font("Segoe UI", 15)); // picit nagyobb, olvashatóbb
+                    lbl.setAlignment(Pos.CENTER);
+                    lbl.setWrapText(false);
+                }
+
+                VBox pricesBox = new VBox(6, minLabel, avgLabel, maxLabel);
+                pricesBox.setAlignment(Pos.CENTER);
+
                 fuelBox.getChildren().addAll(headerBox, pricesBox);
                 fuelRow.getChildren().add(fuelBox);
             }
 
-            lastUpdatedLabel.setText("Utoljára frissítve: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")));
+            lastUpdatedLabel.setText(
+                    "Utoljára frissítve: " +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm"))
+            );
+
+            javafx.scene.layout.VBox.setMargin(fuelRow, new javafx.geometry.Insets(15, 0, 8, 0));
             box.getChildren().setAll(fuelRow, lastUpdatedLabel);
+            box.setAlignment(Pos.CENTER);
         };
 
         updateFuelPrices.run();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.hours(1), e -> updateFuelPrices.run())); timeline.setCycleCount(Timeline.INDEFINITE); timeline.play();
+        Timeline timeline = new Timeline(new KeyFrame(Duration.hours(1), e -> updateFuelPrices.run()));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
         return box;
     }
+
+
+
 
     private VBox createCarsWidget() {
         VBox box = baseWidget("🚗 Autók", "#f1c40f");

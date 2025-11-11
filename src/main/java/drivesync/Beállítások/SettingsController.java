@@ -5,11 +5,16 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Slider;
+import javafx.application.Platform;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.prefs.Preferences;
 
 public class SettingsController {
 
@@ -18,13 +23,39 @@ public class SettingsController {
     @FXML private PasswordField passwordField;
     @FXML private Label regDateLabel;
 
+    // UI beállítások és értesítések
+    @FXML private CheckBox emailNotifications;
+    @FXML private CheckBox smsNotifications;
+    @FXML private CheckBox pushNotifications;
+
+    @FXML private ChoiceBox<String> themeChoiceBox;
+    @FXML private Slider fontSizeSlider;
+
+    @FXML private CheckBox twoFactorAuth;
+    @FXML private CheckBox autoUpdate;
+    @FXML private CheckBox sendUsageStats;
+    @FXML private CheckBox enableLogging;
+
     private int currentUserId;
     private Connection conn;
+    private final Preferences prefs = Preferences.userNodeForPackage(SettingsController.class);
 
     public void setConnection(Connection connection, int userId) {
         this.conn = connection;
         this.currentUserId = userId;
         loadUserData();
+    }
+
+    @FXML
+    private void initialize() {
+        // Prefek betöltése UI elemekbe és azonnali alkalmazása
+        loadPreferencesToControls();
+
+        // Scene csak a megjelenítés után elérhető – késleltetett alkalmazás
+        Platform.runLater(() -> {
+            applyTheme(prefs.get("theme", "Rendszer"));
+            applyFontSize(prefs.getDouble("fontSize", 14.0));
+        });
     }
 
     private void loadUserData() {
@@ -48,57 +79,81 @@ public class SettingsController {
 
     @FXML
     private void handleSave() {
-        if (conn == null) return;
+        // 1) Preferenciák mentése
+        String theme = themeChoiceBox != null && themeChoiceBox.getValue() != null ? themeChoiceBox.getValue() : "Rendszer";
+        double fontSize = fontSizeSlider != null ? fontSizeSlider.getValue() : 14.0;
+        prefs.put("theme", theme);
+        prefs.putDouble("fontSize", fontSize);
+        prefs.putBoolean("emailNotifications", emailNotifications != null && emailNotifications.isSelected());
+        prefs.putBoolean("smsNotifications", smsNotifications != null && smsNotifications.isSelected());
+        prefs.putBoolean("pushNotifications", pushNotifications != null && pushNotifications.isSelected());
+        prefs.putBoolean("twoFactorAuth", twoFactorAuth != null && twoFactorAuth.isSelected());
+        prefs.putBoolean("autoUpdate", autoUpdate != null && autoUpdate.isSelected());
+        prefs.putBoolean("sendUsageStats", sendUsageStats != null && sendUsageStats.isSelected());
+        prefs.putBoolean("enableLogging", enableLogging != null && enableLogging.isSelected());
 
-        String username = usernameField.getText().trim();
-        String email = emailField.getText().trim();
-        String password = passwordField.getText().trim();
+        // Azonnali alkalmazás
+        applyTheme(theme);
+        applyFontSize(fontSize);
 
-        if (username.isEmpty() || email.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Hiányzó adat", "A felhasználónév és email kötelező!");
-            return;
-        }
+        // 2) Felhasználói adatok mentése DB-be (ha van kapcsolat)
+        if (conn != null) {
+            String username = usernameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = passwordField.getText().trim();
 
-        try {
-            String sql;
-            if (password.isEmpty()) {
-                // Ha a jelszó mező üres, ne változtassuk meg a jelszót
-                sql = "UPDATE users SET username=?, email=? WHERE id=?";
-            } else {
-                sql = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
+            if (username.isEmpty() || email.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Hiányzó adat", "A felhasználónév és email kötelező!");
+                return;
             }
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, username);
-                stmt.setString(2, email);
-
+            try {
+                String sql;
                 if (password.isEmpty()) {
-                    stmt.setInt(3, currentUserId);
+                    sql = "UPDATE users SET username=?, email=? WHERE id=?";
                 } else {
-                    stmt.setString(3, password); // Itt érdemes lenne hash-elni a jelszót!
-                    stmt.setInt(4, currentUserId);
+                    sql = "UPDATE users SET username=?, email=?, password=? WHERE id=?";
                 }
 
-                int rows = stmt.executeUpdate();
-                if (rows > 0) {
-                    showAlert(Alert.AlertType.INFORMATION, "Siker", "Adatok sikeresen mentve.");
-                    passwordField.clear(); // Jelszó mező törlése mentés után
-                } else {
-                    showAlert(Alert.AlertType.WARNING, "Figyelem", "Nem történt változtatás.");
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setString(1, username);
+                    stmt.setString(2, email);
+
+                    if (password.isEmpty()) {
+                        stmt.setInt(3, currentUserId);
+                    } else {
+                        stmt.setString(3, password); // TODO: hash jelszó
+                        stmt.setInt(4, currentUserId);
+                    }
+
+                    int rows = stmt.executeUpdate();
+                    if (rows > 0) {
+                        showAlert(Alert.AlertType.INFORMATION, "Siker", "Beállítások és adatok mentve.");
+                        passwordField.clear();
+                    } else {
+                        showAlert(Alert.AlertType.INFORMATION, "Siker", "Beállítások mentve.");
+                    }
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült menteni az adatbázis adatait, de a beállítások elmentésre kerültek.");
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült menteni az adatokat.");
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Siker", "Beállítások mentve.");
         }
     }
 
     @FXML
     private void handleReset() {
+        // Prefek visszatöltése és alkalmazása
+        loadPreferencesToControls();
+        applyTheme(prefs.get("theme", "Rendszer"));
+        applyFontSize(prefs.getDouble("fontSize", 14.0));
+
+        // DB adatok friss betöltése
         loadUserData();
-        passwordField.clear();
-        showAlert(Alert.AlertType.INFORMATION, "Visszaállítás", "Az adatok visszaállítva.");
+        if (passwordField != null) passwordField.clear();
+        showAlert(Alert.AlertType.INFORMATION, "Visszaállítás", "Beállítások visszaállítva.");
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -106,6 +161,8 @@ public class SettingsController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        // Dialógus témázása és stíluslap csatolása
+        drivesync.App.styleDialog(alert);
         alert.showAndWait();
     }
     @FXML
@@ -115,7 +172,62 @@ public class SettingsController {
         alert.setTitle("Jelszó módosítás");
         alert.setHeaderText(null);
         alert.setContentText("Itt lehet a jelszó megváltoztatását kezelni.");
+        drivesync.App.styleDialog(alert);
         alert.showAndWait();
+    }
+
+    private void loadPreferencesToControls() {
+        if (themeChoiceBox != null) {
+            String theme = prefs.get("theme", "Rendszer");
+            // Ha nincs az opciók között, állítsuk be biztonságos értékre
+            themeChoiceBox.setValue(theme.matches("Világos|Sötét|Rendszer alapértelmezett|Rendszer") ? normalizeThemeLabel(theme) : "Rendszer alapértelmezett");
+        }
+        if (fontSizeSlider != null) {
+            fontSizeSlider.setValue(prefs.getDouble("fontSize", 14.0));
+        }
+
+        if (emailNotifications != null) emailNotifications.setSelected(prefs.getBoolean("emailNotifications", false));
+        if (smsNotifications != null) smsNotifications.setSelected(prefs.getBoolean("smsNotifications", false));
+        if (pushNotifications != null) pushNotifications.setSelected(prefs.getBoolean("pushNotifications", true));
+        if (twoFactorAuth != null) twoFactorAuth.setSelected(prefs.getBoolean("twoFactorAuth", false));
+        if (autoUpdate != null) autoUpdate.setSelected(prefs.getBoolean("autoUpdate", true));
+        if (sendUsageStats != null) sendUsageStats.setSelected(prefs.getBoolean("sendUsageStats", false));
+        if (enableLogging != null) enableLogging.setSelected(prefs.getBoolean("enableLogging", false));
+    }
+
+    private void applyTheme(String label) {
+        String normalized = normalizeThemeLabel(label);
+        Platform.runLater(() -> {
+            if (usernameField == null || usernameField.getScene() == null) return;
+            var root = usernameField.getScene().getRoot();
+            if (root == null) return;
+            if ("Sötét".equals(normalized)) {
+                if (!root.getStyleClass().contains("theme-dark")) {
+                    root.getStyleClass().add("theme-dark");
+                }
+            } else {
+                root.getStyleClass().remove("theme-dark");
+            }
+        });
+        prefs.put("theme", normalized);
+    }
+
+    private void applyFontSize(double size) {
+        Platform.runLater(() -> {
+            if (usernameField == null || usernameField.getScene() == null) return;
+            var root = usernameField.getScene().getRoot();
+            if (root == null) return;
+            root.setStyle(String.format("-fx-font-size: %.0fpx;", size));
+        });
+        prefs.putDouble("fontSize", size);
+    }
+
+    private String normalizeThemeLabel(String input) {
+        if (input == null) return "Rendszer alapértelmezett";
+        if (input.equalsIgnoreCase("Rendszer") || input.equalsIgnoreCase("Rendszer alapértelmezett")) {
+            return "Rendszer alapértelmezett";
+        }
+        return input;
     }
 
 }
