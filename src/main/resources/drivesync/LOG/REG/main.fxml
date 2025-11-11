@@ -8,13 +8,13 @@
 <HBox xmlns:fx="http://javafx.com/fxml/1"
       xmlns="http://javafx.com/javafx/24.0.1"
       fx:controller="drivesync.MainController"
-      prefWidth="900" prefHeight="550">
+      prefWidth="900" prefHeight="550" styleClass="app-bg">
 
     <!-- Bal panel – logo -->
     <StackPane prefWidth="300">
-        <VBox alignment="CENTER" spacing="20" style="-fx-background-color: linear-gradient(to bottom, #FFD700, #000000);">
+        <VBox alignment="CENTER" spacing="20" styleClass="sidebar">
             <ImageView fx:id="logoImage" fitWidth="150" fitHeight="150" preserveRatio="true"/>
-            <Label text="DriveSync" style="-fx-font-size:36px; -fx-text-fill:white; -fx-font-weight:bold;"/>
+            <Label text="DriveSync" styleClass="sidebar-appname"/>
         </VBox>
     </StackPane>
 
@@ -23,7 +23,7 @@
 
         <!-- Login pane -->
         <VBox fx:id="loginPane" alignment="CENTER" spacing="20">
-            <Label text="Bejelentkezés" style="-fx-font-size:32px;" />
+            <Label text="Bejelentkezés" styleClass="page-title" />
 
             <GridPane hgap="10" vgap="10" alignment="CENTER">
                 <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
@@ -40,14 +40,14 @@
             <VBox spacing="10" alignment="CENTER">
                 <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
                 <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
-                <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" prefWidth="200"/>
+                <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" prefWidth="200" styleClass="btn-primary"/>
 
 
                 <Button fx:id="googleLoginButton"
                         onAction="#handleGoogleLogin"
                         prefWidth="200"
                         prefHeight="40"
-                        style="-fx-background-color: #FFD700; -fx-text-fill: black; -fx-font-weight: bold;">
+                        styleClass="btn-primary">
                     <graphic>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <ImageView fitWidth="20" fitHeight="20" preserveRatio="true" pickOnBounds="true">
@@ -55,21 +55,19 @@
                                     <Image url="@/drivesync/Logók/google_logo.png" />
                                 </image>
                             </ImageView>
-                            <Label text="Google-fiókkal" style="-fx-text-fill:black; -fx-font-weight:bold;" />
+                            <Label text="Google-fiókkal" />
                         </HBox>
                     </graphic>
                 </Button>
 
 
-
-
-                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" />
+                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" styleClass="modern-link" />
             </VBox>
         </VBox>
 
         <!-- Register pane -->
         <VBox fx:id="registerPane" alignment="CENTER" spacing="20" visible="false">
-            <Label text="Regisztráció" style="-fx-font-size:32px;" />
+            <Label text="Regisztráció" styleClass="page-title" />
 
             <GridPane hgap="10" vgap="10" alignment="CENTER">
                 <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
@@ -95,8 +93,8 @@
 
             <VBox spacing="10" alignment="CENTER">
                 <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
-                <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" prefWidth="200"/>
-                <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" />
+                <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" prefWidth="200" styleClass="btn-primary"/>
+                <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" styleClass="modern-link" />
             </VBox>
         </VBox>
 

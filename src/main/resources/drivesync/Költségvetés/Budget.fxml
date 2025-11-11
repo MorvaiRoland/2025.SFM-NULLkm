@@ -15,52 +15,52 @@
 <?import javafx.scene.text.Font?>
 
 
-<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="900.0" style="-fx-background: transparent;" fx:controller="drivesync.Költségvetés.BudgetController" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="900.0" fx:controller="drivesync.Költségvetés.BudgetController" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" styleClass="app-bg" fitToWidth="true" fitToHeight="true">
    <content>
-      <HBox alignment="CENTER" prefHeight="398.0" prefWidth="898.0" spacing="20.0" style="-fx-background-color: gray;">
+      <HBox alignment="CENTER" prefHeight="398.0" prefWidth="898.0" spacing="20.0" styleClass="content-container">
          <children>
-            <VBox prefWidth="300.0" spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8,0,0,3);">
+            <VBox prefWidth="300.0" spacing="10.0" styleClass="card">
                <children>
-                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="264.0" style="-fx-text-fill: black; -fx-font-size: 20px; -fx-font-weight: bold;" text="Költségvetés" />
-                  <Label prefHeight="31.0" prefWidth="259.0" style="-fx-text-fill: black;" text="Rögzítsd a kiadásodat">
-                     <font>
+                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="264.0" styleClass="card-title" text="Költségvetés" />
+                  <Label prefHeight="31.0" prefWidth="259.0" styleClass="card-subtitle" text="Rögzítsd a kiadásodat">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
                   <TextField fx:id="txt_what" prefHeight="25.0" prefWidth="150.0" promptText="Mire" />
                   <TextField fx:id="txt_amount" prefHeight="25.0" prefWidth="150.0" promptText="Mennyit" />
                   <DatePicker fx:id="txt_date" prefHeight="25.0" prefWidth="261.0" promptText="Mikor" />
                   <ComboBox fx:id="categoryBox" prefHeight="25.0" prefWidth="260.0" promptText="Kategória" />
-                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveData" prefHeight="25.0" prefWidth="262.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 8px;" text="Adat rögzítése" />
-                  <Label fx:id="msg" alignment="CENTER" prefHeight="17.0" prefWidth="261.0" style="-fx-text-fill: red;">
-                     <font>
+                  <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveData" prefHeight="25.0" prefWidth="262.0" styleClass="btn-primary" text="Adat rögzítése" />
+                  <Label fx:id="msg" alignment="CENTER" prefHeight="17.0" prefWidth="261.0">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
                </children>
             </VBox>
-            <VBox prefWidth="300.0" spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8,0,0,3);">
+            <VBox prefWidth="300.0" spacing="10.0" styleClass="card">
                <children>
-                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="264.0" style="-fx-text-fill: black; -fx-font-size: 20px; -fx-font-weight: bold;" text="Összesítés" />
-                  <Label alignment="CENTER" prefHeight="31.0" prefWidth="230.0" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 15;" text="Havi kiadás">
-                     <font>
+                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="264.0" styleClass="card-title" text="Összesítés" />
+                  <Label alignment="CENTER" prefHeight="31.0" prefWidth="230.0" styleClass="card-subtitle" text="Havi kiadás">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
-                  <Label fx:id="monthlyAmount" alignment="CENTER" prefHeight="31.0" prefWidth="259.0" style="-fx-text-fill: green;" text="0 Ft">
-                     <font>
+                  <Label fx:id="monthlyAmount" alignment="CENTER" prefHeight="31.0" prefWidth="259.0" text="0 Ft">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
-                  <Label alignment="CENTER" prefHeight="31.0" prefWidth="231.0" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 15;" text="Éves kiadás">
-                     <font>
+                  <Label alignment="CENTER" prefHeight="31.0" prefWidth="231.0" styleClass="card-subtitle" text="Éves kiadás">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
-                  <Label fx:id="yearlyAmount" alignment="CENTER" prefHeight="31.0" prefWidth="234.0" style="-fx-text-fill: green;" text="0 Ft">
-                     <font>
+                  <Label fx:id="yearlyAmount" alignment="CENTER" prefHeight="31.0" prefWidth="234.0" text="0 Ft">
+                      <font>
                         <Font size="15.0" />
-                     </font>
+                      </font>
                   </Label>
                   <HBox prefHeight="33.0" prefWidth="259.0" />
                </children>

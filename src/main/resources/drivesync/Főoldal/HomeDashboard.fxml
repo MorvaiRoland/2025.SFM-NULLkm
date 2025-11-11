@@ -7,16 +7,14 @@
 <BorderPane fx:id="mainLayout" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="drivesync.Főoldal.HomeDashboardController"
-            style="-fx-background-color: #f0f4f8;"
-            prefWidth="1200" prefHeight="700">
+            prefWidth="1200" prefHeight="700" styleClass="app-bg">
 
     <!-- Középső widget terület -->
     <center>
-        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true"
-                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
             <FlowPane fx:id="widgetContainer"
                       hgap="25" vgap="25" prefWrapLength="1000"
-                      style="-fx-padding: 25; -fx-background-color: transparent;"/>
+                      styleClass="content-container flow-wrap"/>
         </ScrollPane>
     </center>
 
@@ -25,30 +23,23 @@
         <HBox fx:id="menuHBox"
               spacing="15"
               alignment="CENTER"
-              style="-fx-background-color: #2c2c2c; -fx-padding: 10;">
+              styleClass="sidebar">
 
             <!-- Menü összecsukó gomb -->
-            <Button fx:id="toggleMenuBtn" text="☰"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold; -fx-font-size: 22;"/>
+            <Button fx:id="toggleMenuBtn" text="☰" styleClass="menu-toggle"/>
 
             <!-- Menü gombok -->
-            <Button fx:id="weatherBtn" text="Időjárás" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="weatherBtn" text="Időjárás" contentDisplay="TOP" styleClass="menu-button"/>
 
-            <Button fx:id="fuelBtn" text="Üzemanyag" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="fuelBtn" text="Üzemanyag" contentDisplay="TOP" styleClass="menu-button"/>
 
-            <Button fx:id="carsBtn" text="Autók" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="carsBtn" text="Autók" contentDisplay="TOP" styleClass="menu-button"/>
 
-            <Button fx:id="budgetBtn" text="Költségvetés" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="budgetBtn" text="Költségvetés" contentDisplay="TOP" styleClass="menu-button"/>
 
-            <Button fx:id="linksBtn" text="Linkek" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="linksBtn" text="Linkek" contentDisplay="TOP" styleClass="menu-button"/>
 
-            <Button fx:id="notificationsBtn" text="Értesítések" contentDisplay="TOP"
-                    style="-fx-background-color: transparent; -fx-text-fill: gold;"/>
+            <Button fx:id="notificationsBtn" text="Értesítések" contentDisplay="TOP" styleClass="menu-button"/>
 
         </HBox>
     </bottom>
