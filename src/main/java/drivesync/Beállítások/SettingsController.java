@@ -1,14 +1,9 @@
 package drivesync.Beállítások;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.application.Platform;
+import javafx.scene.control.skin.ChoiceBoxSkin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,13 +43,27 @@ public class SettingsController {
 
     @FXML
     private void initialize() {
-        // Prefek betöltése UI elemekbe és azonnali alkalmazása
         loadPreferencesToControls();
 
-        // Scene csak a megjelenítés után elérhető – késleltetett alkalmazás
         Platform.runLater(() -> {
             applyTheme(prefs.get("theme", "Rendszer"));
             applyFontSize(prefs.getDouble("fontSize", 14.0));
+        });
+
+        themeChoiceBox.showingProperty().addListener((obs, wasShowing, isNowShowing) -> {
+            if (isNowShowing) {
+                var skin = themeChoiceBox.getSkin();
+                if (skin instanceof ChoiceBoxSkin<?> choiceBoxSkin) {
+                    try {
+                        var method = ChoiceBoxSkin.class.getDeclaredMethod("getPopupContent");
+                        method.setAccessible(true);
+                        ListView<?> listView = (ListView<?>) method.invoke(choiceBoxSkin);
+                        listView.getStyleClass().add("theme-dark");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         });
     }
 
@@ -198,13 +207,10 @@ public class SettingsController {
     private void applyTheme(String label) {
         String normalized = normalizeThemeLabel(label);
         Platform.runLater(() -> {
-            if (usernameField == null || usernameField.getScene() == null) return;
+            if (usernameField == null || usernameField.getScene() == null || usernameField.getScene().getRoot() == null) return;
             var root = usernameField.getScene().getRoot();
-            if (root == null) return;
-            if ("Sötét".equals(normalized)) {
-                if (!root.getStyleClass().contains("theme-dark")) {
-                    root.getStyleClass().add("theme-dark");
-                }
+            if ("sötét".equalsIgnoreCase(normalized)) {
+                root.getStyleClass().add("theme-dark");
             } else {
                 root.getStyleClass().remove("theme-dark");
             }

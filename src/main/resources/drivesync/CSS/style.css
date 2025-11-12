@@ -95,7 +95,7 @@
 
 .theme-dark .right-panel TextField,
 .theme-dark .right-panel PasswordField {
-    -fx-background-color: #1f2430;
+    -fx-background-color: #2a3040;
     -fx-border-color: rgba(255,255,255,0.2);
     -fx-text-fill: #e8eaf0;
 }
@@ -103,10 +103,9 @@
 .theme-dark .right-panel TextField:focused,
 .theme-dark .right-panel PasswordField:focused {
     -fx-border-color: #ffd86b;
-    -fx-border-width: 2;
 }
 
-/* Checkbox alap stílus */
+/* Checkbox stílus */
 .right-panel CheckBox > .box {
     -fx-background-color: white;
     -fx-border-color: #DAA520;
@@ -180,13 +179,12 @@
 /* Gyökér és háttér */
 .app-bg {
     -fx-background-color: #f5f7fb;
-    -fx-background: #f5f7fb;
     -fx-font-family: "Segoe UI", "Inter", "Roboto", "Arial";
 }
 
 .theme-dark.app-bg {
-    -fx-background-color: #1f2430;
-    -fx-background: #1f2430;
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e8eaf0;
 }
 
 /* Oldalsó menü */
@@ -203,6 +201,7 @@
     -fx-border-color: rgba(255,255,255,0.06);
 }
 
+/* Sidebar szövegek */
 .sidebar-appname {
     -fx-text-fill: #ecf0f1;
     -fx-font-size: 16px;
@@ -211,33 +210,6 @@
 
 .theme-dark .sidebar-appname {
     -fx-text-fill: #e8eaf0;
-}
-
-.menu-toggle {
-    -fx-background-color: transparent;
-    -fx-text-fill: gold;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-background-radius: 8;
-    -fx-padding: 4 8;
-}
-
-.menu-toggle:hover {
-    -fx-background-color: rgba(255,215,0,0.12);
-}
-
-.menu-toggle:armed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
-}
-
-.menu-toggle:selected {
-    -fx-background-color: rgba(255,215,0,0.2);
-}
-
-.theme-dark .menu-toggle {
-    -fx-text-fill: #ffd86b;
 }
 
 .sidebar-label {
@@ -269,7 +241,6 @@
     -fx-padding: 10 20 10 20;
     -fx-cursor: hand;
     -fx-background-radius: 12;
-    -fx-graphic-text-gap: 12;
 }
 
 .menu-button:hover {
@@ -301,6 +272,7 @@
     -fx-border-color: #ffd86b;
 }
 
+/* Logout button */
 .logout-button {
     -fx-background-color: #e74c3c;
     -fx-text-fill: white;
@@ -324,36 +296,7 @@
     -fx-background-color: #b5382b;
 }
 
-.menu-button:armed, .logout-button:armed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
-}
-
-/* Összecsukott oldalsáv állapot */
-.sidebar-collapsed {
-    -fx-padding: 12;
-}
-
-.sidebar-collapsed .sidebar-label,
-.sidebar-collapsed .sidebar-username,
-.sidebar-collapsed .sidebar-appname {
-    -fx-opacity: 0;
-    -fx-max-height: 0;
-}
-
-.sidebar-collapsed .menu-button,
-.sidebar-collapsed .logout-button {
-    -fx-alignment: CENTER;
-    -fx-padding: 10 8 10 8;
-    -fx-font-size: 14px;
-}
-
-/* Fókusz */
-.menu-button:focused, .logout-button:focused, .menu-toggle:focused {
-    -fx-effect: dropshadow(gaussian, rgba(255,215,0,0.45), 10, 0.3, 0, 0);
-}
-
-/* Tartalom területek */
+/* Content area */
 .content-scroll {
     -fx-background: #ecf0f1;
 }
@@ -362,15 +305,11 @@
     -fx-background: #1f2430;
 }
 
+/* Scrollbar */
 .content-scroll .scroll-bar:vertical .thumb,
 .content-scroll .scroll-bar:horizontal .thumb {
     -fx-background-color: rgba(0,0,0,0.25);
     -fx-background-radius: 4;
-}
-
-.content-scroll .scroll-bar:vertical,
-.content-scroll .scroll-bar:horizontal {
-    -fx-background-color: transparent;
 }
 
 .theme-dark .content-scroll .scroll-bar:vertical .thumb,
@@ -378,18 +317,7 @@
     -fx-background-color: rgba(255,255,255,0.25);
 }
 
-.content-scroll .scroll-bar:vertical .increment-button,
-.content-scroll .scroll-bar:vertical .decrement-button,
-.content-scroll .scroll-bar:horizontal .increment-button,
-.content-scroll .scroll-bar:horizontal .decrement-button {
-    -fx-opacity: 0;
-}
-
-.content-container {
-    -fx-padding: 20;
-}
-
-/* Oldal címei */
+/* Page titles */
 .page-title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
@@ -408,7 +336,7 @@
     -fx-text-fill: #b0b6c3;
 }
 
-/* Kártyák */
+/* Card */
 .card {
     -fx-background-color: white;
     -fx-padding: 20;
@@ -429,6 +357,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 16, 0, 0, 6);
 }
 
+/* Card title/subtitle */
 .card-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
@@ -447,6 +376,7 @@
     -fx-text-fill: #d0d5e2;
 }
 
+/* Label sm */
 .label-sm {
     -fx-text-fill: #374151;
     -fx-font-size: 12px;
@@ -481,7 +411,7 @@
     -fx-text-fill: #34d399;
 }
 
-/* Gombok */
+/* Button stílusok */
 .btn-primary {
     -fx-background-color: #10b981;
     -fx-text-fill: white;
@@ -495,11 +425,11 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0, 0, 2);
 }
 
-.btn-primary:armed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
+.theme-dark .btn-primary {
+    -fx-background-color: #10b981;
 }
 
+/* btn-danger */
 .btn-danger {
     -fx-background-color: #f44336;
     -fx-text-fill: white;
@@ -511,16 +441,15 @@
     -fx-background-color: #db3c30;
 }
 
-.btn-danger:armed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
+.theme-dark .btn-danger {
+    -fx-background-color: #f44336;
 }
 
+/* btn-secondary */
 .btn-secondary {
     -fx-background-color: #0ea5e9;
     -fx-text-fill: white;
     -fx-background-radius: 10;
-    -fx-font-weight: bold;
     -fx-padding: 10 16;
 }
 
@@ -536,6 +465,7 @@
     -fx-background-color: #1d4ed8;
 }
 
+/* btn-ghost */
 .btn-ghost {
     -fx-background-color: transparent;
     -fx-text-fill: #374151;
@@ -561,86 +491,23 @@
     -fx-border-color: rgba(255,255,255,0.28);
 }
 
-.result-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #1f2937;
-}
-
-.theme-dark .result-label {
-    -fx-text-fill: #d0d5e2;
-}
-
-/* Form elemek fókusz kiemelése */
-TextField, PasswordField, ChoiceBox, ComboBoxBase, Slider, DatePicker, TextArea {
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-}
-
-TextField:focused, PasswordField:focused, ChoiceBox:focused, ComboBoxBase:focused {
-    -fx-border-color: #10b981;
-    -fx-border-width: 2;
-    -fx-effect: dropshadow(gaussian, rgba(16,185,129,0.25), 10, 0.2, 0, 0);
-}
-
-.theme-dark TextField:focused,
-.theme-dark PasswordField:focused,
-.theme-dark ChoiceBox:focused,
-.theme-dark ComboBoxBase:focused {
-    -fx-border-color: #5bd0a9;
-    -fx-effect: dropshadow(gaussian, rgba(91,208,169,0.25), 10, 0.2, 0, 0);
-}
-
-/* TextInput alap stílusok */
-.text-input, .text-area {
-    -fx-background-color: white;
-    -fx-text-fill: #1f2937;
-    -fx-border-color: rgba(0,0,0,0.15);
-    -fx-border-width: 1;
-    -fx-padding: 8 10;
-}
-
-.text-input:focused, .text-area:focused {
-    -fx-background-color: white;
-}
-
-.text-input:disabled {
-    -fx-opacity: 0.7;
-}
-
-.text-input .prompt-text, .text-area .prompt-text {
-    -fx-text-fill: #9ca3af;
-}
-
-.theme-dark .text-input, .theme-dark .text-area {
+/* TextField és TextArea javított */
+.theme-dark .text-input,
+.theme-dark .text-area {
     -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.16);
     -fx-text-fill: #e8eaf0;
+    -fx-border-color: rgba(255,255,255,0.16);
 }
 
-.theme-dark .text-input:focused, .theme-dark .text-area:focused {
+.theme-dark .text-input:focused,
+.theme-dark .text-area:focused {
     -fx-background-color: #32384a;
 }
 
-.theme-dark .text-input .prompt-text, .theme-dark .text-area .prompt-text {
+/* Prompt text sötétben */
+.theme-dark .text-input .prompt-text,
+.theme-dark .text-area .prompt-text {
     -fx-text-fill: #9aa3b5;
-}
-
-/* TitledPane */
-.titled-pane > .title {
-    -fx-background-color: linear-gradient(to right, rgba(0,0,0,0.04), transparent);
-    -fx-padding: 10 12;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-}
-
-.titled-pane > .content {
-    -fx-background-color: transparent;
-    -fx-padding: 0 0 10 0;
-}
-
-.theme-dark .titled-pane > .title {
-    -fx-background-color: linear-gradient(to right, rgba(255,255,255,0.05), transparent);
-    -fx-text-fill: #e8eaf0;
 }
 
 /* Tooltip */
@@ -656,648 +523,105 @@ TextField:focused, PasswordField:focused, ChoiceBox:focused, ComboBoxBase:focuse
     -fx-background-color: rgba(42,48,64,0.98);
     -fx-text-fill: #e8eaf0;
 }
-
-/* Slider */
-.slider .track {
-    -fx-background-color: rgba(0,0,0,0.12);
-    -fx-background-radius: 3;
+.links-root {
+    -fx-background-color: #f5f7fb; /* világos alap */
 }
 
-.slider .thumb {
-    -fx-background-color: #10b981;
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0.2, 0, 1);
+.theme-dark .links-root {
+    -fx-background-color: #1f2430; /* sötét alap */
+}
+.link-card {
+    -fx-background-color: transparent; /* átlátszó, hogy a root szín látszódjon */
+    -fx-padding: 10;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+    -fx-background-radius: 12;
+}
+.link-text {
+    -fx-text-fill: #2c3e50;
 }
 
-.theme-dark .slider .track {
-    -fx-background-color: rgba(255,255,255,0.2);
-}
-
-.theme-dark .slider .thumb {
-    -fx-background-color: #34d399;
-}
-
-/* CheckBox és RadioButton */
-.check-box > .box, .radio-button > .radio {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0,0,0,0.2);
-    -fx-border-width: 2;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-}
-
-.check-box:selected > .box {
-    -fx-background-color: #10b981;
-    -fx-border-color: #10b981;
-}
-
-.check-box:selected > .box > .mark {
-    -fx-background-color: white;
-}
-
-.check-box .text, .radio-button .text {
-    -fx-fill: #1f2937;
-}
-
-.theme-dark .check-box > .box, .theme-dark .radio-button > .radio {
-    -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.2);
-}
-
-.theme-dark .check-box:selected > .box {
-    -fx-background-color: #10b981;
-    -fx-border-color: #10b981;
-}
-
-.theme-dark .check-box .text, .theme-dark .radio-button .text {
-    -fx-fill: #e8eaf0;
-}
-
-.theme-dark .radio-button:selected > .radio > .dot {
-    -fx-background-color: #34d399;
-}
-
-/* ==============================
-   ListView / TableView
-   ============================== */
-.list-view, .table-view {
-    -fx-background-color: transparent;
-}
-
-.list-view .list-cell, .table-row-cell {
-    -fx-background-color: white;
-    -fx-text-fill: #1f2937;
-    -fx-border-color: rgba(0,0,0,0.06);
-    -fx-border-width: 0 0 1 0;
-}
-
-.list-view .list-cell:odd, .table-row-cell:odd {
-    -fx-background-color: #fafbff;
-}
-
-.list-view .list-cell:selected, .table-row-cell:selected {
-    -fx-background-color: rgba(16,185,129,0.15);
-    -fx-text-fill: #0f172a;
-}
-
-.table-view .column-header-background {
-    -fx-background-color: #eef2f7;
-}
-
-.table-view .column-header, .table-view .filler {
-    -fx-size: 28;
-    -fx-text-fill: #1f2937;
-}
-
-.theme-dark .list-view .list-cell, .theme-dark .table-row-cell {
-    -fx-background-color: #2a3040;
+.theme-dark .link-text {
     -fx-text-fill: #e8eaf0;
-    -fx-border-color: rgba(255,255,255,0.06);
 }
 
-.theme-dark .list-view .list-cell:odd, .theme-dark .table-row-cell:odd {
-    -fx-background-color: #2f3546;
+.link-text:hover {
+    -fx-text-fill: #34495e;
 }
 
-.theme-dark .list-view .list-cell:selected, .theme-dark .table-row-cell:selected {
-    -fx-background-color: rgba(91,208,169,0.22);
-    -fx-text-fill: #f3f4f6;
+.theme-dark .link-text:hover {
+    -fx-text-fill: #60a5fa;
+}
+/* Sötét téma DatePicker */
+.theme-dark .date-picker {
+    -fx-background-color: #2b2b2b;   /* mező háttere */
+    -fx-text-fill: #f0f0f0;           /* szöveg színe */
+    -fx-border-color: #444;           /* keret */
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
-.theme-dark .table-view .column-header-background {
-    -fx-background-color: #222736;
+/* Popup naptár háttere */
+.theme-dark .date-picker .calendar-popup {
+    -fx-background-color: #2b2b2b;
 }
 
-.theme-dark .table-view .column-header, .theme-dark .table-view .filler {
-    -fx-text-fill: #dbe0ea;
+/* Hónap/év fejléc és vezérlőgombok */
+.theme-dark .date-picker .month-year-pane,
+.theme-dark .date-picker .control-buttons {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #f0f0f0;
 }
 
-/* ==============================
-   ComboBox / ChoiceBox / ContextMenu
-   ============================== */
-.combo-box, .choice-box, .date-picker {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0,0,0,0.15);
-    -fx-border-width: 1;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
+/* Napok */
+.theme-dark .date-picker .day-cell {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #f0f0f0;
 }
 
-.combo-box .arrow-button, .choice-box .arrow-button, .date-picker .arrow-button {
-    -fx-background-color: transparent;
+.theme-dark .date-picker .day-cell:hover {
+    -fx-background-color: #505050;
 }
 
-.combo-box .list-cell {
-    -fx-text-fill: #1f2937;
+.theme-dark .date-picker .day-cell:focused {
+    -fx-background-color: #616161;
+}
+.theme-dark .combo-box,
+.theme-dark .choice-box {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #555555;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
-.combo-box-popup .list-view, .choice-box .context-menu, .context-menu {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 12, 0.2, 0, 2);
-}
-
-.combo-box-popup .list-cell:hover, .menu-item:focused {
-    -fx-background-color: rgba(16,185,129,0.12);
-}
-
-.menu-item .label {
-    -fx-text-fill: #1f2937;
-}
-
-.theme-dark .combo-box, .theme-dark .choice-box, .theme-dark .date-picker {
-    -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.18);
-}
-
-.theme-dark .combo-box .list-cell,
-.theme-dark .choice-box .label,
-.theme-dark .date-picker .text-field {
-    -fx-text-fill: #e8eaf0;
+.theme-dark .combo-box .text-field {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
 }
 
 .theme-dark .combo-box-popup .list-view,
-.theme-dark .choice-box .context-menu,
-.theme-dark .context-menu {
-    -fx-background-color: #1f2430;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 14, 0.3, 0, 2);
+.theme-dark .choice-box-popup .list-view {
+    -fx-background-color: #2a2a2a;
+    -fx-control-inner-background: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
 }
 
-.theme-dark .combo-box-popup .list-cell:hover,
-.theme-dark .menu-item:focused {
-    -fx-background-color: rgba(91,208,169,0.24);
-}
-
-.theme-dark .menu-item .label {
-    -fx-text-fill: #dbe0ea;
-}
-
-/* DatePicker naptár popup */
-.date-picker-popup > .month-year-pane {
-    -fx-background-color: #eef2f7;
-}
-
-.date-picker-popup > .month-year-pane .label {
-    -fx-text-fill: #111827;
-    -fx-font-weight: bold;
-}
-
-.date-picker-popup > .calendar-grid {
-    -fx-background-color: white;
-}
-
-.date-picker-popup > .calendar-grid .day-cell {
-    -fx-text-fill: #1f2937;
-}
-
-.date-picker-popup > .calendar-grid .day-cell:hover {
-    -fx-background-color: rgba(0,0,0,0.06);
-}
-
-.date-picker-popup > * {
-    -fx-background-radius: 8;
-}
-
-.theme-dark .date-picker-popup > .month-year-pane {
-    -fx-background-color: #222736;
-}
-
-.theme-dark .date-picker-popup > .month-year-pane .label {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .date-picker-popup > .calendar-grid {
-    -fx-background-color: #2a3040;
-}
-
-.theme-dark .date-picker-popup > .calendar-grid .day-cell {
-    -fx-text-fill: #d0d5e2;
-}
-
-.theme-dark .date-picker-popup > .calendar-grid .day-cell:hover {
-    -fx-background-color: rgba(255,255,255,0.08);
-}
-
-.theme-dark .date-picker .arrow-button .arrow {
-    -fx-background-color: #e5e7eb;
-}
-
-/* ==============================
-   Chart (BarChart, Axis, Legend)
-   ============================== */
-.chart {
+.theme-dark .list-cell {
     -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
 }
 
-.chart-plot-background {
-    -fx-background-color: rgba(0,0,0,0.03);
+.theme-dark .list-cell:hover {
+    -fx-background-color: #3a3a3a;
 }
 
-.chart-horizontal-grid-lines, .chart-vertical-grid-lines {
-    -fx-stroke: rgba(0,0,0,0.08);
+.theme-dark .text-field,
+.theme-dark .text-area {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
 }
 
-.axis {
-    -fx-tick-label-fill: #374151;
-    -fx-tick-mark-stroke: rgba(0,0,0,0.25);
-}
-
-.axis .axis-label {
-    -fx-text-fill: #111827;
-    -fx-font-weight: bold;
-}
-
-.chart-legend {
-    -fx-background-color: transparent;
-}
-
-.chart-legend .label {
-    -fx-text-fill: #1f2937;
-}
-
-.chart-legend-item-symbol {
-    -fx-background-radius: 6;
-}
-
-.theme-dark .chart-plot-background {
-    -fx-background-color: rgba(255,255,255,0.04);
-}
-
-.theme-dark .chart-horizontal-grid-lines,
-.theme-dark .chart-vertical-grid-lines {
-    -fx-stroke: rgba(255,255,255,0.12);
-}
-
-.theme-dark .axis {
-    -fx-tick-label-fill: #d0d5e2;
-    -fx-tick-mark-stroke: rgba(255,255,255,0.25);
-}
-
-.theme-dark .axis .axis-label {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .chart-legend {
-    -fx-background-color: transparent;
-}
-
-.theme-dark .chart-legend .label {
-    -fx-text-fill: #e5e7eb;
-}
-
-/* ==============================
-   ProgressBar és ProgressIndicator
-   ============================== */
-.progress-bar > .track {
-    -fx-background-color: rgba(0,0,0,0.1);
-    -fx-background-radius: 8;
-}
-
-.progress-bar > .bar {
-    -fx-background-color: #10b981;
-    -fx-background-radius: 8;
-    -fx-background-insets: 0;
-}
-
-.theme-dark .progress-bar > .track {
-    -fx-background-color: rgba(255,255,255,0.1);
-}
-
-.theme-dark .progress-bar > .bar {
-    -fx-background-color: #34d399;
-}
-
-.progress-indicator .percentage {
-    -fx-fill: #1f2937;
-}
-
-.theme-dark .progress-indicator .percentage {
-    -fx-fill: #e8eaf0;
-}
-
-/* ==============================
-   Separator
-   ============================== */
-.separator .line {
-    -fx-background-color: rgba(0,0,0,0.12);
-    -fx-border-width: 1;
-}
-
-.theme-dark .separator .line {
-    -fx-background-color: rgba(255,255,255,0.12);
-}
-
-/* ==============================
-   TabPane
-   ============================== */
-.tab-pane {
-    -fx-background-color: transparent;
-}
-
-.tab-pane .tab-header-area {
-    -fx-background-color: #f5f7fb;
-}
-
-.tab-pane .tab {
-    -fx-background-color: transparent;
-    -fx-background-radius: 8 8 0 0;
-    -fx-padding: 8 16;
-}
-
-.tab-pane .tab .tab-label {
-    -fx-text-fill: #6b7280;
-    -fx-font-weight: 500;
-}
-
-.tab-pane .tab:selected {
-    -fx-background-color: white;
-}
-
-.tab-pane .tab:selected .tab-label {
-    -fx-text-fill: #10b981;
-    -fx-font-weight: bold;
-}
-
-.tab-pane .tab:hover {
-    -fx-background-color: rgba(0,0,0,0.05);
-}
-
-.tab-pane .tab-content-area {
-    -fx-background-color: white;
-    -fx-background-radius: 0 0 12 12;
-    -fx-padding: 20;
-}
-
-.theme-dark .tab-pane .tab-header-area {
-    -fx-background-color: #1f2430;
-}
-
-.theme-dark .tab-pane .tab .tab-label {
-    -fx-text-fill: #9ca3af;
-}
-
-.theme-dark .tab-pane .tab:selected {
-    -fx-background-color: #2a3040;
-}
-
-.theme-dark .tab-pane .tab:selected .tab-label {
-    -fx-text-fill: #34d399;
-}
-
-.theme-dark .tab-pane .tab:hover {
-    -fx-background-color: rgba(255,255,255,0.05);
-}
-
-.theme-dark .tab-pane .tab-content-area {
-    -fx-background-color: #2a3040;
-}
-
-/* ==============================
-   Accordion
-   ============================== */
-.accordion .titled-pane {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-padding: 4;
-}
-
-.theme-dark .accordion .titled-pane {
-    -fx-background-color: #2a3040;
-}
-
-/* ==============================
-   SplitPane
-   ============================== */
-.split-pane {
-    -fx-background-color: transparent;
-}
-
-.split-pane-divider {
-    -fx-background-color: rgba(0,0,0,0.08);
-    -fx-padding: 0 1 0 1;
-}
-
-.theme-dark .split-pane-divider {
-    -fx-background-color: rgba(255,255,255,0.08);
-}
-
-/* ==============================
-   MenuBar
-   ============================== */
-.menu-bar {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0,0,0,0.08);
-    -fx-border-width: 0 0 1 0;
-}
-
-.menu-bar .label {
-    -fx-text-fill: #1f2937;
-}
-
-.menu-bar .menu:hover {
-    -fx-background-color: rgba(16,185,129,0.1);
-}
-
-.theme-dark .menu-bar {
-    -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.08);
-}
-
-.theme-dark .menu-bar .label {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .menu-bar .menu:hover {
-    -fx-background-color: rgba(91,208,169,0.15);
-}
-
-/* ==============================
-   ScrollPane általános
-   ============================== */
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
-
-/* ==============================
-   Spinner
-   ============================== */
-.spinner {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0,0,0,0.15);
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-}
-
-.spinner .text-field {
-    -fx-background-color: transparent;
-    -fx-text-fill: #1f2937;
-}
-
-.spinner .increment-arrow-button,
-.spinner .decrement-arrow-button {
-    -fx-background-color: rgba(0,0,0,0.05);
-}
-
-.spinner .increment-arrow-button:hover,
-.spinner .decrement-arrow-button:hover {
-    -fx-background-color: rgba(0,0,0,0.1);
-}
-
-.theme-dark .spinner {
-    -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.18);
-}
-
-.theme-dark .spinner .text-field {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .spinner .increment-arrow-button,
-.theme-dark .spinner .decrement-arrow-button {
-    -fx-background-color: rgba(255,255,255,0.05);
-}
-
-.theme-dark .spinner .increment-arrow-button:hover,
-.theme-dark .spinner .decrement-arrow-button:hover {
-    -fx-background-color: rgba(255,255,255,0.1);
-}
-
-/* ==============================
-   ColorPicker
-   ============================== */
-.color-picker {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0,0,0,0.15);
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-}
-
-.color-picker .color-picker-label {
-    -fx-text-fill: #1f2937;
-}
-
-.theme-dark .color-picker {
-    -fx-background-color: #2a3040;
-    -fx-border-color: rgba(255,255,255,0.18);
-}
-
-.theme-dark .color-picker .color-picker-label {
-    -fx-text-fill: #e8eaf0;
-}
-
-/* ==============================
-   Hyperlink általános
-   ============================== */
-.hyperlink {
-    -fx-text-fill: #007bff;
-    -fx-underline: true;
-    -fx-border-width: 0;
-    -fx-background-color: transparent;
-}
-
-.hyperlink:hover {
-    -fx-text-fill: #0056b3;
-}
-
-.hyperlink:visited {
-    -fx-text-fill: #6610f2;
-}
-
-.theme-dark .hyperlink {
-    -fx-text-fill: #7cc4ff;
-}
-
-.theme-dark .hyperlink:hover {
-    -fx-text-fill: #a8d8ff;
-}
-
-.theme-dark .hyperlink:visited {
-    -fx-text-fill: #b48eff;
-}
-
-/* ==============================
-   Alert / Dialog
-   ============================== */
-.dialog-pane {
-    -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-padding: 20;
-}
-
-.dialog-pane .label {
-    -fx-text-fill: #1f2937;
-}
-
-.dialog-pane .header-panel {
-    -fx-background-color: #f5f7fb;
-    -fx-padding: 16;
-}
-
-.dialog-pane .header-panel .label {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #111827;
-}
-
-.theme-dark .dialog-pane {
-    -fx-background-color: #2a3040;
-}
-
-.theme-dark .dialog-pane .label {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .dialog-pane .header-panel {
-    -fx-background-color: #1f2430;
-}
-
-.theme-dark .dialog-pane .header-panel .label {
-    -fx-text-fill: #e8eaf0;
-}
-
-/* ==============================
-   Pagination
-   ============================== */
-.pagination {
-    -fx-background-color: transparent;
-}
-
-.pagination .pagination-control {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-}
-
-.pagination .pagination-control .button {
-    -fx-background-color: transparent;
-    -fx-text-fill: #1f2937;
-}
-
-.pagination .pagination-control .button:hover {
-    -fx-background-color: rgba(16,185,129,0.1);
-}
-
-.pagination .pagination-control .number-button.selected {
-    -fx-background-color: #10b981;
-    -fx-text-fill: white;
-}
-
-.theme-dark .pagination .pagination-control {
-    -fx-background-color: #2a3040;
-}
-
-.theme-dark .pagination .pagination-control .button {
-    -fx-text-fill: #e8eaf0;
-}
-
-.theme-dark .pagination .pagination-control .button:hover {
-    -fx-background-color: rgba(91,208,169,0.15);
-}
-
-.theme-dark .pagination .pagination-control .number-button.selected {
-    -fx-background-color: #34d399;
-    -fx-text-fill: #1f2937;
+.theme-dark .scroll-pane {
+    -fx-background: #1e1e1e;
 }

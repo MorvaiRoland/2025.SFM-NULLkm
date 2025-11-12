@@ -61,7 +61,7 @@ public class MainController {
 
     // ---------------- DB CONFIG ----------------
     private void loadDBConfig() {
-        try (InputStream input = getClass().getResourceAsStream("/drivesync/NO-GITHUB/db_config.properties")) {
+        try (InputStream input = getClass().getResourceAsStream("/drivesync/Adatbázis/db_config.properties")) {
             if (input == null) {
                 System.err.println("Nem található a db_config.properties!");
                 return;

@@ -83,8 +83,15 @@ public class SajatAutokController {
     @FXML
     private ComboBox<String> typeCombo;
 
+    @FXML private VBox mainPane; // FXML root pane, ide jön a theme-dark
+
     @FXML
     public void initialize() {
+        // --- Dark theme alkalmazása ---
+        if (mainPane != null) {
+            mainPane.getStyleClass().add("theme-dark");
+        }
+
         // Évjáratok
         IntStream.rangeClosed(1960, 2025).forEach(vintageField.getItems()::add);
         vintageField.setValue(2025);
