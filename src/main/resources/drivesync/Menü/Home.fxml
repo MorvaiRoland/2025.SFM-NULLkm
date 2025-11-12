@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<HBox xmlns="http://javafx.com/javafx/24.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="drivesync.HomeController"
+      prefWidth="1200" prefHeight="700">
+
+    <!-- Oldalsó menü fix szélességgel -->
+    <VBox fx:id="sidebarBox" spacing="16"
+          prefWidth="250" minWidth="250" maxWidth="250"
+          styleClass="sidebar">
+
+        <!-- Felső sáv a menüben: hamburger + cím -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <ToggleButton fx:id="menuToggle" onAction="#toggleSidebar" text="☰" focusTraversable="false" styleClass="menu-toggle"/>
+            <Label text="DriveSync" styleClass="sidebar-appname"/>
+        </HBox>
+
+        <!-- Felhasználói név -->
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Bejelentkezve:" styleClass="sidebar-label"/>
+            <Label fx:id="usernameLabel" text="Felhasználó" styleClass="sidebar-username" wrapText="true"/>
+        </VBox>
+
+        <!-- Menü gombok -->
+        <VBox spacing="10">
+            <Button fx:id="homeBtn" text="🏠 Főoldal" onAction="#showHome" maxWidth="Infinity" styleClass="menu-button"/>
+            <Button fx:id="carsBtn" text="🚗 Saját autók" onAction="#showCars" maxWidth="Infinity" styleClass="menu-button"/>
+            <Button fx:id="budgetBtn" text="💰 Költségvetés" onAction="#showBudget" maxWidth="Infinity" styleClass="menu-button"/>
+            <Button fx:id="linksBtn" text="🔗 Hasznos linkek" onAction="#showLinks" maxWidth="Infinity" styleClass="menu-button"/>
+            <Button fx:id="calculatorBtn" text="🔢 Kalkulátor" onAction="#showCalculator" maxWidth="Infinity" styleClass="menu-button"/>
+        </VBox>
+
+        <!-- Alsó gombok -->
+        <VBox spacing="10" style="-fx-padding: 50 0 0 0;">
+            <Button fx:id="settingsBtn" text="⚙ Beállítások" onAction="#showSettings" maxWidth="Infinity" styleClass="menu-button"/>
+            <Button fx:id="logoutButton" text="🚪 Kijelentkezés" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
+        </VBox>
+    </VBox>
+
+    <!-- Tartalom ScrollPane -->
+    <ScrollPane fx:id="contentScrollPane" HBox.hgrow="ALWAYS" fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
+        <VBox fx:id="contentContainer" spacing="10" styleClass="content-container"/>
+    </ScrollPane>
+
+</HBox>

@@ -1,0 +1,627 @@
+/*
+ =====================
+  Login/Regisztráció jobb panel (modernizálva)
+ =====================
+*/
+.right-panel {
+    -fx-background-color: linear-gradient(to bottom right, #eef2f7, #e6ebf2);
+    -fx-padding: 40;
+}
+
+/* Sötét téma a jobb panelre */
+.theme-dark .right-panel {
+    -fx-background-color: linear-gradient(to bottom right, #1a1f2e, #222736);
+}
+
+/* Form pane-ek */
+.right-panel VBox {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-spacing: 10;
+    -fx-alignment: center;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);
+}
+
+.theme-dark .right-panel VBox {
+    -fx-background-color: #2a3040;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 14, 0, 0, 3);
+}
+
+/* Label stílus */
+.right-panel Label {
+    -fx-font-family: "Arial";
+    -fx-text-fill: #333333;
+}
+
+.theme-dark .right-panel Label {
+    -fx-text-fill: #e8eaf0;
+}
+
+/* Gomb stílus a jobb panelen */
+.right-panel Button {
+    -fx-background-radius: 10;
+    -fx-padding: 10 18;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0.2, 0, 2);
+}
+
+.right-panel Button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.14), 10, 0.2, 0, 3);
+}
+
+/* Gomb-stílusú Hyperlink */
+.right-panel Hyperlink {
+    -fx-background-color: transparent;
+    -fx-border-color: #FFD700;
+    -fx-border-width: 2;
+    -fx-text-fill: #FFD700;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+.right-panel Hyperlink:hover {
+    -fx-background-color: #FFD700;
+    -fx-text-fill: black;
+}
+
+.theme-dark .right-panel Hyperlink {
+    -fx-border-color: #ffd86b;
+    -fx-text-fill: #ffd86b;
+}
+
+.theme-dark .right-panel Hyperlink:hover {
+    -fx-background-color: #ffd86b;
+    -fx-text-fill: #1a1f2e;
+}
+
+/* TextField és PasswordField stílus */
+.right-panel TextField,
+.right-panel PasswordField {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+    -fx-text-fill: #333333;
+}
+
+.theme-dark .right-panel TextField,
+.theme-dark .right-panel PasswordField {
+    -fx-background-color: #2a3040;
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-text-fill: #e8eaf0;
+}
+
+.theme-dark .right-panel TextField:focused,
+.theme-dark .right-panel PasswordField:focused {
+    -fx-border-color: #ffd86b;
+}
+
+/* Checkbox stílus */
+.right-panel CheckBox > .box {
+    -fx-background-color: white;
+    -fx-border-color: #DAA520;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5;
+}
+
+.right-panel CheckBox:selected > .box {
+    -fx-background-color: #FFD700;
+}
+
+.right-panel CheckBox:selected > .box > .mark {
+    -fx-background-color: black;
+}
+
+.right-panel CheckBox .text {
+    -fx-fill: #333333;
+}
+
+.theme-dark .right-panel CheckBox > .box {
+    -fx-background-color: #2a3040;
+    -fx-border-color: #ffd86b;
+}
+
+.theme-dark .right-panel CheckBox:selected > .box {
+    -fx-background-color: #ffd86b;
+}
+
+.theme-dark .right-panel CheckBox:selected > .box > .mark {
+    -fx-background-color: #1a1f2e;
+}
+
+.theme-dark .right-panel CheckBox .text {
+    -fx-fill: #e8eaf0;
+}
+
+/* Modern link */
+.modern-link {
+    -fx-text-fill: #007bff;
+    -fx-font-size: 20px;
+    -fx-underline: false;
+    -fx-background-color: transparent;
+    -fx-padding: 6 10;
+    -fx-background-radius: 8;
+    -fx-font-weight: 500;
+}
+
+.modern-link:hover {
+    -fx-text-fill: white;
+    -fx-background-color: #007bff;
+    -fx-underline: false;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.2, 0, 2);
+}
+
+.theme-dark .modern-link {
+    -fx-text-fill: #7cc4ff;
+}
+
+.theme-dark .modern-link:hover {
+    -fx-background-color: #60a5fa;
+    -fx-text-fill: #0b1220;
+}
+
+/* =====================
+   Közös alkalmazás stílusok
+   ===================== */
+
+/* Gyökér és háttér */
+.app-bg {
+    -fx-background-color: #f5f7fb;
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", "Arial";
+}
+
+.theme-dark.app-bg {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #e8eaf0;
+}
+
+/* Oldalsó menü */
+.sidebar {
+    -fx-background-color: linear-gradient(to bottom, #2c2c2c 0%, #232323 100%);
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 18, 0.2, 0, 6);
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: rgba(255,255,255,0.08);
+}
+
+.theme-dark .sidebar {
+    -fx-background-color: linear-gradient(to bottom, #1b1c22 0%, #15161b 100%);
+    -fx-border-color: rgba(255,255,255,0.06);
+}
+
+/* Sidebar szövegek */
+.sidebar-appname {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.theme-dark .sidebar-appname {
+    -fx-text-fill: #e8eaf0;
+}
+
+.sidebar-label {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+}
+
+.theme-dark .sidebar-label {
+    -fx-text-fill: #cfd6e6;
+}
+
+.sidebar-username {
+    -fx-text-fill: gold;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.theme-dark .sidebar-username {
+    -fx-text-fill: #ffd86b;
+}
+
+/* Menü gombok */
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: gold;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 12;
+}
+
+.menu-button:hover {
+    -fx-background-color: rgba(255,215,0,0.18);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.theme-dark .menu-button {
+    -fx-text-fill: #ffd86b;
+}
+
+.menu-button-active {
+    -fx-background-color: rgba(255,215,0,0.25);
+    -fx-text-fill: #111111;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 12;
+    -fx-border-color: #FFD700;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-radius: 12;
+}
+
+.theme-dark .menu-button-active {
+    -fx-background-color: rgba(255,216,107,0.22);
+    -fx-text-fill: #f5f5f5;
+    -fx-border-color: #ffd86b;
+}
+
+/* Logout button */
+.logout-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 12;
+}
+
+.logout-button:hover {
+    -fx-background-color: #cf3f31;
+}
+
+.theme-dark .logout-button {
+    -fx-background-color: #cf3f31;
+}
+
+.theme-dark .logout-button:hover {
+    -fx-background-color: #b5382b;
+}
+
+/* Content area */
+.content-scroll {
+    -fx-background: #ecf0f1;
+}
+
+.theme-dark .content-scroll {
+    -fx-background: #1f2430;
+}
+
+/* Scrollbar */
+.content-scroll .scroll-bar:vertical .thumb,
+.content-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(0,0,0,0.25);
+    -fx-background-radius: 4;
+}
+
+.theme-dark .content-scroll .scroll-bar:vertical .thumb,
+.theme-dark .content-scroll .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(255,255,255,0.25);
+}
+
+/* Page titles */
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.theme-dark .page-title {
+    -fx-text-fill: #e8eaf0;
+}
+
+.page-subtitle {
+    -fx-text-fill: #5f6b7a;
+}
+
+.theme-dark .page-subtitle {
+    -fx-text-fill: #b0b6c3;
+}
+
+/* Card */
+.card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);
+}
+
+.card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.16), 16, 0, 0, 6);
+}
+
+.theme-dark .card {
+    -fx-background-color: #2a3040;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0, 0, 4);
+}
+
+.theme-dark .card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 16, 0, 0, 6);
+}
+
+/* Card title/subtitle */
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.theme-dark .card-title {
+    -fx-text-fill: #e8eaf0;
+}
+
+.card-subtitle {
+    -fx-text-fill: #6b7280;
+}
+
+.theme-dark .card-subtitle {
+    -fx-text-fill: #d0d5e2;
+}
+
+/* Label sm */
+.label-sm {
+    -fx-text-fill: #374151;
+    -fx-font-size: 12px;
+}
+
+.theme-dark .label-sm {
+    -fx-text-fill: #d0d5e2;
+}
+
+/* Szöveg segédosztályok */
+.text-muted {
+    -fx-text-fill: #6b7280;
+}
+
+.theme-dark .text-muted {
+    -fx-text-fill: #9ca3af;
+}
+
+.text-danger {
+    -fx-text-fill: #dc2626;
+}
+
+.theme-dark .text-danger {
+    -fx-text-fill: #f87171;
+}
+
+.text-success {
+    -fx-text-fill: #059669;
+}
+
+.theme-dark .text-success {
+    -fx-text-fill: #34d399;
+}
+
+/* Button stílusok */
+.btn-primary {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    -fx-padding: 10 16;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #0ea371;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0, 0, 2);
+}
+
+.theme-dark .btn-primary {
+    -fx-background-color: #10b981;
+}
+
+/* btn-danger */
+.btn-danger {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 10 16;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #db3c30;
+}
+
+.theme-dark .btn-danger {
+    -fx-background-color: #f44336;
+}
+
+/* btn-secondary */
+.btn-secondary {
+    -fx-background-color: #0ea5e9;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 10 16;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #0284c7;
+}
+
+.theme-dark .btn-secondary {
+    -fx-background-color: #0ea5e9;
+}
+
+.theme-dark .btn-secondary:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+/* btn-ghost */
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: #374151;
+    -fx-border-color: rgba(0,0,0,0.12);
+    -fx-border-width: 1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 10 16;
+}
+
+.btn-ghost:hover {
+    -fx-border-color: rgba(0,0,0,0.3);
+    -fx-background-color: rgba(0,0,0,0.035);
+}
+
+.theme-dark .btn-ghost {
+    -fx-text-fill: #e5e7eb;
+    -fx-border-color: rgba(255,255,255,0.18);
+}
+
+.theme-dark .btn-ghost:hover {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-border-color: rgba(255,255,255,0.28);
+}
+
+/* TextField és TextArea javított */
+.theme-dark .text-input,
+.theme-dark .text-area {
+    -fx-background-color: #2a3040;
+    -fx-text-fill: #e8eaf0;
+    -fx-border-color: rgba(255,255,255,0.16);
+}
+
+.theme-dark .text-input:focused,
+.theme-dark .text-area:focused {
+    -fx-background-color: #32384a;
+}
+
+/* Prompt text sötétben */
+.theme-dark .text-input .prompt-text,
+.theme-dark .text-area .prompt-text {
+    -fx-text-fill: #9aa3b5;
+}
+
+/* Tooltip */
+.tooltip {
+    -fx-background-color: rgba(17,24,39,0.95);
+    -fx-text-fill: #f9fafb;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 8, 0.2, 0, 2);
+}
+
+.theme-dark .tooltip {
+    -fx-background-color: rgba(42,48,64,0.98);
+    -fx-text-fill: #e8eaf0;
+}
+.links-root {
+    -fx-background-color: #f5f7fb; /* világos alap */
+}
+
+.theme-dark .links-root {
+    -fx-background-color: #1f2430; /* sötét alap */
+}
+.link-card {
+    -fx-background-color: transparent; /* átlátszó, hogy a root szín látszódjon */
+    -fx-padding: 10;
+    -fx-spacing: 12;
+    -fx-alignment: center-left;
+    -fx-background-radius: 12;
+}
+.link-text {
+    -fx-text-fill: #2c3e50;
+}
+
+.theme-dark .link-text {
+    -fx-text-fill: #e8eaf0;
+}
+
+.link-text:hover {
+    -fx-text-fill: #34495e;
+}
+
+.theme-dark .link-text:hover {
+    -fx-text-fill: #60a5fa;
+}
+/* Sötét téma DatePicker */
+.theme-dark .date-picker {
+    -fx-background-color: #2b2b2b;   /* mező háttere */
+    -fx-text-fill: #f0f0f0;           /* szöveg színe */
+    -fx-border-color: #444;           /* keret */
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+/* Popup naptár háttere */
+.theme-dark .date-picker .calendar-popup {
+    -fx-background-color: #2b2b2b;
+}
+
+/* Hónap/év fejléc és vezérlőgombok */
+.theme-dark .date-picker .month-year-pane,
+.theme-dark .date-picker .control-buttons {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #f0f0f0;
+}
+
+/* Napok */
+.theme-dark .date-picker .day-cell {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #f0f0f0;
+}
+
+.theme-dark .date-picker .day-cell:hover {
+    -fx-background-color: #505050;
+}
+
+.theme-dark .date-picker .day-cell:focused {
+    -fx-background-color: #616161;
+}
+.theme-dark .combo-box,
+.theme-dark .choice-box {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #555555;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.theme-dark .combo-box .text-field {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+}
+
+.theme-dark .combo-box-popup .list-view,
+.theme-dark .choice-box-popup .list-view {
+    -fx-background-color: #2a2a2a;
+    -fx-control-inner-background: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+}
+
+.theme-dark .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e0e0e0;
+}
+
+.theme-dark .list-cell:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+.theme-dark .text-field,
+.theme-dark .text-area {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #e0e0e0;
+}
+
+.theme-dark .scroll-pane {
+    -fx-background: #1e1e1e;
+}

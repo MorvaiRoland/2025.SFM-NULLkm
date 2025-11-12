@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.Image?>
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/24.0.1"
+      fx:controller="drivesync.MainController"
+      prefWidth="900" prefHeight="550" styleClass="app-bg">
+
+    <!-- Bal panel – logo -->
+    <StackPane prefWidth="300">
+        <VBox alignment="CENTER" spacing="20" styleClass="sidebar">
+            <ImageView fx:id="logoImage" fitWidth="150" fitHeight="150" preserveRatio="true"/>
+            <Label text="DriveSync" styleClass="sidebar-appname"/>
+        </VBox>
+    </StackPane>
+
+    <!-- Jobb panel – login/register -->
+    <StackPane prefWidth="600" styleClass="right-panel">
+
+        <!-- Login pane -->
+        <VBox fx:id="loginPane" alignment="CENTER" spacing="20">
+            <Label text="Bejelentkezés" styleClass="page-title" />
+
+            <GridPane hgap="10" vgap="10" alignment="CENTER">
+                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="loginUsername" promptText="Add meg a felhasználóneved"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <PasswordField fx:id="loginPassword" promptText="Add meg a jelszavad"
+                               GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                <TextField fx:id="loginPasswordVisible" promptText="Add meg a jelszavad"
+                           visible="false" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <VBox spacing="10" alignment="CENTER">
+                <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
+                <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
+                <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" prefWidth="200" styleClass="btn-primary"/>
+
+
+                <Button fx:id="googleLoginButton"
+                        onAction="#handleGoogleLogin"
+                        prefWidth="200"
+                        prefHeight="40"
+                        styleClass="btn-primary">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <ImageView fitWidth="20" fitHeight="20" preserveRatio="true" pickOnBounds="true">
+                                <image>
+                                    <Image url="@/drivesync/Logók/google_logo.png" />
+                                </image>
+                            </ImageView>
+                            <Label text="Google-fiókkal" />
+                        </HBox>
+                    </graphic>
+                </Button>
+
+
+                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" styleClass="modern-link" />
+            </VBox>
+        </VBox>
+
+        <!-- Register pane -->
+        <VBox fx:id="registerPane" alignment="CENTER" spacing="20" visible="false">
+            <Label text="Regisztráció" styleClass="page-title" />
+
+            <GridPane hgap="10" vgap="10" alignment="CENTER">
+                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="regUsername" promptText="Add meg a felhasználóneved"
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="regEmail" promptText="Add meg az email címed"
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <PasswordField fx:id="regPassword" promptText="Adj meg egy jelszót"
+                               GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                <TextField fx:id="regPasswordVisible" promptText="Adj meg egy jelszót"
+                           visible="false" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                <Label text="Jelszó ismét:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <PasswordField fx:id="regPasswordConfirm" promptText="Írd be újra a jelszót"
+                               GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                <TextField fx:id="regPasswordConfirmVisible" promptText="Írd be újra a jelszót"
+                           visible="false" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+            </GridPane>
+
+            <VBox spacing="10" alignment="CENTER">
+                <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
+                <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" prefWidth="200" styleClass="btn-primary"/>
+                <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" styleClass="modern-link" />
+            </VBox>
+        </VBox>
+
+    </StackPane>
+
+</HBox>
