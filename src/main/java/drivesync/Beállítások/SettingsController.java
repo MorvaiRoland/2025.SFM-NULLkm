@@ -39,6 +39,7 @@ public class SettingsController {
         this.conn = connection;
         this.currentUserId = userId;
         loadUserData();
+
     }
 
     @FXML
