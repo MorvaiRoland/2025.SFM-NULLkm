@@ -7,7 +7,7 @@
 <BorderPane fx:id="mainLayout" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="drivesync.Főoldal.HomeDashboardController"
-            prefWidth="1200" prefHeight="700" styleClass="app-bg">
+            prefWidth="1200" prefHeight="700"   stylesheets="@/drivesync/CSS/style.css" styleClass="app-bg">
 
     <!-- Középső widget terület -->
     <center>

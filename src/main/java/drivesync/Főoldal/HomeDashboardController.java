@@ -51,6 +51,7 @@ public class HomeDashboardController {
     private boolean isCollapsed = false;
     private final Map<String, VBox> activeWidgets = new HashMap<>();
     private String username;
+    private boolean darkTheme = false;
 
     public void setUsername(String username) {
         this.username = username;
@@ -96,6 +97,16 @@ public class HomeDashboardController {
         budgetBtn.setOnAction(e -> toggleWidget("budget", this::createBudgetWidget));
         linksBtn.setOnAction(e -> toggleWidget("links", this::createLinksWidget));
         notificationsBtn.setOnAction(e -> toggleWidget("notifications", this::createNotificationWidgets));
+
+        mainLayout.getStyleClass().add("theme-light");
+    }
+
+    @FXML
+    private void toggleTheme() {
+        darkTheme = !darkTheme;
+        var root = mainLayout.getScene().getRoot();
+        root.getStyleClass().removeAll("theme-light", "theme-dark");
+        root.getStyleClass().add(darkTheme ? "theme-dark" : "theme-light");
     }
 
     private void setButtonGraphic(Button btn, String resourcePath) {
@@ -142,27 +153,34 @@ public class HomeDashboardController {
 
     private VBox createWeatherWidget() {
         VBox box = baseWidget("🌤 Időjárás", "#f1c40f");
+        box.getStyleClass().add("widget-card"); // Alap widget stílus
 
+        // Város mező
         TextField cityInput = new TextField();
         cityInput.setPromptText("Írd be a várost");
+        cityInput.getStyleClass().add("text-input");
         cityInput.setPrefWidth(200);
 
+        // Widget feliratok
         Label cityLabel = new Label();
-        cityLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
-        cityLabel.setTextFill(Color.WHITE);
-        Label tempLabel = new Label();
-        tempLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
-        tempLabel.setTextFill(Color.WHITE);
-        Label feelsLikeLabel = new Label();
-        feelsLikeLabel.setTextFill(Color.LIGHTGRAY);
-        Label humidityLabel = new Label();
-        humidityLabel.setTextFill(Color.LIGHTGRAY);
-        Label windLabel = new Label();
-        windLabel.setTextFill(Color.LIGHTGRAY);
-        Label descLabel = new Label();
-        descLabel.setFont(Font.font("Segoe UI", 16));
-        descLabel.setTextFill(Color.LIGHTGRAY);
+        cityLabel.getStyleClass().addAll("card-title"); // sárga főcím
 
+        Label tempLabel = new Label();
+        tempLabel.getStyleClass().addAll("card-title"); // sárga nagyobb szöveg
+
+        Label feelsLikeLabel = new Label();
+        feelsLikeLabel.getStyleClass().add("card-subtitle"); // világosabb felirat
+
+        Label humidityLabel = new Label();
+        humidityLabel.getStyleClass().add("card-subtitle");
+
+        Label windLabel = new Label();
+        windLabel.getStyleClass().add("card-subtitle");
+
+        Label descLabel = new Label();
+        descLabel.getStyleClass().add("card-subtitle");
+
+        // Frissítő logika
         Runnable updateWeather = () -> {
             String city = cityInput.getText().isEmpty() ? "Budapest" : cityInput.getText();
             Weather weather = WeatherService.getWeather(city);
@@ -186,12 +204,30 @@ public class HomeDashboardController {
         cityInput.setOnAction(e -> updateWeather.run());
         updateWeather.run();
 
-        box.getChildren().addAll(cityInput, cityLabel, tempLabel, feelsLikeLabel, humidityLabel, windLabel, descLabel);
+        box.getChildren().addAll(
+                cityInput,
+                cityLabel,
+                tempLabel,
+                feelsLikeLabel,
+                humidityLabel,
+                windLabel,
+                descLabel
+        );
+
+        // Középre igazítás
+        box.setAlignment(Pos.CENTER);
+
         return box;
     }
 
+
+
     private VBox createFuelWidget() {
         VBox box = baseWidget("⛽ Üzemanyagárak", "#f1c40f");
+
+        // Alap CSS osztály a widgethez
+        box.getStyleClass().add("widget-card");
+
         String[] fuelOrder = {"95-ös benzin", "Gázolaj", "100-as benzin"};
         Map<String, String> fuelIcons = Map.of(
                 "95-ös benzin", "/drivesync/icons/benzin.png",
@@ -200,58 +236,72 @@ public class HomeDashboardController {
         );
 
         Label lastUpdatedLabel = new Label();
-        lastUpdatedLabel.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 12));
-        lastUpdatedLabel.setTextFill(Color.LIGHTGRAY);
+        lastUpdatedLabel.getStyleClass().addAll("widget-text", "widget-small");
+        lastUpdatedLabel.setAlignment(Pos.CENTER);
 
         Runnable updateFuelPrices = () -> {
             Map<String, String[]> prices = FuelService.getFuelPrices();
             if (prices.isEmpty()) {
-                box.getChildren().setAll(new Label("Nem sikerült lekérni az adatokat"));
+                Label errorLabel = new Label("Nem sikerült lekérni az adatokat");
+                errorLabel.getStyleClass().add("widget-text");
+                box.getChildren().setAll(errorLabel);
                 return;
             }
 
-            HBox fuelRow = new HBox(40);
+            HBox fuelRow = new HBox(50); // nagyobb spacing
             fuelRow.setAlignment(Pos.CENTER);
 
             for (String fuel : fuelOrder) {
-                VBox fuelBox = new VBox(15);
+                VBox fuelBox = new VBox(20); // nagyobb spacing
                 fuelBox.setAlignment(Pos.CENTER);
-                fuelBox.setStyle("-fx-background-color: #3a4b5c; -fx-padding: 20; -fx-border-radius: 14; -fx-background-radius: 14;");
-                fuelBox.setPrefWidth(260);
+                fuelBox.getStyleClass().add("widget-card"); // CSS osztály
+                fuelBox.setPrefWidth(300);
+                fuelBox.setMinWidth(240);
+                fuelBox.setMaxWidth(320);
 
                 ImageView icon = new ImageView(getClass().getResource(fuelIcons.get(fuel)).toExternalForm());
-                icon.setFitWidth(50);
-                icon.setFitHeight(50);
+                icon.setFitWidth(70);  // nagyobb ikon
+                icon.setFitHeight(70);
+
                 Label fuelLabel = new Label(fuel);
-                fuelLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-                fuelLabel.setTextFill(Color.WHITE);
+                fuelLabel.getStyleClass().add("widget-header");
+                fuelLabel.setWrapText(true);
+                fuelLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
                 fuelLabel.setAlignment(Pos.CENTER);
-                VBox headerBox = new VBox(8, icon, fuelLabel);
+
+                VBox headerBox = new VBox(10, icon, fuelLabel);
                 headerBox.setAlignment(Pos.CENTER);
 
                 String[] fuelPrices = prices.getOrDefault(fuel, new String[]{"-", "-", "-"});
                 Label minLabel = new Label("Min: " + fuelPrices[0]);
                 Label avgLabel = new Label("Átlag: " + fuelPrices[1]);
                 Label maxLabel = new Label("Max: " + fuelPrices[2]);
+
                 for (Label lbl : new Label[]{minLabel, avgLabel, maxLabel}) {
-                    lbl.setTextFill(Color.WHITE);
-                    lbl.setFont(Font.font("Segoe UI", 15));
+                    lbl.getStyleClass().add("widget-text"); // CSS osztály
                     lbl.setAlignment(Pos.CENTER);
+                    lbl.setWrapText(false);
                 }
 
-                VBox pricesBox = new VBox(6, minLabel, avgLabel, maxLabel);
+                VBox pricesBox = new VBox(8, minLabel, avgLabel, maxLabel);
                 pricesBox.setAlignment(Pos.CENTER);
+
                 fuelBox.getChildren().addAll(headerBox, pricesBox);
                 fuelRow.getChildren().add(fuelBox);
             }
 
-            lastUpdatedLabel.setText("Utoljára frissítve: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm")));
-            VBox.setMargin(fuelRow, new Insets(15, 0, 8, 0));
+            lastUpdatedLabel.setText(
+                    "Utoljára frissítve: " +
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm"))
+            );
+
+            VBox.setMargin(fuelRow, new Insets(20, 0, 15, 0));
             box.getChildren().setAll(fuelRow, lastUpdatedLabel);
             box.setAlignment(Pos.CENTER);
         };
 
         updateFuelPrices.run();
+
         Timeline timeline = new Timeline(new KeyFrame(Duration.hours(1), e -> updateFuelPrices.run()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -259,11 +309,18 @@ public class HomeDashboardController {
         return box;
     }
 
+
+
+
     private VBox createCarsWidget() {
         VBox box = baseWidget("🚗 Autók", "#f1c40f");
+
+        // CSS osztály a theme-kompatibilitáshoz
+        box.getStyleClass().add("widget-card");
+
         Label infoLabel = new Label("Saját autók listája:");
-        infoLabel.setFont(Font.font("Segoe UI", 14));
-        infoLabel.setTextFill(Color.WHITE);
+        infoLabel.getStyleClass().add("widget-text");
+
         VBox carsContainer = new VBox(10);
         carsContainer.setPrefWidth(380);
 
@@ -292,19 +349,26 @@ public class HomeDashboardController {
             javafx.application.Platform.runLater(() -> {
                 if (cars.isEmpty()) {
                     Label noCars = new Label("Nincs regisztrált autó.");
-                    noCars.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 14));
-                    noCars.setTextFill(Color.LIGHTGRAY);
+                    noCars.getStyleClass().addAll("widget-text", "widget-subtitle");
                     carsContainer.getChildren().add(noCars);
                 } else {
                     for (Map<String, Object> car : cars) {
                         VBox carBox = new VBox(4);
-                        carBox.setStyle("-fx-background-color: #3a4b5c; -fx-padding:12; -fx-border-radius:10; -fx-background-radius:10; -fx-border-color:#f1c40f; -fx-border-width:1;");
+                        carBox.getStyleClass().add("widget-card");
+
                         Label title = new Label(car.get("brand") + " " + car.get("type"));
-                        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-                        title.setTextFill(Color.WHITE);
-                        Label details = new Label("Rendszám: " + car.get("license") + "\nÉvjárat: " + car.get("vintage") + "\nÜzemanyag: " + car.get("fuel") + "\nKm: " + String.format("%,d km", car.get("km")) + (car.get("color") != null && !((String) car.get("color")).isEmpty() ? "\nSzín: " + car.get("color") : ""));
-                        details.setFont(Font.font("Segoe UI", 14));
-                        details.setTextFill(Color.LIGHTGRAY);
+                        title.getStyleClass().addAll("widget-text", "widget-title");
+
+                        Label details = new Label(
+                                "Rendszám: " + car.get("license") +
+                                        "\nÉvjárat: " + car.get("vintage") +
+                                        "\nÜzemanyag: " + car.get("fuel") +
+                                        "\nKm: " + String.format("%,d km", car.get("km")) +
+                                        (car.get("color") != null && !((String) car.get("color")).isEmpty() ? "\nSzín: " + car.get("color") : "")
+                        );
+                        details.getStyleClass().addAll("widget-text", "widget-subtitle");
+                        details.setWrapText(true);
+
                         carBox.getChildren().addAll(title, details);
                         carsContainer.getChildren().add(carBox);
                     }
@@ -316,18 +380,26 @@ public class HomeDashboardController {
         return box;
     }
 
-    private VBox createBudgetWidget() {
-        VBox box = baseWidget("💰 Költségvetés", "#f1c40f");
-        Label infoLabel = new Label("Kiadások és bevételek összegzése:");
-        infoLabel.setFont(Font.font("Segoe UI", 14));
-        infoLabel.setTextFill(Color.WHITE);
-        Label monthlyLabel = new Label("Havi összesítés: ...");
-        monthlyLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-        monthlyLabel.setTextFill(Color.WHITE);
-        Label yearlyLabel = new Label("Éves összesítés: ...");
-        yearlyLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-        yearlyLabel.setTextFill(Color.WHITE);
 
+    private VBox createBudgetWidget() {
+        // Widget alap
+        VBox box = baseWidget("💰 Költségvetés", "#f1c40f");
+
+        // CSS osztály a theme-kompatibilitáshoz
+        box.getStyleClass().add("widget-card");
+
+        // Információs szöveg
+        Label infoLabel = new Label("Kiadások és bevételek összegzése:");
+        infoLabel.getStyleClass().add("widget-text");
+
+        // Havi és éves összesítés
+        Label monthlyLabel = new Label("Havi összesítés: ...");
+        monthlyLabel.getStyleClass().addAll("widget-text", "widget-title");
+
+        Label yearlyLabel = new Label("Éves összesítés: ...");
+        yearlyLabel.getStyleClass().addAll("widget-text", "widget-title");
+
+        // Diagram
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
@@ -337,14 +409,17 @@ public class HomeDashboardController {
         xAxis.setLabel("Hónap");
         yAxis.setLabel("Összeg (Ft)");
 
+        // Adatok lekérése külön szálon
         new Thread(() -> {
             try (Connection conn = drivesync.Adatbázis.Database.getConnection()) {
                 String sql = "SELECT price, datet FROM expense WHERE owner_id=(SELECT id FROM users WHERE username=?)";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, username);
                 ResultSet rs = stmt.executeQuery();
+
                 int yearlySumTemp = 0;
                 int[] monthlySumTemp = new int[12];
+
                 while (rs.next()) {
                     int amount = rs.getInt("price");
                     LocalDate date = rs.getDate("datet").toLocalDate();
@@ -353,19 +428,23 @@ public class HomeDashboardController {
                         monthlySumTemp[date.getMonthValue() - 1] += amount;
                     }
                 }
+
                 final int yearlySum = yearlySumTemp;
                 final int[] monthlySum = monthlySumTemp;
+
                 DecimalFormat df = new DecimalFormat("#,###");
                 XYChart.Series<String, Number> series = new XYChart.Series<>();
                 String[] months = {"Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Szep", "Okt", "Nov", "Dec"};
                 for (int i = 0; i < 12; i++) {
                     series.getData().add(new XYChart.Data<>(months[i], monthlySum[i]));
                 }
+
                 javafx.application.Platform.runLater(() -> {
                     monthlyLabel.setText("Havi összesítés: " + df.format(monthlySum[LocalDate.now().getMonthValue() - 1]) + " Ft");
                     yearlyLabel.setText("Éves összesítés: " + df.format(yearlySum) + " Ft");
                     chart.getData().add(series);
                 });
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -375,28 +454,37 @@ public class HomeDashboardController {
         return box;
     }
 
+
     private VBox createLinksWidget() {
         VBox box = baseWidget("🔗 Linkek", "#f1c40f");
+
+        // CSS osztály a theme-kompatibilitáshoz
+        box.getStyleClass().add("widget-card");
+
         Label label = new Label("Gyakran használt linkek.");
-        label.setFont(Font.font("Segoe UI", 14));
-        label.setTextFill(Color.WHITE);
+        label.getStyleClass().add("widget-text");
+
         box.getChildren().add(label);
         return box;
     }
 
+
     private VBox createNotificationWidgets() {
-        VBox container = new VBox(15);
-        container.setPrefWidth(400);
+        // Base widget létrehozása a "widget-card" stílussal
+        VBox box = baseWidget("🔔 Szerviz értesítések", "#f1c40f");
+        box.getStyleClass().add("widget-card");
+
         ServiceDAO dao = new ServiceDAO();
         List<ServiceDAO.Service> services = dao.getUpcomingServices();
+
         if (services.isEmpty()) {
             Label empty = new Label("Nincs elérhető szerviz információ.");
-            empty.setFont(Font.font("Segoe UI", FontPosture.ITALIC, 14));
-            empty.setTextFill(Color.LIGHTGRAY);
-            container.getChildren().add(empty);
-            return container;
+            empty.getStyleClass().addAll("widget-text", "widget-empty");
+            box.getChildren().add(empty);
+            return box;
         }
 
+        // Minden szolgáltatás külön Label-ként, egyetlen VBox-ban
         for (ServiceDAO.Service s : services) {
             StringBuilder text = new StringBuilder("Autó: ").append(s.brand).append(" ").append(s.type)
                     .append("\nDátum: ").append(s.serviceDate)
@@ -404,30 +492,26 @@ public class HomeDashboardController {
                     .append(s.notes != null && !s.notes.isEmpty() ? "\nMegjegyzés: " + s.notes : "")
                     .append("\nEmlékeztető: ").append(s.reminder ? "Igen" : "Nem");
 
-            VBox widget = new VBox(8);
-            widget.setPrefWidth(350);
-            widget.setStyle("-fx-background-color:#3a4b5c; -fx-padding:15; -fx-border-radius:12; -fx-background-radius:12;");
-            Label header = new Label("🔔 Szerviz értesítés");
-            header.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-            header.setTextFill(Color.web("#f1c40f"));
             Label serviceLabel = new Label(text.toString());
-            serviceLabel.setFont(Font.font("Segoe UI", 14));
-            serviceLabel.setTextFill(Color.LIGHTGRAY);
+            serviceLabel.getStyleClass().add("widget-text");
             serviceLabel.setWrapText(true);
-            widget.getChildren().addAll(header, serviceLabel);
-            container.getChildren().add(widget);
+
+            box.getChildren().add(serviceLabel);
         }
 
-        return container;
+        return box;
     }
+
+
 
     private VBox baseWidget(String title, String color) {
         VBox box = new VBox(8);
         box.setPrefWidth(400);
-        box.setStyle("-fx-background-color: #2c3e50; -fx-border-radius:12; -fx-background-radius:12; -fx-padding:20;");
+        box.getStyleClass().add("widget-card"); // inline style helyett CSS osztály
         box.getChildren().add(baseWidgetHeader(title));
         return box;
     }
+
 
     private Label baseWidgetHeader(String title) {
         Label header = new Label(title);

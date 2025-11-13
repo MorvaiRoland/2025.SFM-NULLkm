@@ -56,17 +56,20 @@ public class SettingsController {
                 var skin = themeChoiceBox.getSkin();
                 if (skin instanceof ChoiceBoxSkin<?> choiceBoxSkin) {
                     try {
-                        var method = ChoiceBoxSkin.class.getDeclaredMethod("getPopupContent");
-                        method.setAccessible(true);
-                        ListView<?> listView = (ListView<?>) method.invoke(choiceBoxSkin);
-                        listView.getStyleClass().add("theme-dark");
+                        // Reflection helyett próbáljuk meg a popupot CSS-sel vagy közvetlen stílussal kezelni
+                        var popupNode = themeChoiceBox.lookup(".context-menu");
+                        if (popupNode != null) {
+                            popupNode.getStyleClass().add("theme-dark");
+                        }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        System.err.println("Nem sikerült stílust alkalmazni a ChoiceBox popupra: " + e.getMessage());
                     }
                 }
             }
         });
+
     }
+
 
     private void loadUserData() {
         if (conn == null) return;

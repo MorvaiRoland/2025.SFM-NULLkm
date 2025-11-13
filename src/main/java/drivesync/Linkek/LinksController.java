@@ -1,4 +1,5 @@
-package  drivesync.Linkek;
+package drivesync.Linkek;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Tooltip;
@@ -33,7 +34,12 @@ public class LinksController {
         imgWAZE.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/waze.png")));
         imgGARVISOR.setImage(new Image(getClass().getResourceAsStream("/drivesync/icons/garvisor.png")));
 
-        // Tooltip-ek beállítása programból
+        // CSS osztályok alkalmazása a témához
+        for (Hyperlink link : new Hyperlink[]{linkHAHU, linkFEKMESTER, linkHOLTANKOLJAK, linkWAZE, linkGARVISOR}) {
+            link.getStyleClass().add("widget-link"); // minden linknek ugyanaz a CSS osztály
+        }
+
+        // Tooltip-ek beállítása
         linkHAHU.setTooltip(new Tooltip("Használt autók keresése"));
         linkFEKMESTER.setTooltip(new Tooltip("Autóalkatrész áruház"));
         linkHOLTANKOLJAK.setTooltip(new Tooltip("Üzemanyag árak országosan"));

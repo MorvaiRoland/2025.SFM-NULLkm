@@ -44,15 +44,12 @@ public class App extends Application {
         // Home scene előre betöltése
         FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/drivesync/Menü/Home.fxml"));
         homeScene = new Scene(homeLoader.load(), 1200, 700);
-        // Alap stíluslap hozzáadása a fő jelenethez is
         homeScene.getStylesheets().add(getClass().getResource("/drivesync/CSS/style.css").toExternalForm());
         homeController = homeLoader.getController();
-
-        // Globális beállítások alkalmazása a fő jelenetre is
         applyGlobalPreferences(homeScene);
 
         // Automatikus login ellenőrzés
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(MainController.class);
+        Preferences prefs = Preferences.userNodeForPackage(MainController.class);
         String rememberedUser = prefs.get("username", null);
         if (rememberedUser != null) {
             homeController.setUsername(rememberedUser);
@@ -70,50 +67,58 @@ public class App extends Application {
         launch();
     }
 
+    /**
+     * Alkalmazza a globális felhasználói beállításokat (téma és betűméret)
+     * Ha nincs tárolva téma a Preferences-ben, alapból világos ("light") témát alkalmaz.
+     */
     private void applyGlobalPreferences(Scene scene) {
         if (scene == null || scene.getRoot() == null) return;
+
         Preferences prefs = Preferences.userNodeForPackage(App.class);
-        String theme = prefs.get("theme", "Rendszer alapértelmezett");
+        prefs.remove("theme");
+
+        // Ha nincs mentett téma, alapból világos
+        String theme = prefs.get("theme", "Világos");
         double fontSize = prefs.getDouble("fontSize", 14.0);
 
-        // Téma
+        // Mindig töröljük az előző téma-osztályokat
+        scene.getRoot().getStyleClass().removeAll("theme-dark", "theme-light");
+
+        // Alkalmazzuk a témát
         if ("Sötét".equalsIgnoreCase(theme)) {
-            if (!scene.getRoot().getStyleClass().contains("theme-dark")) {
-                scene.getRoot().getStyleClass().add("theme-dark");
-            }
+            scene.getRoot().getStyleClass().add("theme-dark");
         } else {
-            scene.getRoot().getStyleClass().remove("theme-dark");
+            scene.getRoot().getStyleClass().add("theme-light");
         }
 
         // Betűméret
         scene.getRoot().setStyle(String.format("-fx-font-size: %.0fpx;", fontSize));
     }
 
-    // Egységes stílus alkalmazása JavaFX Dialógusokra (Alert, Dialog)
+
+    /**
+     * Egységes stílus alkalmazása JavaFX dialógusokra (Alert, Dialog)
+     */
     public static void styleDialog(Dialog<?> dialog) {
         if (dialog == null || dialog.getDialogPane() == null) return;
         try {
             var pane = dialog.getDialogPane();
-            // Stíluslap hozzáadása, ha még nincs rajta
             String css = App.class.getResource("/drivesync/CSS/style.css").toExternalForm();
             if (!pane.getStylesheets().contains(css)) {
                 pane.getStylesheets().add(css);
             }
 
             Preferences prefs = Preferences.userNodeForPackage(App.class);
-            String theme = prefs.get("theme", "Rendszer alapértelmezett");
+            String theme = prefs.get("theme", "Világos");
             double fontSize = prefs.getDouble("fontSize", 14.0);
 
-            // Téma alkalmazása a DialogPane-re
+            pane.getStyleClass().removeAll("theme-dark", "theme-light");
             if ("Sötét".equalsIgnoreCase(theme)) {
-                if (!pane.getStyleClass().contains("theme-dark")) {
-                    pane.getStyleClass().add("theme-dark");
-                }
+                pane.getStyleClass().add("theme-dark");
             } else {
-                pane.getStyleClass().remove("theme-dark");
+                pane.getStyleClass().add("theme-light");
             }
 
-            // Betűméret
             pane.setStyle(String.format("-fx-font-size: %.0fpx;", fontSize));
         } catch (Exception ignored) {}
     }
