@@ -7,11 +7,8 @@ import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -35,9 +32,11 @@ public class HomeController {
 
     private String username;
     private final List<Button> menuButtons = new ArrayList<>();
+    private final List<String> originalMenuTexts = new ArrayList<>();
 
     @FXML
     public void initialize() {
+        // Menü gombok listába
         menuButtons.add(homeBtn);
         menuButtons.add(carsBtn);
         menuButtons.add(budgetBtn);
@@ -45,19 +44,17 @@ public class HomeController {
         menuButtons.add(calculatorBtn);
         menuButtons.add(settingsBtn);
 
-        setActiveMenu(homeBtn);
-        addHoverEffectToMenu();
+        // Eredeti gomb szövegek cache-elése
+        cacheOriginalMenuTexts();
 
-        // Tooltip-ek a jobb használhatóságért, különösen összecsukott oldalsávnál
+        setActiveMenu(homeBtn);
         setupTooltips();
 
         // Oldalsáv állapot visszatöltése
         Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
         boolean collapsed = prefs.getBoolean("sidebarCollapsed", false);
         applySidebarCollapsed(collapsed);
-        if (menuToggle != null) {
-            menuToggle.setSelected(collapsed);
-        }
+        if (menuToggle != null) menuToggle.setSelected(collapsed);
     }
 
     public void setUsername(String username) {
@@ -68,26 +65,55 @@ public class HomeController {
 
     @FXML
     private void handleLogout() {
-        Stage stage = (Stage) logoutButton.getScene().getWindow();
-        Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
-        prefs.remove("username");
-        stage.setScene(App.getLoginScene());
-        stage.setTitle("DriveSync");
+        try {
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
+            prefs.remove("username");
+            prefs.remove("google_email"); // Google login törlése
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/LOG/REG/main.fxml"));
+            Parent root = loader.load(); // Itt a MainController automatikusan initialize() futtat
+
+            Scene loginScene = new Scene(root, 900, 600);
+            loginScene.getStylesheets().add(getClass().getResource("/drivesync/CSS/style.css").toExternalForm());
+            stage.setScene(loginScene);
+            stage.setTitle("DriveSync");
+            stage.setResizable(false);
+
+            // Fade animáció
+            root.setOpacity(0);
+            FadeTransition fade = new FadeTransition(Duration.millis(220), root);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+            fade.play();
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Hiba");
+            alert.setHeaderText("Hiba történt a kijelentkezés során");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
-    @FXML private void showHome() { loadFXML("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
-    @FXML private void showCars() { loadFXML("/drivesync/SajátAutók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
-    @FXML private void showBudget() { loadFXML("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
-    @FXML private void showLinks() { loadFXML("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
+
+
+
+
+
+    @FXML private void showHome()       { loadFXML("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
+    @FXML private void showCars()       { loadFXML("/drivesync/SajátAutók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
+    @FXML private void showBudget()     { loadFXML("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
+    @FXML private void showLinks()      { loadFXML("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
     @FXML private void showCalculator() { loadFXML("/drivesync/Kalkulátor/Calculator.fxml"); setActiveMenu(calculatorBtn); }
-    @FXML private void showSettings() { loadFXML("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
+    @FXML private void showSettings()   { loadFXML("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
 
     private void loadFXML(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent pane = loader.load();
 
-            // Tartalomváltás finom átmenettel
+            // Tartalomváltás animációval
             if (!contentContainer.getChildren().isEmpty()) {
                 Parent old = (Parent) contentContainer.getChildren().get(0);
                 FadeTransition fadeOut = new FadeTransition(Duration.millis(140), old);
@@ -111,14 +137,11 @@ public class HomeController {
             }
 
             Object controller = loader.getController();
-            if (controller != null) {
-                if (controller instanceof SajatAutokController) {
-                    ((SajatAutokController) controller).setUsername(username);
-                } else if (controller instanceof HomeDashboardController) {
-                    ((HomeDashboardController) controller).setUsername(username);
-                }
-            }
-            if (controller instanceof BudgetController) {
+            if (controller instanceof SajatAutokController) {
+                ((SajatAutokController) controller).setUsername(username);
+            } else if (controller instanceof HomeDashboardController) {
+                ((HomeDashboardController) controller).setUsername(username);
+            } else if (controller instanceof BudgetController) {
                 ((BudgetController) controller).setUsername(username);
             }
 
@@ -127,7 +150,6 @@ public class HomeController {
         }
     }
 
-
     private void setActiveMenu(Button activeBtn) {
         for (Button btn : menuButtons) {
             btn.getStyleClass().remove("menu-button-active");
@@ -135,15 +157,9 @@ public class HomeController {
                 btn.getStyleClass().add("menu-button");
             }
         }
-        if (activeBtn != null) {
-            if (!activeBtn.getStyleClass().contains("menu-button-active")) {
-                activeBtn.getStyleClass().add("menu-button-active");
-            }
+        if (activeBtn != null && !activeBtn.getStyleClass().contains("menu-button-active")) {
+            activeBtn.getStyleClass().add("menu-button-active");
         }
-    }
-
-    private void addHoverEffectToMenu() {
-        // Hover effektek CSS-ből érkeznek (:hover). Itt nincs további teendő.
     }
 
     @FXML
@@ -163,14 +179,12 @@ public class HomeController {
             if (!sidebarBox.getStyleClass().contains("sidebar-collapsed")) {
                 sidebarBox.getStyleClass().add("sidebar-collapsed");
             }
-            // Csak ikonok megjelenítése összecsukva
             setMenuTextsCollapsed(true);
         } else {
             sidebarBox.setPrefWidth(250);
             sidebarBox.setMinWidth(250);
             sidebarBox.setMaxWidth(250);
             sidebarBox.getStyleClass().remove("sidebar-collapsed");
-            // Eredeti szövegek visszaállítása
             setMenuTextsCollapsed(false);
         }
     }
@@ -189,12 +203,10 @@ public class HomeController {
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(sidebarBox.prefWidthProperty(), from),
                         new KeyValue(sidebarBox.minWidthProperty(), from),
-                        new KeyValue(sidebarBox.maxWidthProperty(), from)
-                ),
+                        new KeyValue(sidebarBox.maxWidthProperty(), from)),
                 new KeyFrame(Duration.millis(180), kvPref, kvMin, kvMax)
         );
 
-        // Felhasználónév finom áttűnése, gombok maradjanak láthatóak (ikon mód)
         if (usernameLabel != null) {
             double targetOpacity = collapse ? 0.0 : 1.0;
             FadeTransition ftUser = new FadeTransition(Duration.millis(140), usernameLabel);
@@ -206,10 +218,7 @@ public class HomeController {
         tl.play();
     }
 
-    // --------- Ikon/label szöveg kezelés az összecsukott menühöz ---------
-    private final List<String> originalMenuTexts = new ArrayList<>();
-
-    private void cacheOriginalMenuTextsIfNeeded() {
+    private void cacheOriginalMenuTexts() {
         if (!originalMenuTexts.isEmpty()) return;
         for (Button b : menuButtons) {
             originalMenuTexts.add(b.getText());
@@ -217,14 +226,11 @@ public class HomeController {
     }
 
     private void setMenuTextsCollapsed(boolean collapsed) {
-        cacheOriginalMenuTextsIfNeeded();
         for (int i = 0; i < menuButtons.size(); i++) {
             Button b = menuButtons.get(i);
             String full = originalMenuTexts.get(i);
             if (collapsed) {
-                // Próbáljuk az első "ikon" karaktert megtartani (általában emoji), egy szóköz után kezdődik a szöveg
-                String iconOnly = extractLeadingIcon(full);
-                b.setText(iconOnly);
+                b.setText(extractLeadingIcon(full));
             } else {
                 b.setText(full);
             }
@@ -233,12 +239,8 @@ public class HomeController {
 
     private String extractLeadingIcon(String text) {
         if (text == null || text.isEmpty()) return "";
-        // Ha az első karakter egy emoji + szóköz, vágjuk le az első token-t
         int spaceIdx = text.indexOf(' ');
-        if (spaceIdx > 0) {
-            return text.substring(0, spaceIdx); // pl. "🏠"
-        }
-        // Ellenkező esetben hagyjuk az első Unicode kódpontot
+        if (spaceIdx > 0) return text.substring(0, spaceIdx);
         int cp = text.codePointAt(0);
         return new String(Character.toChars(cp));
     }

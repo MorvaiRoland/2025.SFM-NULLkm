@@ -13,9 +13,9 @@
           prefWidth="250" minWidth="250" maxWidth="250"
           styleClass="sidebar">
 
-        <!-- Felső sáv a menüben: hamburger + cím -->
+        <!-- Felső sáv a menüben: cím -->
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <ToggleButton fx:id="menuToggle" onAction="#toggleSidebar" text="☰" focusTraversable="false" styleClass="menu-toggle"/>
+
             <Label text="DriveSync" styleClass="sidebar-appname"/>
         </HBox>
 

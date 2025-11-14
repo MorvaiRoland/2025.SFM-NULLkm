@@ -34,6 +34,11 @@
             <artifactId>javafx-swing</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version> <!-- FONTOS: 25, nem 20.0.2 -->
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -60,6 +65,7 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.46.0.0</version>
         </dependency>
+
 
         <!-- iText 7 -->
         <!-- iText 7: Alap modulok -->
@@ -140,6 +146,8 @@
                     <mainClass>${main.class}</mainClass>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </build>
 </project>

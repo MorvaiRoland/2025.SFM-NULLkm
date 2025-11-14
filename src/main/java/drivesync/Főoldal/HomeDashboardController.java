@@ -87,8 +87,7 @@ public class HomeDashboardController {
         addHover(linksBtn);
         addHover(notificationsBtn);
 
-        // Menü összecsukás
-        toggleMenuBtn.setOnAction(e -> toggleMenu());
+
 
         // Widget-ek gombjai
         weatherBtn.setOnAction(e -> toggleWidget("weather", this::createWeatherWidget));

@@ -1,13 +1,16 @@
 package drivesync;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
@@ -39,65 +42,49 @@ public class MainController {
     @FXML private TextField loginPasswordVisible, regPasswordVisible, regPasswordConfirmVisible;
     @FXML private Button loginButton, registerButton, googleLoginButton;
     @FXML private CheckBox showLoginPasswordCheck, showPasswordCheck, rememberMeCheck;
-    @FXML private ImageView logoImage;
+    @FXML private MediaView sidebarVideo;
 
     private String DB_URL;
     private String DB_USER;
     private String DB_PASS;
+    private MediaPlayer mediaPlayer;
 
     @FXML
     private void initialize() {
         loadDBConfig();
         setupPasswordToggle();
+        setupSidebarVideo();   // Csak videó betöltése, méretezés FXML-ben!
         autoLoginIfPossible();
-
-        try {
-            Image logo = new Image(getClass().getResourceAsStream("/drivesync/icons/logo.png"));
-            logoImage.setImage(logo);
-        } catch (Exception e) {
-            System.err.println("Logo betöltése sikertelen: " + e.getMessage());
-        }
     }
 
-    // ---------------- DB CONFIG ----------------
     private void loadDBConfig() {
         try (InputStream input = getClass().getResourceAsStream("/drivesync/Adatbázis/db_config.properties")) {
-            if (input == null) {
-                System.err.println("Nem található a db_config.properties!");
-                return;
-            }
             Properties props = new Properties();
             props.load(input);
+
             DB_URL = props.getProperty("db.url");
             DB_USER = props.getProperty("db.user");
             DB_PASS = props.getProperty("db.password");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // ---------------- PASSWORD TOGGLE ----------------
     private void setupPasswordToggle() {
-        loginPasswordVisible.managedProperty().bind(showLoginPasswordCheck.selectedProperty());
-        loginPasswordVisible.visibleProperty().bind(showLoginPasswordCheck.selectedProperty());
-        loginPassword.managedProperty().bind(showLoginPasswordCheck.selectedProperty().not());
-        loginPassword.visibleProperty().bind(showLoginPasswordCheck.selectedProperty().not());
         loginPassword.textProperty().bindBidirectional(loginPasswordVisible.textProperty());
-
-        regPasswordVisible.managedProperty().bind(showPasswordCheck.selectedProperty());
-        regPasswordVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
-        regPassword.managedProperty().bind(showPasswordCheck.selectedProperty().not());
-        regPassword.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
         regPassword.textProperty().bindBidirectional(regPasswordVisible.textProperty());
-
-        regPasswordConfirmVisible.managedProperty().bind(showPasswordCheck.selectedProperty());
-        regPasswordConfirmVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
-        regPasswordConfirm.managedProperty().bind(showPasswordCheck.selectedProperty().not());
-        regPasswordConfirm.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
         regPasswordConfirm.textProperty().bindBidirectional(regPasswordConfirmVisible.textProperty());
+
+        loginPasswordVisible.visibleProperty().bind(showLoginPasswordCheck.selectedProperty());
+        loginPassword.visibleProperty().bind(showLoginPasswordCheck.selectedProperty().not());
+
+        regPasswordVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
+        regPassword.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
+        regPasswordConfirmVisible.visibleProperty().bind(showPasswordCheck.selectedProperty());
+        regPasswordConfirm.visibleProperty().bind(showPasswordCheck.selectedProperty().not());
     }
 
-    // ---------------- LOGIN ----------------
     @FXML
     private void handleLogin() {
         String username = loginUsername.getText().trim();
@@ -115,24 +102,26 @@ public class MainController {
             stmt.setString(2, password);
 
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 if (rememberMeCheck.isSelected()) {
                     Preferences prefs = Preferences.userNodeForPackage(MainController.class);
                     prefs.put("username", username);
                 }
+
                 Stage stage = (Stage) loginButton.getScene().getWindow();
-                loadHomeSceneAfterStageShown(username, stage);
+                cleanupMediaPlayer();
+                loadHomeScene(username, stage);
+
             } else {
                 showAlert(Alert.AlertType.ERROR, "Hiba", "Helytelen felhasználónév vagy jelszó!");
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hiba", "Adatbázis hiba: " + e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Hiba", e.getMessage());
         }
     }
 
-    // ---------------- REGISTER ----------------
     @FXML
     private void handleRegister() {
         String username = regUsername.getText().trim();
@@ -144,6 +133,7 @@ public class MainController {
             showAlert(Alert.AlertType.ERROR, "Hiba", "Tölts ki minden mezőt!");
             return;
         }
+
         if (!password.equals(confirm)) {
             showAlert(Alert.AlertType.ERROR, "Hiba", "A jelszavak nem egyeznek!");
             return;
@@ -159,156 +149,250 @@ public class MainController {
             stmt.executeUpdate();
 
             showLogin();
-            showAlert(Alert.AlertType.INFORMATION, "Siker", "Sikeres regisztráció! Most bejelentkezhetsz.");
+            showAlert(Alert.AlertType.INFORMATION, "Siker", "Sikeres regisztráció!");
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hiba", "Adatbázis hiba: " + e.getMessage());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Hiba", e.getMessage());
         }
     }
 
-    @FXML private void showRegister() {
+    @FXML
+    private void showRegister() {
         loginPane.setVisible(false);
         registerPane.setVisible(true);
     }
 
-    @FXML private void showLogin() {
+    @FXML
+    private void showLogin() {
         registerPane.setVisible(false);
         loginPane.setVisible(true);
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // ---------------- GOOGLE LOGIN ----------------
     @FXML
     private void handleGoogleLogin() {
-        try {
-            InputStream stream = getClass().getResourceAsStream("/drivesync/NO-GITHUB/client_secret.json");
-            if (stream == null) {
-                showAlert(Alert.AlertType.ERROR, "Hiba", "A client_secret.json nem található!");
-                return;
-            }
+        // letiltjuk a gombot, hogy többször ne lehessen kattintani
+        googleLoginButton.setDisable(true);
+        String originalText = googleLoginButton.getText();
+        googleLoginButton.setText("Bejelentkezés...");
 
-            GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                    GsonFactory.getDefaultInstance(),
-                    new InputStreamReader(stream)
-            );
+        Task<GoogleLoginResult> task = new Task<>() {
+            @Override
+            protected GoogleLoginResult call() {
+                // InputStream try-with-resources OK
+                try (InputStream stream = getClass().getResourceAsStream("/drivesync/NO-GITHUB/client_secret.json")) {
+                    if (stream == null) {
+                        return GoogleLoginResult.error("A client_secret.json nem található!");
+                    }
 
-            FileDataStoreFactory dataStoreFactory = new FileDataStoreFactory(
-                    new File(System.getProperty("user.home"), ".drivesync_credentials")
-            );
-
-            GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    clientSecrets,
-                    Arrays.asList(
-                            "https://www.googleapis.com/auth/userinfo.profile",
-                            "https://www.googleapis.com/auth/userinfo.email"
-                    )
-            ).setAccessType("offline").setDataStoreFactory(dataStoreFactory).build();
-
-            LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-
-            Credential credential = flow.loadCredential("user");
-            if (credential == null || credential.getAccessToken() == null) {
-                credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-            } else if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
-                credential.refreshToken();
-            }
-
-            Oauth2 oauth2 = new Oauth2.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    credential
-            ).setApplicationName("DriveSync").build();
-
-            Userinfo userInfo = oauth2.userinfo().get().execute();
-            String name = userInfo.getName() != null ? userInfo.getName() : userInfo.getEmail();
-            String email = userInfo.getEmail();
-
-            if (email == null || email.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült az email lekérése! Ellenőrizd, hogy a Google fiókod engedélyezte az email hozzáférést.");
-                return;
-            }
-
-            // Mentés az adatbázisba, ha még nincs ott
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
-                PreparedStatement checkStmt = conn.prepareStatement("SELECT * FROM users WHERE email=?");
-                checkStmt.setString(1, email);
-                ResultSet rs = checkStmt.executeQuery();
-
-                if (!rs.next()) {
-                    PreparedStatement insertStmt = conn.prepareStatement(
-                            "INSERT INTO users (username, email, password, isDark) VALUES (?, ?, ?, 0)"
+                    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
+                            GsonFactory.getDefaultInstance(),
+                            new InputStreamReader(stream)
                     );
-                    insertStmt.setString(1, name);
-                    insertStmt.setString(2, email);
-                    insertStmt.setString(3, ""); // Google login jelszó nélkül
-                    insertStmt.executeUpdate();
+
+                    FileDataStoreFactory dataStoreFactory = new FileDataStoreFactory(
+                            new File(System.getProperty("user.home"), ".drivesync_credentials")
+                    );
+
+                    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                            GoogleNetHttpTransport.newTrustedTransport(),
+                            GsonFactory.getDefaultInstance(),
+                            clientSecrets,
+                            Arrays.asList(
+                                    "https://www.googleapis.com/auth/userinfo.profile",
+                                    "https://www.googleapis.com/auth/userinfo.email"
+                            )
+                    ).setAccessType("offline").setDataStoreFactory(dataStoreFactory).build();
+
+                    // LocalServerReceiver NEM AutoCloseable -> kezeljük manuálisan
+                    LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+                    try {
+                        Credential credential = flow.loadCredential("user");
+                        if (credential == null || credential.getAccessToken() == null) {
+                            credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+                        } else if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
+                            credential.refreshToken();
+                        }
+
+                        if (credential == null || credential.getAccessToken() == null) {
+                            return GoogleLoginResult.error("Nem kaptunk hozzáférést a Google-től.");
+                        }
+
+                        Oauth2 oauth2 = new Oauth2.Builder(
+                                GoogleNetHttpTransport.newTrustedTransport(),
+                                GsonFactory.getDefaultInstance(),
+                                credential
+                        ).setApplicationName("DriveSync").build();
+
+                        Userinfo userInfo = oauth2.userinfo().get().execute();
+                        String name = userInfo.getName() != null ? userInfo.getName() : userInfo.getEmail();
+                        String email = userInfo.getEmail();
+
+                        if (email == null || email.isEmpty()) {
+                            return GoogleLoginResult.error("Nem sikerült az email lekérése!");
+                        }
+
+                        // DB művelet: új user beszúrása, ha nincs
+                        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS)) {
+                            PreparedStatement checkStmt = conn.prepareStatement("SELECT * FROM users WHERE email=?");
+                            checkStmt.setString(1, email);
+                            ResultSet rs = checkStmt.executeQuery();
+                            if (!rs.next()) {
+                                PreparedStatement insertStmt = conn.prepareStatement(
+                                        "INSERT INTO users (username, email, password, isDark) VALUES (?, ?, ?, 0)"
+                                );
+                                insertStmt.setString(1, name);
+                                insertStmt.setString(2, email);
+                                insertStmt.setString(3, "");
+                                insertStmt.executeUpdate();
+                                insertStmt.close();
+                            }
+                            checkStmt.close();
+                        }
+
+                        Preferences prefs = Preferences.userNodeForPackage(MainController.class);
+                        prefs.put("google_email", email);
+
+                        return GoogleLoginResult.success(name, email);
+
+                    } finally {
+                        // mindig állítsuk le a receiver-t, különben a lokális szerver futva maradhat
+                        try {
+                            receiver.stop();
+                        } catch (Exception stopEx) {
+                            // csak logoljuk, ne dobjuk el (a Task a fő hibakezelő)
+                            stopEx.printStackTrace();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return GoogleLoginResult.error("Nem sikerült a Google-bejelentkezés: " + e.getMessage());
                 }
             }
+        };
 
-            Preferences prefs = Preferences.userNodeForPackage(MainController.class);
-            prefs.put("google_email", email);
+        // Sikeres befejezés (JavaFX Application Thread-en fut)
+        task.setOnSucceeded(evt -> {
+            GoogleLoginResult result = task.getValue();
+            googleLoginButton.setDisable(false);
+            googleLoginButton.setText(originalText);
+
+            if (!result.success) {
+                showAlert(Alert.AlertType.ERROR, "Hiba", result.message);
+                return;
+            }
 
             showAlert(Alert.AlertType.INFORMATION, "Sikeres bejelentkezés",
-                    "Üdv, " + name + " (" + email + ")");
+                    "Üdv, " + result.name + " (" + result.email + ")");
 
             Stage stage = (Stage) googleLoginButton.getScene().getWindow();
-            loadHomeSceneAfterStageShown(name, stage);
+            cleanupMediaPlayer();
+            loadHomeScene(result.name, stage);
+        });
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült a Google-bejelentkezés:\n" + e.getMessage());
+        task.setOnFailed(evt -> {
+            Throwable ex = task.getException();
+            ex.printStackTrace();
+            googleLoginButton.setDisable(false);
+            googleLoginButton.setText(originalText);
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Nem sikerült a Google-bejelentkezés:\n" + ex.getMessage());
+        });
+
+        task.setOnCancelled(evt -> {
+            googleLoginButton.setDisable(false);
+            googleLoginButton.setText(originalText);
+            showAlert(Alert.AlertType.INFORMATION, "Megszakítva", "A Google-bejelentkezés megszakadt.");
+        });
+
+        Thread t = new Thread(task, "google-login-task");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    // Egyszerű wrapper eredmény visszaadására
+    private static class GoogleLoginResult {
+        final boolean success;
+        final String name;
+        final String email;
+        final String message;
+
+        private GoogleLoginResult(boolean success, String name, String email, String message) {
+            this.success = success;
+            this.name = name;
+            this.email = email;
+            this.message = message;
+        }
+
+        static GoogleLoginResult success(String name, String email) {
+            return new GoogleLoginResult(true, name, email, null);
+        }
+
+        static GoogleLoginResult error(String message) {
+            return new GoogleLoginResult(false, null, null, message);
         }
     }
 
-    // ---------------- AUTOLOGIN ----------------
+
+
     private void autoLoginIfPossible() {
         Preferences prefs = Preferences.userNodeForPackage(MainController.class);
         String savedUsername = prefs.get("username", null);
-        String savedGoogleEmail = prefs.get("google_email", null);
 
         if (savedUsername != null) {
-            Platform.runLater(() -> {
-                try {
-                    Stage stage = (Stage) loginPane.getScene().getWindow();
-                    loadHomeSceneAfterStageShown(savedUsername, stage);
-                } catch (Exception e) { e.printStackTrace(); }
-            });
-        } else if (savedGoogleEmail != null) {
-            Platform.runLater(this::handleGoogleLogin);
+            Stage stage = (Stage) loginPane.getScene().getWindow();
+            cleanupMediaPlayer();
+            loadHomeScene(savedUsername, stage);
         }
     }
 
-    // ---------------- LOAD HOME ----------------
-    public void loadHomeSceneAfterStageShown(String username, Stage stage) {
+    private void loadHomeScene(String username, Stage stage) {
         try {
-            // Használjuk az App által előre betöltött és stílusozott fő jelenetet,
-            // így garantált a style.css és a globális beállítások (téma, betűméret) alkalmazása.
-            Scene homeScene = App.getHomeScene();
-            HomeController homeController = App.getHomeController();
-            if (homeController != null) {
-                homeController.setUsername(username);
-            }
+            Scene home = App.getHomeScene();
+            HomeController hc = App.getHomeController();
+            if (hc != null) hc.setUsername(username);
 
-            if (homeScene != null) {
-                stage.setScene(homeScene);
-            }
-            stage.setTitle("DriveSync - Főoldal");
+            stage.setScene(home);
 
-            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-            stage.setX((screenBounds.getWidth() - 1200) / 2);
-            stage.setY((screenBounds.getHeight() - 700) / 2);
+            Rectangle2D b = Screen.getPrimary().getVisualBounds();
+            stage.setX((b.getWidth() - 1200) / 2);
+            stage.setY((b.getHeight() - 700) / 2);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setupSidebarVideo() {
+        try {
+            String videoPath = getClass().getResource("/drivesync/Videók/intro.mp4").toExternalForm();
+            mediaPlayer = new MediaPlayer(new Media(videoPath));
+
+            mediaPlayer.setAutoPlay(true);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            mediaPlayer.setMute(true);
+
+            sidebarVideo.setMediaPlayer(mediaPlayer);
+
+        } catch (Exception e) {
+            System.err.println("Videó hiba: " + e.getMessage());
+        }
+    }
+
+    private void cleanupMediaPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+            mediaPlayer = null;
+        }
+    }
+
+    private void showAlert(Alert.AlertType t, String title, String msg) {
+        Platform.runLater(() -> {
+            Alert a = new Alert(t);
+            a.setTitle(title);
+            a.setHeaderText(null);
+            a.setContentText(msg);
+            a.showAndWait();
+        });
     }
 }
