@@ -678,3 +678,9 @@
 .theme-dark {
     -fx-link-color: #ffffff;
 }
+
+.chart-vertical-axis .axis-label {
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
