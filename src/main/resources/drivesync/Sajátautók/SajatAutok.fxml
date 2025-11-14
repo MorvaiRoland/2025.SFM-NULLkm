@@ -97,6 +97,9 @@
 
                             <Label text="Biztosítás dátuma:" GridPane.rowIndex="11" GridPane.columnIndex="0" wrapText="true"/>
                             <DatePicker fx:id="insuranceDatePicker" GridPane.rowIndex="11" GridPane.columnIndex="1" maxWidth="200"/>
+
+                            <Label text="Műsszaki érvényesség:" GridPane.rowIndex="12" GridPane.columnIndex="0" wrapText="true"/>
+                            <DatePicker fx:id="inspection_date" GridPane.rowIndex="12" GridPane.columnIndex="1" maxWidth="200"/>
                         </GridPane>
 
                         <Button text="Mentés" onAction="#handleAddOrEditCar" styleClass="btn-primary"/>

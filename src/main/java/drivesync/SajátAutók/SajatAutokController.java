@@ -67,7 +67,8 @@ public class SajatAutokController {
     @FXML private TextArea upcomingServiceNotes;
     @FXML private CheckBox upcomingServiceReminder;
     @FXML private Label selectedCarLabelUpcoming;
-    @FXML private VBox servicesContainer; // ide töltjük a közelgő szervizek widgeteket
+    @FXML private VBox servicesContainer;
+    @FXML private DatePicker inspection_date;
 
 
 
@@ -152,73 +153,77 @@ public class SajatAutokController {
      */
     private void checkUpcomingReminders(String username) {
         String sql = """
-        SELECT u.service_date, u.location, u.notes, c.license, usr.email
+        SELECT u.car_id, u.service_date, u.location, u.notes, c.license, usr.email, u.last_email_sent
         FROM upcoming_services u
         JOIN cars c ON u.car_id = c.id
         JOIN users usr ON c.owner_id = usr.id
-        WHERE u.reminder = TRUE AND usr.username = ?
+        WHERE u.reminder = TRUE 
+          AND usr.username = ?
+          AND (u.last_email_sent IS NULL OR u.last_email_sent < CURRENT_DATE)
+          AND u.archived = FALSE
     """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            LocalDate today = LocalDate.now();
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                LocalDate today = LocalDate.now();
-                boolean foundReminder = false;
+            while (rs.next()) {
+                LocalDate serviceDate = rs.getDate("service_date").toLocalDate();
 
-                while (rs.next()) {
-                    LocalDate serviceDate = rs.getDate("service_date").toLocalDate();
-                    long days = java.time.temporal.ChronoUnit.DAYS.between(today, serviceDate);
-
-                    if (days >= 0 && days <= 3) {
-                        foundReminder = true;
-
-                        String license = rs.getString("license");
-                        String location = rs.getString("location");
-                        String notes = rs.getString("notes");
-                        String ownerEmail = rs.getString("email");
-
-                        String messageBody = """
-                        Közelgő szerviz:
-
-                        Autó: %s
-                        Dátum: %s
-                        Helyszín: %s
-                        Megjegyzés: %s
-
-                        Üdvözlettel:
-                        DriveSync rendszer
-                        """.formatted(license, serviceDate, location, (notes != null ? notes : "-"));
-
-                        boolean success = EmailService.sendEmail(
-                                ownerEmail,
-                                "Közelgő szerviz emlékeztető",
-                                messageBody
-                        );
-
-                        if (success) {
-                            System.out.println("✅ Emlékeztető elküldve: " + ownerEmail + " (" + license + ")");
-                        } else {
-                            System.err.println("❌ Hiba az email küldésénél: " + ownerEmail);
-                        }
+                // Ha a szerviz már lejárt, archiváljuk
+                if (serviceDate.isBefore(today)) {
+                    try (PreparedStatement updateStmt = conn.prepareStatement(
+                            "UPDATE upcoming_services SET archived = TRUE WHERE car_id = ? AND service_date = ?")) {
+                        updateStmt.setInt(1, rs.getInt("car_id"));
+                        updateStmt.setDate(2, java.sql.Date.valueOf(serviceDate));
+                        updateStmt.executeUpdate();
                     }
+                    continue;
                 }
 
-                if (!foundReminder) {
-                    System.out.println("ℹ️ Nincs közelgő szerviz a felhasználónál: " + username);
+                // Ha a szerviz 3 napon belül van, küldjük az emailt
+                long days = java.time.temporal.ChronoUnit.DAYS.between(today, serviceDate);
+                if (days >= 0 && days <= 3) {
+                    String license = rs.getString("license");
+                    String location = rs.getString("location");
+                    String notes = rs.getString("notes");
+                    String ownerEmail = rs.getString("email");
+
+                    String messageBody = String.format("""
+                    Közelgő szerviz:
+
+                    Autó: %s
+                    Dátum: %s
+                    Helyszín: %s
+                    Megjegyzés: %s
+
+                    Üdvözlettel:
+                    DriveSync rendszer
+                    """, license, serviceDate, location, (notes != null ? notes : "-"));
+
+                    boolean success = EmailService.sendEmail(ownerEmail, "Közelgő szerviz emlékeztető", messageBody);
+
+                    if (success) {
+                        System.out.println("✅ Emlékeztető elküldve: " + ownerEmail + " (" + license + ")");
+                        // Frissítjük a last_email_sent mezőt
+                        try (PreparedStatement updateStmt = conn.prepareStatement(
+                                "UPDATE upcoming_services SET last_email_sent = CURRENT_DATE WHERE car_id = ? AND service_date = ?")) {
+                            updateStmt.setInt(1, rs.getInt("car_id"));
+                            updateStmt.setDate(2, java.sql.Date.valueOf(serviceDate));
+                            updateStmt.executeUpdate();
+                        }
+                    }
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Adatbázis hiba az emlékeztetők lekérdezésekor:");
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("❌ Váratlan hiba az emlékeztetők feldolgozásakor:");
             e.printStackTrace();
         }
     }
+
 
 
 
@@ -805,24 +810,23 @@ public class SajatAutokController {
 
     private void addCar() {
         String sql = """
-        INSERT INTO cars 
-        (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, color, notes)
-        VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+    INSERT INTO cars 
+    (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance, inspection_date, color, notes)
+    VALUES ((SELECT id FROM users WHERE username=?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             String selectedBrand = brandCombo.getEditor().getText().trim();
             String selectedType = typeCombo.getEditor().getText().trim();
-
             if (selectedBrand.isEmpty() || selectedType.isEmpty()) {
                 showAlert("Hiba", "Kérlek válassz márkát és típust!");
                 return;
             }
 
             // Szín HEX formátumban
-            String color = "";
+            String color = "#FFFFFF"; // alapértelmezett fehér
             if (colorPicker != null && colorPicker.getValue() != null) {
                 javafx.scene.paint.Color c = colorPicker.getValue();
                 color = String.format("#%02X%02X%02X",
@@ -831,13 +835,13 @@ public class SajatAutokController {
                         (int) (c.getBlue() * 255));
             }
 
-            // Kötelező mezők ellenőrzése
+            // Kötelező mezők
             if (licenseField.getText().trim().isEmpty()) {
                 showAlert("Hiba", "Rendszám megadása kötelező!");
                 return;
             }
 
-            stmt.setString(1, username); // owner
+            stmt.setString(1, username);
             stmt.setString(2, licenseField.getText().trim());
             stmt.setString(3, selectedBrand);
             stmt.setString(4, selectedType);
@@ -848,17 +852,26 @@ public class SajatAutokController {
             stmt.setString(9, oilField.getText().trim());
             stmt.setString(10, tireSizeField.getText().trim());
 
-            // 🔹 11. paraméter: service (nincs dátum picker, így NULL)
+            // service mező (nincs picker, NULL)
             stmt.setNull(11, Types.DATE);
 
-            // 🔹 12. paraméter: insurance (dátum, ha van)
+            // insurance
             if (insuranceDatePicker != null && insuranceDatePicker.getValue() != null)
                 stmt.setDate(12, java.sql.Date.valueOf(insuranceDatePicker.getValue()));
             else
                 stmt.setNull(12, Types.DATE);
 
-            stmt.setString(13, color);
-            stmt.setString(14, notesField != null ? notesField.getText().trim() : "");
+            // inspection_date
+            if (inspection_date != null && inspection_date.getValue() != null)
+                stmt.setDate(13, java.sql.Date.valueOf(inspection_date.getValue()));
+            else
+                stmt.setNull(13, Types.DATE);
+
+            // color
+            stmt.setString(14, color);
+
+            // notes
+            stmt.setString(15, notesField != null ? notesField.getText().trim() : "");
 
             stmt.executeUpdate();
             showAlert("Sikeres", "Az autó hozzáadva!");
@@ -873,21 +886,21 @@ public class SajatAutokController {
 
 
 
+
     private void editCar(int carId) {
-        String sql = "UPDATE cars SET license=?, brand=?, type=?, vintage=?, engine_type=?, fuel_type=?, km=?, oil=?, tire_size=?, service=?, insurance=?, color=?, notes=? WHERE id=?";
+        String sql = "UPDATE cars SET license=?, brand=?, type=?, vintage=?, engine_type=?, fuel_type=?, km=?, oil=?, tire_size=?, service=?, insurance=?, inspection_date=?, color=?, notes=? WHERE id=?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             String selectedBrand = brandCombo.getEditor().getText().trim();
             String selectedType = typeCombo.getEditor().getText().trim();
-
             if (selectedBrand.isEmpty() || selectedType.isEmpty()) {
                 showAlert("Hiba", "Kérlek válassz márkát és típust!");
                 return;
             }
 
-            String color = "";
+            String color = "#FFFFFF";
             if (colorPicker != null && colorPicker.getValue() != null) {
                 javafx.scene.paint.Color c = colorPicker.getValue();
                 color = String.format("#%02X%02X%02X",
@@ -905,10 +918,23 @@ public class SajatAutokController {
             stmt.setInt(7, !kmField.getText().trim().isEmpty() ? Integer.parseInt(kmField.getText().trim()) : 0);
             stmt.setString(8, oilField.getText().trim());
             stmt.setString(9, tireSizeField.getText().trim());
+
+            // service: nincs, NULL
+            stmt.setNull(10, Types.DATE);
+
+            // insurance
             stmt.setDate(11, insuranceDatePicker.getValue() != null ? java.sql.Date.valueOf(insuranceDatePicker.getValue()) : null);
-            stmt.setString(12, color);
-            stmt.setString(13, notesField.getText().trim());
-            stmt.setInt(14, carId);
+
+            // inspection_date
+            stmt.setDate(12, inspection_date.getValue() != null ? java.sql.Date.valueOf(inspection_date.getValue()) : null);
+
+            // color
+            stmt.setString(13, color);
+
+            // notes
+            stmt.setString(14, notesField != null ? notesField.getText().trim() : "");
+
+            stmt.setInt(15, carId);
 
             stmt.executeUpdate();
             showAlert("Sikeres", "Az autó adatai frissítve!");

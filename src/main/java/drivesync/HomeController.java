@@ -141,6 +141,10 @@ public class HomeController {
                 ((SajatAutokController) controller).setUsername(username);
             } else if (controller instanceof HomeDashboardController) {
                 ((HomeDashboardController) controller).setUsername(username);
+
+                // --- Ide tesszük az automatikus popup hívást ---
+                CarReminderPopup popup = new CarReminderPopup();
+                popup.showReminders(username);
             } else if (controller instanceof BudgetController) {
                 ((BudgetController) controller).setUsername(username);
             }
@@ -149,6 +153,7 @@ public class HomeController {
             e.printStackTrace();
         }
     }
+
 
     private void setActiveMenu(Button activeBtn) {
         for (Button btn : menuButtons) {

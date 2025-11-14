@@ -345,22 +345,35 @@ public class MainController {
         }
     }
 
+    private static boolean remindersShown = false;
+
     private void loadHomeScene(String username, Stage stage) {
         try {
+            // Főoldal betöltése
             Scene home = App.getHomeScene();
             HomeController hc = App.getHomeController();
             if (hc != null) hc.setUsername(username);
 
             stage.setScene(home);
 
-            Rectangle2D b = Screen.getPrimary().getVisualBounds();
-            stage.setX((b.getWidth() - 1200) / 2);
-            stage.setY((b.getHeight() - 700) / 2);
+            // Ablak középre igazítása
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            stage.setX((screenBounds.getWidth() - 1200) / 2);
+            stage.setY((screenBounds.getHeight() - 700) / 2);
+
+            // CarReminderPopup egyszeri megjelenítése
+            if (!remindersShown) {
+                remindersShown = true;               // egyszeri flag beállítása
+                CarReminderPopup popup = new CarReminderPopup();
+                popup.showReminders(username);       // popup megjelenítése
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     private void setupSidebarVideo() {
         try {
