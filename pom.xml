@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>23.0.2</javafx.version>
+        <javafx.version>25</javafx.version>
         <maven.compiler.release>21</maven.compiler.release>
         <main.class>drivesync.Launcher</main.class>
         <junit.version>5.11.0</junit.version>
@@ -33,6 +33,11 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version> <!-- FONTOS: 25, nem 20.0.2 -->
         </dependency>
 
         <!-- Testing -->
@@ -61,6 +66,7 @@
             <version>3.46.0.0</version>
         </dependency>
 
+
         <!-- iText 7 -->
         <!-- iText 7: Alap modulok -->
         <dependency>
@@ -84,7 +90,10 @@
             <version>2.0.30</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.16.1</version> </dependency>
 
 
         <!-- Google API Client + OAuth2 -->
@@ -138,6 +147,16 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <source>17</source> <!-- vagy a használt Java verzió -->
+                    <outputDirectory>${project.build.directory}/docs/javadoc</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

@@ -3,98 +3,142 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.media.MediaView?>
+
 <HBox xmlns:fx="http://javafx.com/fxml/1"
       xmlns="http://javafx.com/javafx/24.0.1"
       fx:controller="drivesync.MainController"
       prefWidth="900" prefHeight="550" styleClass="app-bg">
 
-    <!-- Bal panel – logo -->
-    <StackPane prefWidth="300">
-        <VBox alignment="CENTER" spacing="20" styleClass="sidebar">
-            <ImageView fx:id="logoImage" fitWidth="150" fitHeight="150" preserveRatio="true"/>
-            <Label text="DriveSync" styleClass="sidebar-appname"/>
+    <!-- BAL PANEL - Videó, logó, feliratok -->
+    <StackPane fx:id="videoContainer" prefWidth="350" prefHeight="550" style="-fx-background-color: #1a1a2e;">
+        <!-- Teljes méretű videó háttér -->
+        <MediaView fx:id="sidebarVideo" fitWidth="350" fitHeight="550" preserveRatio="false" />
+
+        <!-- Sötétítő overlay -->
+        <VBox alignment="CENTER" spacing="0" style="-fx-background-color: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));"></VBox>
+
+        <!-- Logo és feliratok konténer -->
+        <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
+
+            <!-- Logo -->
+            <VBox alignment="CENTER" spacing="20" style="-fx-background-color: rgba(255,255,255,0.08); -fx-background-radius: 25; -fx-padding: 35; -fx-border-color: rgba(255,255,255,0.2); -fx-border-width: 1.5; -fx-border-radius: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.4, 0, 8);">
+
+                <ImageView fx:id="logoImage" fitWidth="120" fitHeight="120" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 15, 0.5, 0, 5);">
+                    <image>
+                        <Image url="@/drivesync/Logók/DriveSync logo-2.png" />
+                    </image>
+                </ImageView>
+
+                <!-- Főcím -->
+                <Label fx:id="videoCaption" text="Üdvözlünk a DriveSync-ben!" style="-fx-text-alignment: center; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 6, 0.6, 0, 2);" wrapText="true" maxWidth="280"/>
+            </VBox>
+
+            <!-- Alcím -->
+            <Label text="„Autód története egy helyen – minden kilométer számít." style="-fx-font-style: italic; -fx-font-size: 15px; -fx-text-fill: rgba(255,255,255,0.9); -fx-text-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 4, 0.5, 0, 2);" wrapText="true" maxWidth="280"/>
+
         </VBox>
     </StackPane>
 
-    <!-- Jobb panel – login/register -->
-    <StackPane prefWidth="600" styleClass="right-panel">
+    <!-- JOBB PANEL - Login/Register űrlapok -->
+    <StackPane prefWidth="550" HBox.hgrow="ALWAYS" style="-fx-background-color: #f5f5f5;">
 
-        <!-- Login pane -->
-        <VBox fx:id="loginPane" alignment="CENTER" spacing="20">
-            <Label text="Bejelentkezés" styleClass="page-title" />
+        <!-- LOGIN PANEL -->
+        <VBox fx:id="loginPane" alignment="CENTER" spacing="25" style="-fx-padding: 50;">
 
-            <GridPane hgap="10" vgap="10" alignment="CENTER">
-                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <TextField fx:id="loginUsername" promptText="Add meg a felhasználóneved"
-                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Bejelentkezés" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
 
-                <Label text="Jelszó:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <PasswordField fx:id="loginPassword" promptText="Add meg a jelszavad"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1" />
-                <TextField fx:id="loginPasswordVisible" promptText="Add meg a jelszavad"
-                           visible="false" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-            </GridPane>
+            <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
 
-            <VBox spacing="10" alignment="CENTER">
-                <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" />
-                <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" />
-                <Button fx:id="loginButton" onAction="#handleLogin" text="Bejelentkezés" prefWidth="200" styleClass="btn-primary"/>
+                <!-- Felhasználónév -->
+                <VBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Felhasználónév" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <TextField fx:id="loginUsername" promptText="Add meg a felhasználóneved" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                </VBox>
 
+                <!-- Jelszó -->
+                <VBox spacing="8" alignment="CENTER_LEFT">
+                    <Label text="Jelszó" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <StackPane>
+                        <PasswordField fx:id="loginPassword" promptText="Add meg a jelszavad" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                        <TextField fx:id="loginPasswordVisible" promptText="Add meg a jelszavad" prefWidth="350" visible="false" style="-fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                    </StackPane>
+                </VBox>
 
-                <Button fx:id="googleLoginButton"
-                        onAction="#handleGoogleLogin"
-                        prefWidth="200"
-                        prefHeight="40"
-                        styleClass="btn-primary">
+                <!-- Jelszó megjelenítés és emlékezz rám -->
+                <HBox spacing="20" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="showLoginPasswordCheck" text="Mutasd a jelszót" style="-fx-font-size: 13px;"/>
+                    <CheckBox fx:id="rememberMeCheck" text="Maradjak bejelentkezve" style="-fx-font-size: 13px;"/>
+                </HBox>
+
+                <!-- Bejelentkezés gomb -->
+                <Button fx:id="loginButton" text="Bejelentkezés" onAction="#handleLogin" prefWidth="350" prefHeight="45" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+                <!-- Google bejelentkezés gomb -->
+                <Button fx:id="googleLoginButton" onAction="#handleGoogleLogin" prefWidth="350" prefHeight="45" style="-fx-background-color: white; -fx-text-fill: #333; -fx-font-size: 15px; -fx-font-weight: 600; -fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-border-radius: 8; -fx-cursor: hand;">
                     <graphic>
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <ImageView fitWidth="20" fitHeight="20" preserveRatio="true" pickOnBounds="true">
+                        <HBox alignment="CENTER" spacing="12">
+                            <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
                                 <image>
                                     <Image url="@/drivesync/Logók/google_logo.png" />
                                 </image>
                             </ImageView>
-                            <Label text="Google-fiókkal" />
+                            <Label text="Bejelentkezés Google-fiókkal" style="-fx-font-size: 15px; -fx-font-weight: 600;"/>
                         </HBox>
                     </graphic>
                 </Button>
 
-
-                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj" styleClass="modern-link" />
+                <!-- Regisztráció link -->
+                <Hyperlink onAction="#showRegister" text="Nincs fiókod? Regisztrálj most!" style="-fx-font-size: 14px; -fx-text-fill: #1976D2; -fx-underline: true;"/>
             </VBox>
         </VBox>
 
-        <!-- Register pane -->
-        <VBox fx:id="registerPane" alignment="CENTER" spacing="20" visible="false">
-            <Label text="Regisztráció" styleClass="page-title" />
+        <!-- REGISTER PANEL -->
+        <VBox fx:id="registerPane" alignment="CENTER" spacing="20" visible="false" style="-fx-padding: 40;">
 
-            <GridPane hgap="10" vgap="10" alignment="CENTER">
-                <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <TextField fx:id="regUsername" promptText="Add meg a felhasználóneved"
-                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="Regisztráció" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
 
-                <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <TextField fx:id="regEmail" promptText="Add meg az email címed"
-                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <VBox spacing="12" alignment="CENTER">
 
-                <Label text="Jelszó:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                <PasswordField fx:id="regPassword" promptText="Adj meg egy jelszót"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1" />
-                <TextField fx:id="regPasswordVisible" promptText="Adj meg egy jelszót"
-                           visible="false" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                <!-- Felhasználónév -->
+                <VBox spacing="6" alignment="CENTER_LEFT">
+                    <Label text="Felhasználónév" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <TextField fx:id="regUsername" promptText="Add meg a felhasználóneved" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                </VBox>
 
-                <Label text="Jelszó ismét:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-                <PasswordField fx:id="regPasswordConfirm" promptText="Írd be újra a jelszót"
-                               GridPane.rowIndex="3" GridPane.columnIndex="1" />
-                <TextField fx:id="regPasswordConfirmVisible" promptText="Írd be újra a jelszót"
-                           visible="false" GridPane.rowIndex="3" GridPane.columnIndex="1" />
-            </GridPane>
+                <!-- Email -->
+                <VBox spacing="6" alignment="CENTER_LEFT">
+                    <Label text="Email" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <TextField fx:id="regEmail" promptText="Add meg az email címed" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                </VBox>
 
-            <VBox spacing="10" alignment="CENTER">
-                <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" />
-                <Button fx:id="registerButton" onAction="#handleRegister" text="Regisztráció" prefWidth="200" styleClass="btn-primary"/>
-                <Hyperlink onAction="#showLogin" text="Van már fiókod? Bejelentkezés" styleClass="modern-link" />
+                <!-- Jelszó -->
+                <VBox spacing="6" alignment="CENTER_LEFT">
+                    <Label text="Jelszó" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <StackPane>
+                        <PasswordField fx:id="regPassword" promptText="Adj meg egy biztonságos jelszót" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                        <TextField fx:id="regPasswordVisible" promptText="Adj meg egy biztonságos jelszót" prefWidth="350" visible="false" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                    </StackPane>
+                </VBox>
+
+                <!-- Jelszó megerősítés -->
+                <VBox spacing="6" alignment="CENTER_LEFT">
+                    <Label text="Jelszó ismét" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #333;"/>
+                    <StackPane>
+                        <PasswordField fx:id="regPasswordConfirm" promptText="Írd be újra a jelszót" prefWidth="350" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                        <TextField fx:id="regPasswordConfirmVisible" promptText="Írd be újra a jelszót" prefWidth="350" visible="false" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+                    </StackPane>
+                </VBox>
+
+                <!-- Jelszó megjelenítés -->
+                <CheckBox fx:id="showPasswordCheck" text="Mutasd a jelszót" style="-fx-font-size: 13px;"/>
+
+                <!-- Regisztráció gomb -->
+                <Button fx:id="registerButton" text="Regisztráció" onAction="#handleRegister" prefWidth="350" prefHeight="45" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+                <!-- Bejelentkezés link -->
+                <Hyperlink onAction="#showLogin" text="Van már fiókod? Jelentkezz be!" style="-fx-font-size: 14px; -fx-text-fill: #1976D2; -fx-underline: true;"/>
             </VBox>
         </VBox>
 
