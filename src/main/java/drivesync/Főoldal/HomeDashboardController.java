@@ -1,17 +1,18 @@
 package drivesync.Főoldal;
 
+import drivesync.Adatbázis.Database;
 import drivesync.Adatbázis.ServiceDAO;
+import drivesync.AI.AIDiagnosticsService;
 import drivesync.FuelService.FuelService;
 import drivesync.Időjárás.WeatherService;
 import drivesync.Időjárás.WeatherService.Weather;
 import javafx.animation.KeyFrame;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -25,8 +26,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
+import javafx.concurrent.Task;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,14 +40,19 @@ import java.util.*;
 
 public class HomeDashboardController {
 
-    @FXML
-    private FlowPane widgetContainer;
-    @FXML
-    private HBox menuHBox;
-    @FXML
-    private Button toggleMenuBtn, weatherBtn, fuelBtn, carsBtn, budgetBtn, linksBtn, notificationsBtn;
-    @FXML
-    private BorderPane mainLayout;
+    @FXML private FlowPane widgetContainer;
+    @FXML private HBox menuHBox;
+    @FXML private Button weatherBtn, fuelBtn, carsBtn, budgetBtn, linksBtn, notificationsBtn;
+
+    // VÁLTOZÁS 1: AI DIAGNOSZTIKAI GOMB ÉS WIDGET ELEMEK
+    @FXML private Button diagnosticsBtn; // FXML-ben deklarált gomb
+    private TextField symptomField; // Dynamikusan létrehozott bemenet
+    private TextArea diagnosisResultArea; // Dynamikusan létrehozott kimenet
+    private Button diagnoseButton; // Dynamikusan létrehozott indító gomb
+
+    private final AIDiagnosticsService aiService = new AIDiagnosticsService(); // AI szolgáltatás
+
+    @FXML private BorderPane mainLayout;
 
     private boolean isCollapsed = false;
     private final Map<String, VBox> activeWidgets = new HashMap<>();
@@ -70,6 +76,7 @@ public class HomeDashboardController {
         budgetBtn.setTooltip(new Tooltip("Költségvetés"));
         linksBtn.setTooltip(new Tooltip("Linkek"));
         notificationsBtn.setTooltip(new Tooltip("Értesítések"));
+        diagnosticsBtn.setTooltip(new Tooltip("AI Diagnosztika"));
 
         // Ikonok beállítása
         setButtonGraphic(weatherBtn, "/drivesync/icons/weather.png");
@@ -78,6 +85,7 @@ public class HomeDashboardController {
         setButtonGraphic(budgetBtn, "/drivesync/icons/budget.png");
         setButtonGraphic(linksBtn, "/drivesync/icons/links.png");
         setButtonGraphic(notificationsBtn, "/drivesync/icons/notification.png");
+        setButtonGraphic(diagnosticsBtn, "/drivesync/icons/ai.png"); // Feltételezve, hogy van egy 'ai.png' ikon
 
         // Hover effekt
         addHover(weatherBtn);
@@ -86,7 +94,7 @@ public class HomeDashboardController {
         addHover(budgetBtn);
         addHover(linksBtn);
         addHover(notificationsBtn);
-
+        addHover(diagnosticsBtn);
 
 
         // Widget-ek gombjai
@@ -96,6 +104,8 @@ public class HomeDashboardController {
         budgetBtn.setOnAction(e -> toggleWidget("budget", this::createBudgetWidget));
         linksBtn.setOnAction(e -> toggleWidget("links", this::createLinksWidget));
         notificationsBtn.setOnAction(e -> toggleWidget("notifications", this::createNotificationWidgets));
+        // VÁLTOZÁS 4: AI Diagnosztika hozzáadása
+        diagnosticsBtn.setOnAction(e -> toggleWidget("diagnostics", this::createAIDiagnosticsWidget));
 
         mainLayout.getStyleClass().add("theme-light");
     }
@@ -131,12 +141,6 @@ public class HomeDashboardController {
         });
     }
 
-    private void toggleMenu() {
-        double targetHeight = isCollapsed ? 60 : 0;
-        menuHBox.setPrefHeight(targetHeight);
-        isCollapsed = !isCollapsed;
-    }
-
     private void toggleWidget(String key, WidgetCreator creator) {
         if (activeWidgets.containsKey(key)) {
             widgetContainer.getChildren().remove(activeWidgets.get(key));
@@ -149,6 +153,91 @@ public class HomeDashboardController {
     }
 
     // ---------------- Widget létrehozók ----------------
+
+
+
+    // VÁLTOZÁS 6: AI DIAGNOSZTIKAI LOGIKA
+    // drivesync.Főoldal.HomeDashboardController.java
+
+    @FXML
+    private void handleAIDiagnosis() {
+        String symptom = symptomField.getText().trim();
+        if (symptom.isEmpty()) {
+            diagnosisResultArea.setText("Kérlek írj be egy tünetet a diagnózis megkezdéséhez.");
+            return;
+        }
+
+        // VÁLTOZTATÁS: Dinamikus autóadatok lekérése a felhasználó első autójáról
+        String[] carDetails = getPrimaryCarDetails();
+        String carBrand = carDetails[0];
+        String carType = carDetails[1];
+
+        if (carBrand.equals("Ismeretlen")) {
+            diagnosisResultArea.setText("Hiba: Nem találtunk autót a felhasználódhoz a diagnózishoz. Kérlek rögzíts egy autót!");
+            return;
+        }
+        // -----------------------------------------------------------------
+
+        diagnoseButton.setDisable(true);
+        diagnosisResultArea.setText("Diagnózis készítése... Kérlek várj.");
+
+        Task<String> diagnosisTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                // Hálózati hívás a háttérszálon
+                return aiService.getDiagnosis(carBrand, carType, symptom);
+            }
+
+            @Override
+            protected void succeeded() {
+                // Visszatérés a JavaFX szálra
+                diagnosisResultArea.setText(getValue());
+                diagnoseButton.setDisable(false);
+            }
+
+            @Override
+            protected void failed() {
+                // Hiba kezelése (pl. API kulcs hiba, timeout)
+                diagnosisResultArea.setText("Hiba a diagnózis közben: " + getException().getMessage() + "\nEllenőrizd az API kulcsot és a hálózati kapcsolatot.");
+                diagnoseButton.setDisable(false);
+                getException().printStackTrace();
+            }
+        };
+
+        // A task elindítása egy új szálon
+        new Thread(diagnosisTask).start();
+    }
+
+    /**
+     * ÚJ SEGÉD METÓDUS: Lekéri a felhasználó első rögzített autójának adatait.
+     * @return String[Márka, Típus]. Ha nincs autó, {"Ismeretlen", "Ismeretlen"}.
+     */
+    private String[] getPrimaryCarDetails() {
+        if (username == null || username.isEmpty()) {
+            return new String[]{"Ismeretlen", "Ismeretlen"};
+        }
+        String sql = """
+        SELECT c.brand, c.type 
+        FROM cars c 
+        JOIN users u ON c.owner_id = u.id
+        WHERE u.username = ?
+        LIMIT 1
+    """;
+        try (Connection conn = drivesync.Adatbázis.Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new String[]{rs.getString("brand"), rs.getString("type")};
+            }
+        } catch (SQLException e) {
+            System.err.println("Hiba az első autó adatainak lekérdezésekor: " + e.getMessage());
+        }
+        return new String[]{"Ismeretlen", "Ismeretlen"};
+    }
+
 
     private VBox createWeatherWidget() {
         VBox box = baseWidget("🌤 Időjárás", "#f1c40f");
@@ -503,6 +592,46 @@ public class HomeDashboardController {
 
         return box;
     }
+
+    // VÁLTOZÁS 5: AI DIAGNOSZTIKAI WIDGET LÉTREHOZÁSA
+    private VBox createAIDiagnosticsWidget() {
+        // 1. Felhasználói felület elemek inicializálása
+        symptomField = new TextField();
+        symptomField.setPromptText("Pl.: Rángat a motor alacsony fordulaton...");
+
+        diagnosisResultArea = new TextArea();
+        diagnosisResultArea.setEditable(false);
+        diagnosisResultArea.setPrefRowCount(10);
+        diagnosisResultArea.setText("Írd le a tünetet, majd kattints a Diagnózis indítása gombra.");
+        diagnosisResultArea.setWrapText(true);
+
+        diagnoseButton = new Button("Diagnózis indítása");
+        diagnoseButton.getStyleClass().add("btn-primary");
+        // Az eseménykezelő hozzárendelése:
+        diagnoseButton.setOnAction(event -> handleAIDiagnosis());
+
+        Label title = new Label("AI Autódiagnosztika");
+        title.getStyleClass().add("card-title");
+
+        Label description = new Label("Kérlek írj be egy részletes tünetet. Az AI javaslatai tájékoztató jellegűek!");
+        description.getStyleClass().add("text-muted");
+
+        // 2. Konténer (Widget) létrehozása
+        VBox aiWidget = new VBox(10);
+        aiWidget.getStyleClass().add("widget-card");
+        aiWidget.setPrefWidth(600);
+        aiWidget.getChildren().addAll(
+                title,
+                description,
+                symptomField,
+                diagnoseButton,
+                diagnosisResultArea
+        );
+
+        return aiWidget;
+    }
+
+
 
 
 
