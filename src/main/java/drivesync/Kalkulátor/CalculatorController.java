@@ -114,9 +114,9 @@ public class CalculatorController {
 
     private void initializeVehicleCategoryComboBox() {
         vehicleCategory.getItems().addAll(
-                "D1 - Motorkerékpár",
-                "D1M - Moped",
-                "D2 - Személyautó"
+                "D1 - Személyautó",
+                "D1M - Motorkerékpár",
+                "D2 - Kisteher"
         );
     }
 
@@ -340,26 +340,26 @@ public class CalculatorController {
 
             int cost = 0;
 
-            // 2024-es magyar e-matrica árak
-            if (category.contains("D1 -")) { // Motorkerékpár
+            // 2025-es magyar e-matrica árak
+            if (category.contains("D1 -")) { // Személyautó
                 cost = switch (type) {
-                    case "10 napos" -> 2975;
-                    case "Havi" -> 5050;
-                    case "Éves" -> 21450;
+                    case "10 napos" -> 6620;
+                    case "Havi" -> 10710;
+                    case "Éves" -> 59210;
                     default -> 0;
                 };
-            } else if (category.contains("D1M")) { // Moped
+            } else if (category.contains("D1M")) { // Motorkerékpár
                 cost = switch (type) {
-                    case "10 napos" -> 1470;
-                    case "Havi" -> 2520;
-                    case "Éves" -> 10710;
+                    case "10 napos" -> 3310;
+                    case "Havi" -> 5360;
+                    case "Éves" -> 59210;
                     default -> 0;
                 };
-            } else if (category.contains("D2")) { // Személyautó (3,5t alatt)
+            } else if (category.contains("D2")) { // Kisteher
                 cost = switch (type) {
-                    case "10 napos" -> 4780;
-                    case "Havi" -> 8100;
-                    case "Éves" -> 59250;
+                    case "10 napos" -> 9630;
+                    case "Havi" -> 15170;
+                    case "Éves" -> 84040;
                     default -> 0;
                 };
             }
