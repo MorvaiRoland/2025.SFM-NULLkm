@@ -370,6 +370,7 @@ public class CalculatorController {
         }
     }
 
+
     // 8. Benzin vs Dízel megtérülési kalkulátor
     private void calculatePetrolVsDiesel() {
         try {
