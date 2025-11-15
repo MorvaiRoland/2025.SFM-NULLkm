@@ -468,13 +468,16 @@ public class HomeDashboardController {
     }
 
 
+    // drivesync.Főoldal.HomeDashboardController.java
+
     private VBox createNotificationWidgets() {
         // Base widget létrehozása a "widget-card" stílussal
         VBox box = baseWidget("🔔 Szerviz értesítések", "#f1c40f");
         box.getStyleClass().add("widget-card");
 
         ServiceDAO dao = new ServiceDAO();
-        List<ServiceDAO.Service> services = dao.getUpcomingServices();
+        // Változtatás: Hívjuk az új metódust a felhasználónévvel
+        List<ServiceDAO.Service> services = dao.getUpcomingServicesForUser(this.username); // <-- JAVÍTVA
 
         if (services.isEmpty()) {
             Label empty = new Label("Nincs elérhető szerviz információ.");
@@ -485,7 +488,7 @@ public class HomeDashboardController {
 
         // Minden szolgáltatás külön Label-ként, egyetlen VBox-ban
         for (ServiceDAO.Service s : services) {
-            StringBuilder text = new StringBuilder("Autó: ").append(s.brand).append(" ").append(s.type)
+            StringBuilder text = new StringBuilder("Autó ID: ").append(s.carId) // IDEIGLENES: Ha nincs brand/type a Service modellben
                     .append("\nDátum: ").append(s.serviceDate)
                     .append("\nHelyszín: ").append(s.location)
                     .append(s.notes != null && !s.notes.isEmpty() ? "\nMegjegyzés: " + s.notes : "")

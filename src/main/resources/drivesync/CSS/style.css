@@ -684,3 +684,112 @@
     -fx-text-alignment: center;
 }
 
+/* =====================
+   Saját Autók Oldal - Kártya Stílusok
+   ===================== */
+
+/* Alapvető kártya konténer */
+.car-card {
+    -fx-background-color: transparent; /* A stílus a default-card-on van */
+    -fx-padding: 16;
+    -fx-background-radius: 18;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.3, 0, 4); /* Alap árnyék */
+}
+
+/* 1. Alap (Default) stílus */
+.default-card {
+    -fx-background-color: linear-gradient(to bottom right, #f9f9f9, #ffffff);
+    -fx-border-color: transparent;
+}
+
+.theme-dark .default-card {
+    -fx-background-color: linear-gradient(to bottom right, #2a3040, #32384a);
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0.3, 0, 4);
+}
+
+/* 2. Hover stílus */
+.hover-card {
+    -fx-background-color: linear-gradient(to bottom right, #e3f2fd, #ffffff);
+    -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.4), 15, 0.3, 0, 5);
+}
+
+.theme-dark .hover-card {
+    -fx-background-color: linear-gradient(to bottom right, #394867, #4f6385);
+    -fx-effect: dropshadow(gaussian, rgba(100,100,255,0.5), 15, 0.3, 0, 5);
+}
+
+/* 3. Kiválasztott (Selected) stílus */
+.selected-card {
+    -fx-background-color: linear-gradient(to bottom right, #bbdefb, #90caf9);
+    -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.6), 18, 0.3, 0, 6);
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2;
+    -fx-border-radius: 18;
+    -fx-background-insets: 0;
+}
+
+.theme-dark .selected-card {
+    -fx-background-color: linear-gradient(to bottom right, #607d8b, #455a64);
+    -fx-effect: dropshadow(gaussian, rgba(135,206,250,0.7), 18, 0.3, 0, 6);
+    -fx-border-color: #87cefa;
+    -fx-border-width: 2;
+}
+
+/* Kártyán belüli címkék */
+
+/* Márka/Típus címke */
+.card-brand-type {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a237e;
+}
+
+.theme-dark .card-brand-type {
+    -fx-text-fill: #90caf9;
+}
+
+/* Rendszám címke (kék badge) */
+.card-license {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #2196F3;
+    -fx-background-radius: 6;
+    -fx-padding: 4 8 4 8;
+}
+
+.theme-dark .card-license {
+    -fx-background-color: #4CAF50; /* Zöld, hogy jobban látszódjon sötétben */
+}
+
+/* Részletek (Évjárat, KM) címke */
+.card-details {
+    -fx-font-size: 14px;
+    -fx-text-fill: #444;
+    -fx-opacity: 0.9;
+}
+
+.theme-dark .card-details {
+    -fx-text-fill: #cccccc;
+    -fx-opacity: 1.0;
+}
+/* Progress Bar Szín Definíciók */
+.red-bar > .bar {
+    -fx-accent: #e53935; /* Piros */
+}
+
+.orange-bar > .bar {
+    -fx-accent: #ff9800; /* Narancs */
+}
+
+.green-bar > .bar {
+    -fx-accent: #4caf50; /* Zöld */
+}
+
+/* Átlátszóvá teszi az eredeti, szürke csíkot */
+.progress-bar {
+    -fx-box-border: lightgray;
+    -fx-control-inner-background: #eeeeee;
+}

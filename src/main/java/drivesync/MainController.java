@@ -1,19 +1,22 @@
 package drivesync;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.stage.Stage;
-import javafx.geometry.Rectangle2D;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -48,18 +51,27 @@ public class MainController {
     private String DB_USER;
     private String DB_PASS;
     private MediaPlayer mediaPlayer;
+    private static boolean remindersShown = false;
 
     @FXML
     private void initialize() {
         loadDBConfig();
         setupPasswordToggle();
-        setupSidebarVideo();   // Csak videó betöltése, méretezés FXML-ben!
-        autoLoginIfPossible();
+        setupSidebarVideo();
+
+        // Elhalasztjuk az ablak műveletet addig, amíg az App.java hozzáadja a Scene-hez
+        Platform.runLater(this::autoLoginIfPossible);
     }
 
     private void loadDBConfig() {
+        // A konfigurációs útvonal feltételezve, hogy a drivesync/Adatbázis/db_config.properties a helyes.
+        // Ha /drivesync/NO-GITHUB/db_config.properties a helyes, módosítsd az útvonalat!
         try (InputStream input = getClass().getResourceAsStream("/drivesync/Adatbázis/db_config.properties")) {
             Properties props = new Properties();
+            if (input == null) {
+                System.err.println("Hiba: db_config.properties nem található!");
+                return;
+            }
             props.load(input);
 
             DB_URL = props.getProperty("db.url");
@@ -67,6 +79,7 @@ public class MainController {
             DB_PASS = props.getProperty("db.password");
 
         } catch (Exception e) {
+            System.err.println("Hiba az adatbázis konfiguráció betöltésekor: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -95,8 +108,9 @@ public class MainController {
             return;
         }
 
+        // Jelszó ellenőrzése SHA2(?, 256) használatával
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username=? AND password=?")) {
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username=? AND password=SHA2(?, 256)")) {
 
             stmt.setString(1, username);
             stmt.setString(2, password);
@@ -109,6 +123,9 @@ public class MainController {
                     prefs.put("username", username);
                 }
 
+                // Sikeres bejelentkezés esetén nem zavarjuk a felhasználót, rögtön váltunk a főoldalra.
+                // A siker visszajelzését a főoldalon is megtehetjük, vagy itt hívhatunk egy rövid Toast-ot, ha szükséges.
+
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 cleanupMediaPlayer();
                 loadHomeScene(username, stage);
@@ -118,7 +135,7 @@ public class MainController {
             }
 
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Hiba", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Adatbázis Hiba", e.getMessage());
         }
     }
 
@@ -141,7 +158,7 @@ public class MainController {
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO users (username, email, password, isDark) VALUES (?, ?, ?, 0)")) {
+                     "INSERT INTO users (username, email, password, isDark) VALUES (?, ?, SHA2(?, 256), 0)")) {
 
             stmt.setString(1, username);
             stmt.setString(2, email);
@@ -149,10 +166,14 @@ public class MainController {
             stmt.executeUpdate();
 
             showLogin();
-            showAlert(Alert.AlertType.INFORMATION, "Siker", "Sikeres regisztráció!");
 
+            // VÁLTOZÁS 1: Nem blokkoló Toast a sikeres regisztrációhoz
+            showToast("Siker", "Sikeres regisztráció! Jelentkezz be.", Duration.seconds(3));
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            showAlert(Alert.AlertType.ERROR, "Adatbázis hiba", "A felhasználónév vagy email cím már foglalt.");
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Hiba", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Adatbázis Hiba", e.getMessage());
         }
     }
 
@@ -170,7 +191,6 @@ public class MainController {
 
     @FXML
     private void handleGoogleLogin() {
-        // letiltjuk a gombot, hogy többször ne lehessen kattintani
         googleLoginButton.setDisable(true);
         String originalText = googleLoginButton.getText();
         googleLoginButton.setText("Bejelentkezés...");
@@ -178,15 +198,13 @@ public class MainController {
         Task<GoogleLoginResult> task = new Task<>() {
             @Override
             protected GoogleLoginResult call() {
-                // InputStream try-with-resources OK
                 try (InputStream stream = getClass().getResourceAsStream("/drivesync/NO-GITHUB/client_secret.json")) {
                     if (stream == null) {
                         return GoogleLoginResult.error("A client_secret.json nem található!");
                     }
 
                     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-                            GsonFactory.getDefaultInstance(),
-                            new InputStreamReader(stream)
+                            GsonFactory.getDefaultInstance(), new InputStreamReader(stream)
                     );
 
                     FileDataStoreFactory dataStoreFactory = new FileDataStoreFactory(
@@ -194,16 +212,10 @@ public class MainController {
                     );
 
                     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                            GoogleNetHttpTransport.newTrustedTransport(),
-                            GsonFactory.getDefaultInstance(),
-                            clientSecrets,
-                            Arrays.asList(
-                                    "https://www.googleapis.com/auth/userinfo.profile",
-                                    "https://www.googleapis.com/auth/userinfo.email"
-                            )
+                            GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(), clientSecrets,
+                            Arrays.asList("https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email")
                     ).setAccessType("offline").setDataStoreFactory(dataStoreFactory).build();
 
-                    // LocalServerReceiver NEM AutoCloseable -> kezeljük manuálisan
                     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
                     try {
                         Credential credential = flow.loadCredential("user");
@@ -218,9 +230,7 @@ public class MainController {
                         }
 
                         Oauth2 oauth2 = new Oauth2.Builder(
-                                GoogleNetHttpTransport.newTrustedTransport(),
-                                GsonFactory.getDefaultInstance(),
-                                credential
+                                GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(), credential
                         ).setApplicationName("DriveSync").build();
 
                         Userinfo userInfo = oauth2.userinfo().get().execute();
@@ -255,11 +265,9 @@ public class MainController {
                         return GoogleLoginResult.success(name, email);
 
                     } finally {
-                        // mindig állítsuk le a receiver-t, különben a lokális szerver futva maradhat
                         try {
                             receiver.stop();
                         } catch (Exception stopEx) {
-                            // csak logoljuk, ne dobjuk el (a Task a fő hibakezelő)
                             stopEx.printStackTrace();
                         }
                     }
@@ -282,8 +290,10 @@ public class MainController {
                 return;
             }
 
-            showAlert(Alert.AlertType.INFORMATION, "Sikeres bejelentkezés",
-                    "Üdv, " + result.name + " (" + result.email + ")");
+            // VÁLTOZÁS 2: Nem blokkoló Toast a sikeres bejelentkezéshez
+            showToast("Sikeres bejelentkezés",
+                    "Üdv, " + result.name + " (" + result.email + ")",
+                    Duration.seconds(3));
 
             Stage stage = (Stage) googleLoginButton.getScene().getWindow();
             cleanupMediaPlayer();
@@ -301,7 +311,7 @@ public class MainController {
         task.setOnCancelled(evt -> {
             googleLoginButton.setDisable(false);
             googleLoginButton.setText(originalText);
-            showAlert(Alert.AlertType.INFORMATION, "Megszakítva", "A Google-bejelentkezés megszakadt.");
+            showToast("Megszakítva", "A Google-bejelentkezés megszakadt.", Duration.seconds(2));
         });
 
         Thread t = new Thread(task, "google-login-task");
@@ -309,7 +319,6 @@ public class MainController {
         t.start();
     }
 
-    // Egyszerű wrapper eredmény visszaadására
     private static class GoogleLoginResult {
         final boolean success;
         final String name;
@@ -333,24 +342,37 @@ public class MainController {
     }
 
 
-
+    /**
+     * Megpróbál automatikusan bejelentkezni, ha van mentett felhasználónév a Preferences-ben.
+     */
     private void autoLoginIfPossible() {
         Preferences prefs = Preferences.userNodeForPackage(MainController.class);
         String savedUsername = prefs.get("username", null);
 
         if (savedUsername != null) {
-            Stage stage = (Stage) loginPane.getScene().getWindow();
-            cleanupMediaPlayer();
-            loadHomeScene(savedUsername, stage);
+            Scene currentScene = loginPane.getScene();
+
+            if (currentScene != null && currentScene.getWindow() instanceof Stage stage) {
+                cleanupMediaPlayer();
+                loadHomeScene(savedUsername, stage);
+            } else {
+                System.err.println("Figyelmeztetés: Az automatikus bejelentkezés Stage objektuma nem érhető el.");
+            }
         }
     }
 
-    private static boolean remindersShown = false;
-
     private void loadHomeScene(String username, Stage stage) {
+        if (stage == null) {
+            System.err.println("Hiba: loadHomeScene Stage paramétere null. Nem lehet scene-t váltani.");
+            return;
+        }
+
         try {
-            // Főoldal betöltése
             Scene home = App.getHomeScene();
+            if (home == null) {
+                throw new IllegalStateException("Hiba: Az App.getHomeScene() null-t adott vissza!");
+            }
+
             HomeController hc = App.getHomeController();
             if (hc != null) hc.setUsername(username);
 
@@ -358,21 +380,21 @@ public class MainController {
 
             // Ablak középre igazítása
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-            stage.setX((screenBounds.getWidth() - 1200) / 2);
-            stage.setY((screenBounds.getHeight() - 700) / 2);
+            stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
+            stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
 
             // CarReminderPopup egyszeri megjelenítése
             if (!remindersShown) {
-                remindersShown = true;               // egyszeri flag beállítása
+                remindersShown = true;
                 CarReminderPopup popup = new CarReminderPopup();
-                popup.showReminders(username);       // popup megjelenítése
+                popup.showReminders(username);
             }
 
         } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Betöltési hiba", "Nem sikerült betölteni a főoldalt: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
 
 
     private void setupSidebarVideo() {
@@ -399,13 +421,57 @@ public class MainController {
         }
     }
 
+    /**
+     * VÁLTOZÁS 3: Nem-blokkoló, időzített TOAST értesítés megjelenítése (új funkció).
+     */
+    private void showToast(String title, String msg, Duration duration) {
+        Platform.runLater(() -> {
+            Stage toastStage = new Stage();
+            toastStage.initStyle(StageStyle.UNDECORATED);
+            toastStage.setAlwaysOnTop(true);
+            toastStage.setResizable(false);
+
+            // Stílusos Label konténer
+            Label label = new Label(msg);
+            label.setStyle("-fx-padding: 10 20; -fx-background-color: rgba(50, 50, 50, 0.95); -fx-text-fill: white; -fx-background-radius: 5; -fx-font-weight: bold;");
+
+            VBox root = new VBox(label);
+            root.setStyle("-fx-background-color: transparent;");
+
+            Scene scene = new Scene(root);
+            scene.setFill(Color.TRANSPARENT);
+            toastStage.setScene(scene);
+
+            // Pozicionálás: Képernyő tetején, középen
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+            toastStage.setX((screenBounds.getWidth() - label.getWidth()) / 2);
+            toastStage.setY(50); // Közel a képernyő tetejéhez
+
+            toastStage.show();
+
+            Timeline timeline = new Timeline(new KeyFrame(duration, e -> toastStage.close()));
+            timeline.play();
+        });
+    }
+
+
+    /**
+     * VÁLTOZÁS 4: Blokkoló showAlert csak KRITIKUS HIBÁKHOZ.
+     */
     private void showAlert(Alert.AlertType t, String title, String msg) {
         Platform.runLater(() -> {
             Alert a = new Alert(t);
             a.setTitle(title);
             a.setHeaderText(null);
             a.setContentText(msg);
-            a.showAndWait();
+
+            // Csak a hibák és a megerősítések blokkolnak
+            if (t == Alert.AlertType.ERROR || t == Alert.AlertType.CONFIRMATION || t == Alert.AlertType.WARNING) {
+                a.showAndWait();
+            } else {
+                // Az INFO ablakokat a showToast veszi át, de ha mégis hívódna, ne blokkoljon.
+                a.show();
+            }
         });
     }
 }
