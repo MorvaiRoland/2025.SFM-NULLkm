@@ -15,17 +15,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.prefs.Preferences;
 
-public class LoginController {
+public abstract class LoginController {
 
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private TextField passwordVisibleField;
-    @FXML private Button loginButton;
-    @FXML private Label errorLabel;
-    @FXML private CheckBox rememberMeCheck;
-    @FXML private CheckBox showPasswordCheck;
-    @FXML private MediaView sidebarVideo;
-    @FXML private Label videoCaption;
+    @FXML public TextField usernameField;
+    @FXML public PasswordField passwordField;
+    @FXML public TextField passwordVisibleField;
+    @FXML public Button loginButton;
+    @FXML public Label errorLabel;
+    @FXML public CheckBox rememberMeCheck;
+    @FXML public CheckBox showPasswordCheck;
+    @FXML public MediaView sidebarVideo;
+    @FXML public Label videoCaption;
 
     @FXML
     private void initialize() {
@@ -40,7 +40,7 @@ public class LoginController {
         }
     }
 
-    private void setupPasswordToggle() {
+    public void setupPasswordToggle() {
         if (passwordVisibleField != null && passwordField != null && showPasswordCheck != null) {
             showPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
                 if (isSelected) {
@@ -77,7 +77,7 @@ public class LoginController {
     }
 
     @FXML
-    private void handleLogin() {
+    public void handleLogin() {
         String username = usernameField.getText().trim();
         String password = showPasswordCheck.isSelected() ? passwordVisibleField.getText().trim() : passwordField.getText().trim();
 
@@ -127,4 +127,6 @@ public class LoginController {
             e.printStackTrace();
         }
     }
+
+
 }

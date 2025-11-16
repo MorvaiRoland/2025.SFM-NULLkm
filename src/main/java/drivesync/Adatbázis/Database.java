@@ -113,4 +113,7 @@ public class Database {
             return null;
         }
     }
+
+    public static void overrideConnection(String dbUrl) {
+    }
 }
