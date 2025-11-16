@@ -15,11 +15,14 @@ import javafx.util.Duration;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -395,6 +398,8 @@ public class BudgetController {
     // ──────────────────────────────────────────────
     // PDF EXPORT (PDFBox, Type1 fontokkal)
     // ──────────────────────────────────────────────
+
+
     @FXML
     public void exportPDF() {
         FileChooser fileChooser = new FileChooser();
@@ -407,59 +412,98 @@ public class BudgetController {
             PDPage page = new PDPage();
             doc.addPage(page);
 
+            // Load the Unicode font (e.g., Arial)
+            InputStream fontStream = getClass().getResourceAsStream("/drivesync/fonts/arial.ttf");
+            if (fontStream == null) throw new IOException("Font file not found: arial.ttf");
+            PDType0Font font = PDType0Font.load(doc, fontStream);
+
             PDPageContentStream cs = new PDPageContentStream(doc, page);
 
-            float y = 750;
+            float y = 750; // Starting position on the Y-axis for the content
+            float margin = 50; // Left margin
+            float[] columnOffsets = { margin, margin + 100, margin + 200, margin + 300 }; // X-offsets for columns
+
+            // Title
             cs.beginText();
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 18);
+            cs.setFont(font, 18);
             cs.newLineAtOffset(200, y);
-            cs.showText("Költségvetési Jelentés");
+            cs.showText("Költségvetési Jelentés"); // Hungarian letters
             cs.endText();
 
-            y -= 30;
+            y -= 30; // Move down after the title
+
+            // Username
             cs.beginText();
-            cs.setFont(PDType1Font.HELVETICA, 12);
-            cs.newLineAtOffset(50, y);
+            cs.setFont(font, 12);
+            cs.newLineAtOffset(margin, y);
             cs.showText("Felhasználó: " + username);
             cs.endText();
 
             y -= 20;
+
+            // Date
             cs.beginText();
-            cs.newLineAtOffset(50, y);
+            cs.setFont(font, 12);
+            cs.newLineAtOffset(margin, y);
             cs.showText("Generálva: " + LocalDate.now());
             cs.endText();
 
             y -= 30;
 
-            // Táblázat-fejléc
+            // Table header
             cs.beginText();
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 12);
-            cs.newLineAtOffset(50, y);
-            cs.showText(String.format("%-10s %-12s %-12s %-12s", "Hónap", categories[0], categories[1], categories[2]));
+            cs.setFont(font, 12);
+            cs.newLineAtOffset(columnOffsets[0], y);
+            cs.showText("Hónap");
             cs.endText();
+
+            cs.beginText();
+            cs.newLineAtOffset(columnOffsets[1], y);
+            cs.showText(categories[0]);
+            cs.endText();
+
+            cs.beginText();
+            cs.newLineAtOffset(columnOffsets[2], y);
+            cs.showText(categories[1]);
+            cs.endText();
+
+            cs.beginText();
+            cs.newLineAtOffset(columnOffsets[3], y);
+            cs.showText(categories[2]);
+            cs.endText();
+
             y -= 20;
 
-            // Táblázat adatok
+            // Table data
             String[] monthsNames = {"Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Szep", "Okt", "Nov", "Dec"};
             for (int i = 0; i < 12; i++) {
                 cs.beginText();
-                cs.setFont(PDType1Font.HELVETICA, 12);
-                cs.newLineAtOffset(50, y);
-
-                String line = String.format("%-10s", monthsNames[i]);
-                for (String cat : categories) {
-                    Number value = 0;
-                    var series = monthlyChart.getData().stream()
-                            .filter(s -> s.getName().equals(cat))
-                            .findFirst();
-                    if (series.isPresent() && series.get().getData().size() > i)
-                        value = series.get().getData().get(i).getYValue();
-                    line += String.format("%-12s", value + " Ft");
-                }
-
-                cs.showText(line);
+                cs.setFont(font, 12);
+                cs.newLineAtOffset(columnOffsets[0], y);
+                cs.showText(monthsNames[i]);
                 cs.endText();
+
+                for (int j = 0; j < categories.length; j++) {
+                    int currentIndex = j; // Declare a new effectively final variable
+                    Number value = 0;
+
+                    // Retrieve data for each category in the series
+                    var matchingSeries = monthlyChart.getData().stream()
+                            .filter(s -> s.getName().equals(categories[currentIndex])) // Use the effectively final variable
+                            .findFirst();
+
+                    if (matchingSeries.isPresent() && matchingSeries.get().getData().size() > i) {
+                        value = matchingSeries.get().getData().get(i).getYValue();
+                    }
+
+                    cs.beginText();
+                    cs.newLineAtOffset(columnOffsets[j + 1], y);
+                    cs.showText(value + " Ft");
+                    cs.endText();
+                }
                 y -= 20;
+
+                // Add a new page if Y-position is too low
                 if (y < 50) {
                     cs.close();
                     page = new PDPage();
@@ -470,15 +514,19 @@ public class BudgetController {
             }
 
             y -= 20;
+
+            // Yearly total
             cs.beginText();
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 12);
-            cs.newLineAtOffset(50, y);
+            cs.setFont(font, 12);
+            cs.newLineAtOffset(margin, y);
             cs.showText("Összes éves kiadás: " + yearlyAmount.getText());
             cs.endText();
 
             y -= 15;
+
+            // Monthly total
             cs.beginText();
-            cs.newLineAtOffset(50, y);
+            cs.newLineAtOffset(margin, y);
             cs.showText("Aktuális havi kiadás: " + monthlyAmount.getText());
             cs.endText();
 

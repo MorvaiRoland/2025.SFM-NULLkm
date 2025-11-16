@@ -174,10 +174,15 @@ public class PdfGenerator {
                 carTable.addCell(createCarHeaderCell("Biztosítás Érvényes"));
                 carTable.addCell(createCarValueCell(carRs.getDate("insurance") != null ? carRs.getDate("insurance").toLocalDate().format(DATE_FORMATTER) : "Nincs adat"));
 
+                // Új sor a Műszaki számára
                 carTable.addCell(createCarHeaderCell("Műszaki Érvényes"));
                 carTable.addCell(createCarValueCell(carRs.getDate("inspection_date") != null ? carRs.getDate("inspection_date").toLocalDate().format(DATE_FORMATTER) : "Nincs adat"));
+                
+                // Kitöltjük a maradék 2 cellát üres cellákkal, hogy teljes legyen a sor
+                carTable.addCell(createCarValueCell(""));
+                carTable.addCell(createCarValueCell(""));
 
-                // Megjegyzés, teljes szélességben (1, 4)
+                // Megjegyzés, teljes szélességben (4 oszlop)
                 carTable.addCell(createCarHeaderCell("Megjegyzés"));
                 carTable.addCell(createCarValueCell(carRs.getString("notes") != null ? carRs.getString("notes") : "-", 3));
 
