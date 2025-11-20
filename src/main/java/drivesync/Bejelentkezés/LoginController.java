@@ -6,25 +6,31 @@ import drivesync.HomeController;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.prefs.Preferences;
 
-public class LoginController {
+public abstract class LoginController {
 
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private TextField passwordVisibleField;
-    @FXML private Button loginButton;
-    @FXML private Label errorLabel;
-    @FXML private CheckBox rememberMeCheck;
-    @FXML private CheckBox showPasswordCheck;
+    @FXML public TextField usernameField;
+    @FXML public PasswordField passwordField;
+    @FXML public TextField passwordVisibleField;
+    @FXML public Button loginButton;
+    @FXML public Label errorLabel;
+    @FXML public CheckBox rememberMeCheck;
+    @FXML public CheckBox showPasswordCheck;
+    @FXML public MediaView sidebarVideo;
+    @FXML public Label videoCaption;
 
     @FXML
     private void initialize() {
         setupPasswordToggle();
+        setupSidebarVideo();
 
         // Automatikus login
         Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
@@ -34,7 +40,7 @@ public class LoginController {
         }
     }
 
-    private void setupPasswordToggle() {
+    public void setupPasswordToggle() {
         if (passwordVisibleField != null && passwordField != null && showPasswordCheck != null) {
             showPasswordCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
                 if (isSelected) {
@@ -50,8 +56,28 @@ public class LoginController {
         }
     }
 
+    private void setupSidebarVideo() {
+        try {
+            // Videó betöltése resources mappából
+            String videoPath = getClass().getResource("/drivesync/Videók/intro.mp4").toExternalForm();
+            Media media = new Media(videoPath);
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setAutoPlay(true);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // loop
+            sidebarVideo.setMediaPlayer(mediaPlayer);
+
+            // Felirat
+            videoCaption.setText("Üdvözlünk a DriveSync-ben!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (videoCaption != null) {
+                videoCaption.setText("Videó betöltése sikertelen!");
+            }
+        }
+    }
+
     @FXML
-    private void handleLogin() {
+    public void handleLogin() {
         String username = usernameField.getText().trim();
         String password = showPasswordCheck.isSelected() ? passwordVisibleField.getText().trim() : passwordField.getText().trim();
 
@@ -61,12 +87,10 @@ public class LoginController {
         }
 
         if (loginUser(username, password)) {
-            // Mentés, ha "Maradjak bejelentkezve" be van jelölve
             if (rememberMeCheck.isSelected()) {
                 Preferences prefs = Preferences.userNodeForPackage(LoginController.class);
                 prefs.put("username", username);
             }
-
             openHome(username);
         } else {
             errorLabel.setText("Hibás felhasználónév vagy jelszó!");
@@ -83,7 +107,6 @@ public class LoginController {
 
             ResultSet rs = stmt.executeQuery();
             return rs.next();
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -93,17 +116,17 @@ public class LoginController {
     private void openHome(String username) {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(App.getHomeScene()); // Home scene-t az App.java-ban tároljuk
+            stage.setScene(App.getHomeScene());
             stage.setTitle("DriveSync");
 
-            // HomeController username beállítása
             HomeController controller = App.getHomeController();
             if (controller != null) {
                 controller.setUsername(username);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }

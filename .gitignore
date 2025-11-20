@@ -4,3 +4,5 @@ src/main/resources/drivesync/NO-GITHUB/client_secret.json
 # MySQL credentials
 src/main/resources/drivesync/NO-GITHUB/db_config.properties
 src/main/resources/drivesync/NO-GITHUB/email.properties
+src/main/resources/drivesync/NO-GITHUB/gemini_config.properties
+src/main/resources/drivesync/NO-GITHUB/
