@@ -199,6 +199,189 @@ public class CalculatorControllerUnitTest {
     }
 
     @Test
+    public void testVehicleTax() throws  Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            TextField horsepower = getField(controller, "HorsePower", TextField.class);
+            TextField productionYear = getField(controller, "ProductionYear", TextField.class);
+            Label resultLabel1 = getField(controller, "resultLabel1", Label.class);
+            Button calcButton1 = getField(controller, "calcButton1", Button.class);
+
+            horsepower.setText("85");
+            productionYear.setText("2015");
+            calcButton1.fire();
+
+            // Várt eredmény: 85 * 230 Ft = 19550 Ft. Kora: 10 év.
+            String expectedPart1 = "Adó:";
+            String expectedPart2 = "19"; // 19 550 vagy 19,550
+            String expectedPart3 = "Kora: 10 év";
+
+            String actualText = resultLabel1.getText();
+
+            // Ellenőrizzük a kulcsrészeket: az Adó előtagot, a számot, és az életkort
+            boolean success = actualText.contains(expectedPart1) &&
+                    actualText.contains(expectedPart2) &&
+                    actualText.contains(expectedPart3);
+
+            assertTrue(success,
+                    "Hiba: A járműadó számítás helytelen. Aktuális tartalom: " + actualText +
+                            ". Elvárt: 'Adó: 19(xxx) Ft/év | Kora: 10 év'");
+
+            latch.countDown();
+        });
+        latch.await();
+    }
+
+    @Test
+    public void testMandatoryInsurance() throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+
+            TextField BaseFee = getField(controller, "BaseFee", TextField.class);
+            TextField PowerFactor = getField(controller, "PowerFactor", TextField.class);
+            TextField ProductionYear1 = getField(controller, "ProductionYear1", TextField.class);
+            ComboBox<String> BonusMalus = getField(controller, "BonusMalus", ComboBox.class);
+            Label resultLabel2 = getField(controller, "resultLabel2", Label.class);
+            Button calcButton2 = getField(controller, "calcButton2", Button.class);
+
+            BaseFee.setText("50000");      // Alapdíj
+            PowerFactor.setText("100");    // 100 kW (Teljesítmény szorzó: 1.4)
+            ProductionYear1.setText("2018"); // 2025 - 2018 = 7 év (Kor szorzó: 1.0)
+
+            BonusMalus.setValue("B10");    // Bónusz-Málusz (B10 szorzó: 0.5)
+
+            calcButton2.fire();
+
+            // Várt eredmény: 50000 * 1.4 * 1.0 * 0.5 = 35000 Ft
+            String expectedClean = "Biztosítás:35000Ft/év"; // Várt szöveg, szóközök nélkül.
+            String actualText = getField(controller, "resultLabel2", Label.class).getText();
+
+            // 1. Tisztítás
+            String actualClean = actualText.replaceAll("[\\s\\u00A0]+", "");
+
+            // 2. Ellenőrzés a megtisztított stringeken
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: A kötelező biztosítás számítás hibás. Aktuális (tisztítva): " + actualClean +
+                            ". Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+    @Test
+    public void testLeasing() throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+            TextField vehiclePrice = getField(controller, "vehiclePrice", TextField.class);
+            TextField downPayment = getField(controller, "downPayment", TextField.class);
+            TextField leaseTerm = getField(controller, "leaseTerm", TextField.class);
+            TextField interestRate = getField(controller, "interestRate", TextField.class);
+            Label resultLabel3 = getField(controller, "resultLabel3", Label.class);
+            Button calcButton3 = getField(controller, "calcButton3", Button.class);
+
+            // Bemeneti adatok beállítása: 1M Ft, 20% önrész, 12 hónap, 12% éves kamat
+            vehiclePrice.setText("1000000");
+            downPayment.setText("20");
+            leaseTerm.setText("12");
+            interestRate.setText("12");
+
+            calcButton3.fire();
+
+            // VÁRT EREDMÉNY
+            // 71079 Ft | 1052948 Ft | 52948 Ft
+            String expectedClean = "Havi:71079Ft|Össz:1052948Ft|Kamat:52948Ft"; // A "kb." kimaradt, ami helyes!
+
+            String actualText = resultLabel3.getText();
+
+            String actualClean = actualText.replaceAll("[\\s\\u00A0]+", "");
+
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: A lízing kalkuláció hibás. Aktuális (tisztítva): " + actualClean +
+                            " | Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+
+    @Test
+    public void testDepreciaton() throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+
+            TextField purchasePrice = getField(controller, "purchasePrice", TextField.class);
+            TextField currentAge = getField(controller, "currentAge", TextField.class);
+            TextField lifespan = getField(controller, "lifespan", TextField.class);
+            Label resultLabel4 = getField(controller, "resultLabel4", Label.class);
+            Button calcButton4 = getField(controller, "calcButton4", Button.class);
+
+            purchasePrice.setText("1000000");
+            currentAge.setText("3");
+            lifespan.setText("10");
+
+            calcButton4.fire();
+
+            // Várt eredmény
+            // Értékek: 700000 Ft, 100000 Ft, 30.0%
+
+            String expectedText = "Jelenlegi érték: 700000 Ft | Évente: 100000 Ft | 30.0%";
+            String actualText = resultLabel4.getText();
+
+            //Tisztítás
+            String actualClean = actualText.replaceAll("[\\s\\u00A0,]+", "");
+            String expectedClean = expectedText.replaceAll("[\\s\\u00A0,.]+", ""); // Eltávolítjuk a pontot, vesszőt, szóközt
+
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: Az amortizáció számítás hibás. Aktuális (tisztítva): " + actualClean +
+                            " | Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+
+    @Test
+    public void testCostPerKm() throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+
+            TextField annualKm = getField(controller, "annualKm", TextField.class);
+            TextField fuelCostYear = getField(controller, "fuelCostYear", TextField.class);
+            TextField insuranceCost = getField(controller, "insuranceCost", TextField.class);
+            TextField taxCost = getField(controller, "taxCost", TextField.class);
+            TextField maintenanceCost = getField(controller, "maintenanceCost", TextField.class);
+            Label resultLabel5 = getField(controller, "resultLabel5", Label.class);
+            Button calcButton5 = getField(controller, "calcButton5", Button.class);
+
+            // Bemeneti adatok beállítása
+            annualKm.setText("20000");
+            fuelCostYear.setText("400000");
+            insuranceCost.setText("100000");
+            taxCost.setText("50000");
+            maintenanceCost.setText("50000");
+
+            calcButton5.fire();
+
+            // Várt eredmény: Össz éves: 600 000 Ft | Per km: 30.00 Ft
+
+            String expectedClean = "Összéves:600000Ft|Perkm:3000Ft";
+
+            String actualText = resultLabel5.getText();
+
+            // Tisztítás
+            String actualClean = actualText.replaceAll("[\\s\\u00A0,.]+", "");
+
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: A km-enkénti költség számítás hibás. Aktuális (tisztítva): " + actualClean +
+                            " | Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+
+
+    @Test
     public void testTollFee() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {
@@ -217,6 +400,85 @@ public class CalculatorControllerUnitTest {
         latch.await();
     }
 
-    // további tesztek átvehetők ugyanezzel a mintával (a korábbi full tesztkészletet beillesztheted)
+    @Test
+    public void testPetrolVsDiesel() throws  Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+            // Mezők lekérése
+            TextField priceDifference = getField(controller, "priceDifference", TextField.class);
+            TextField petrolConsumption = getField(controller, "petrolConsumption", TextField.class);
+            TextField dieselConsumption = getField(controller, "dieselConsumption", TextField.class);
+            TextField petrolPrice = getField(controller, "petrolPrice", TextField.class);
+            TextField dieselPrice = getField(controller, "dieselPrice", TextField.class);
+            Label resultLabel7 = getField(controller, "resultLabel7", Label.class);
+            Button calcButton7 = getField(controller, "calcButton7", Button.class);
+
+            // Bemeneti adatok beállítása
+            priceDifference.setText("300000"); // 300e Ft árkülönbség
+            petrolConsumption.setText("7.0");
+            dieselConsumption.setText("5.5");
+            petrolPrice.setText("600");
+            dieselPrice.setText("600");
+
+            calcButton7.fire();
+
+            // Várt eredmény: Megtérülés: 33 333 km | 2.2 év | Spórol: 900 Ft/100km
+
+            // A kimenet formátuma: Megtérülés: %,d km | %.1f év | Spórol: %.0f Ft/100km
+
+            // Várt értékek tisztítva (szóközök, tizedesvessző/pont nélkül).
+            String expectedClean = "Megtérülés:33333km|22év|Spórol:900Ft/100km";
+
+            String actualText = resultLabel7.getText();
+
+            // Tisztítás: Eltávolítunk minden szóköz karaktert ÉS a tizedes elválasztókat (pont/vessző)
+            String actualClean = actualText.replaceAll("[\\s\\u00A0,.]+", "");
+
+            // Ellenőrzés a tisztított stringen
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: A benzin-dízel megtérülés számítás hibás. Aktuális (tisztítva): " + actualClean +
+                            " | Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+
+    @Test
+    public void testTireCost() throws Exception{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Platform.runLater(() -> {
+
+            TextField tireSetPrice = getField(controller, "tireSetPrice", TextField.class);
+            TextField tireLifespan = getField(controller, "tireLifespan", TextField.class);
+            TextField annualKmTire = getField(controller, "annualKmTire", TextField.class);
+            Label resultLabel8 = getField(controller, "resultLabel8", Label.class);
+            Button calcButton8 = getField(controller, "calcButton8", Button.class);
+
+            // Bemeneti adatok beállítása
+            tireSetPrice.setText("120000");
+            tireLifespan.setText("40000");
+            annualKmTire.setText("10000");
+
+            calcButton8.fire();
+
+            // Várt eredmény: Évente: 30 000 Ft | Per km: 3.00 Ft | Csere: 4.0 év
+
+            String expectedClean = "Évente:30000Ft|Perkm:300Ft|Csere:40év";
+
+            String actualText = resultLabel8.getText();
+
+            // Tisztítás:
+            String actualClean = actualText.replaceAll("[\\s\\u00A0,.]+", "");
+
+            assertTrue(actualClean.contains(expectedClean),
+                    "Hiba: A gumiabroncs költség számítás hibás. Aktuális (tisztítva): " + actualClean +
+                            " | Elvárt (tisztítva): " + expectedClean);
+
+            latch.countDown();
+        });
+    }
+
 }
 
