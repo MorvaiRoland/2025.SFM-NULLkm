@@ -1,192 +1,262 @@
 package drivesync;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import drivesync.Költségvetés.BudgetController;
+import drivesync.SajátAutók.SajatAutokController;
+import drivesync.Főoldal.HomeDashboardController;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
-import java.sql.*;
-import java.time.LocalDate;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 public class HomeController {
 
     @FXML private Label usernameLabel;
     @FXML private Button logoutButton;
 
-    @FXML private Button homeBtn, carsBtn, budgetBtn, linksBtn, calculatorBtn;
-    @FXML private FlowPane contentFlow;
+    @FXML private VBox contentContainer;
+    @FXML private ScrollPane contentScrollPane;
+
+    @FXML private Button homeBtn, carsBtn, budgetBtn, linksBtn, calculatorBtn, settingsBtn;
+    @FXML private ToggleButton menuToggle;
+    @FXML private VBox sidebarBox;
 
     private String username;
-    private ObservableList<Car> cars = FXCollections.observableArrayList();
+    private final List<Button> menuButtons = new ArrayList<>();
+    private final List<String> originalMenuTexts = new ArrayList<>();
+
+    @FXML
+    public void initialize() {
+        // Menü gombok listába
+        menuButtons.add(homeBtn);
+        menuButtons.add(carsBtn);
+        menuButtons.add(budgetBtn);
+        menuButtons.add(linksBtn);
+        menuButtons.add(calculatorBtn);
+        menuButtons.add(settingsBtn);
+
+        // Eredeti gomb szövegek cache-elése
+        cacheOriginalMenuTexts();
+
+        setActiveMenu(homeBtn);
+        setupTooltips();
+
+        // Oldalsáv állapot visszatöltése
+        Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
+        boolean collapsed = prefs.getBoolean("sidebarCollapsed", false);
+        applySidebarCollapsed(collapsed);
+        if (menuToggle != null) menuToggle.setSelected(collapsed);
+    }
 
     public void setUsername(String username) {
         this.username = username;
-        usernameLabel.setText(username);
+        if (usernameLabel != null) usernameLabel.setText(username);
         showHome();
     }
 
     @FXML
     private void handleLogout() {
-        Stage stage = (Stage) logoutButton.getScene().getWindow();
-        java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(HomeController.class);
-        prefs.remove("username");
-        stage.setScene(App.getLoginScene());
-        stage.setTitle("DriveSync");
-    }
-
-    @FXML private void showHome() {
-        contentFlow.getChildren().clear();
-        Label lbl = new Label("Főoldal tartalom");
-        contentFlow.getChildren().add(lbl);
-    }
-
-    @FXML private void showCars() {
-        contentFlow.getChildren().clear();
-        cars.clear();
-        loadCarsFromDB();
-        for (Car car : cars) {
-            VBox carBox = new VBox(5);
-            carBox.setStyle("-fx-border-color: black; -fx-padding: 10; -fx-background-color: #FFD700;");
-            Label lbl = new Label(car.getBrand() + " " + car.getType() + " (" + car.getLicense() + ")");
-            Button deleteBtn = new Button("Törlés");
-            deleteBtn.setOnAction(e -> deleteCar(car));
-            carBox.getChildren().addAll(lbl, deleteBtn);
-            contentFlow.getChildren().add(carBox);
-        }
-
-        Button addCarBtn = new Button("Új autó hozzáadása");
-        addCarBtn.setOnAction(e -> showAddCarDialog());
-        contentFlow.getChildren().add(addCarBtn);
-    }
-
-    private void loadCarsFromDB() {
-        String sql = "SELECT * FROM cars WHERE owner_id = (SELECT id FROM users WHERE username = ?)";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Car car = new Car(
-                        rs.getInt("id"),
-                        rs.getInt("owner_id"),
-                        rs.getString("license"),
-                        rs.getString("brand"),
-                        rs.getString("type"),
-                        rs.getInt("vintage"),
-                        rs.getString("engine_type"),
-                        rs.getString("fuel_type"),
-                        rs.getInt("km"),
-                        rs.getInt("oil"),
-                        rs.getInt("tire_size"),
-                        rs.getDate("service").toLocalDate(),
-                        rs.getDate("insurance").toLocalDate()
-                );
-                cars.add(car);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void deleteCar(Car car) {
-        String sql = "DELETE FROM cars WHERE id = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, car.getId());
-            stmt.executeUpdate();
-            showCars();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showAddCarDialog() {
-        Dialog<Car> dialog = new Dialog<>();
-        dialog.setTitle("Új autó hozzáadása");
-        VBox box = new VBox(10);
-
-        TextField licenseField = new TextField();
-        licenseField.setPromptText("Rendszám");
-        TextField brandField = new TextField();
-        brandField.setPromptText("Márka");
-        TextField typeField = new TextField();
-        typeField.setPromptText("Típus");
-        TextField vintageField = new TextField();
-        vintageField.setPromptText("Évjárat");
-
-        box.getChildren().addAll(new Label("Rendszám:"), licenseField,
-                new Label("Márka:"), brandField,
-                new Label("Típus:"), typeField,
-                new Label("Évjárat:"), vintageField);
-
-        dialog.getDialogPane().setContent(box);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.setResultConverter(button -> {
-            if (button == ButtonType.OK) {
-                return new Car(0, 0, licenseField.getText(), brandField.getText(),
-                        typeField.getText(), Integer.parseInt(vintageField.getText()),
-                        "", "", 0, 0, 0, LocalDate.now(), LocalDate.now());
-            }
-            return null;
-        });
-
-        dialog.showAndWait().ifPresent(this::addCarToDB);
-    }
-
-    private void addCarToDB(Car car) {
-        String sql = "INSERT INTO cars (owner_id, license, brand, type, vintage, engine_type, fuel_type, km, oil, tire_size, service, insurance) " +
-                "VALUES ((SELECT id FROM users WHERE username = ?), ?, ?, ?, ?, '', '', 0,0,0, NOW(), NOW())";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setString(2, car.getLicense());
-            stmt.setString(3, car.getBrand());
-            stmt.setString(4, car.getType());
-            stmt.setInt(5, car.getVintage());
-            stmt.executeUpdate();
-            showCars();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ----------------- Új módszer az FXML-ek betöltésére -----------------
-    private void loadFXMLToContent(String fxmlFileName) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFileName));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
+            prefs.remove("username");
+            prefs.remove("google_email"); // Google login törlése
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/drivesync/LOG/REG/main.fxml"));
+            Parent root = loader.load(); // Itt a MainController automatikusan initialize() futtat
+
+            Scene loginScene = new Scene(root, 900, 600);
+            loginScene.getStylesheets().add(getClass().getResource("/drivesync/CSS/style.css").toExternalForm());
+            stage.setScene(loginScene);
+            stage.setTitle("DriveSync");
+            stage.setResizable(false);
+
+            // Fade animáció
+            root.setOpacity(0);
+            FadeTransition fade = new FadeTransition(Duration.millis(220), root);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+            fade.play();
+
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Hiba");
+            alert.setHeaderText("Hiba történt a kijelentkezés során");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+
+
+
+
+
+    @FXML private void showHome()       { loadFXML("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
+    @FXML private void showCars()       { loadFXML("/drivesync/SajátAutók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
+    @FXML private void showBudget()     { loadFXML("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
+    @FXML private void showLinks()      { loadFXML("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
+    @FXML private void showCalculator() { loadFXML("/drivesync/Kalkulátor/Calculator.fxml"); setActiveMenu(calculatorBtn); }
+    @FXML private void showSettings()   { loadFXML("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
+
+    private void loadFXML(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent pane = loader.load();
 
-            contentFlow.getChildren().clear();
-            contentFlow.getChildren().add(pane);
-
-            // Ha szükséges, itt elérhetjük a controller-t
-            Object controller = loader.getController();
-            if (controller instanceof CalculatorController) {
-                CalculatorController calcController = (CalculatorController) controller;
-                // további inicializáció, ha kell
+            // Tartalomváltás animációval
+            if (!contentContainer.getChildren().isEmpty()) {
+                Parent old = (Parent) contentContainer.getChildren().get(0);
+                FadeTransition fadeOut = new FadeTransition(Duration.millis(140), old);
+                fadeOut.setFromValue(1.0);
+                fadeOut.setToValue(0.0);
+                fadeOut.setOnFinished(e -> {
+                    contentContainer.getChildren().setAll(pane);
+                    FadeTransition fadeIn = new FadeTransition(Duration.millis(180), pane);
+                    fadeIn.setFromValue(0.0);
+                    fadeIn.setToValue(1.0);
+                    fadeIn.play();
+                });
+                fadeOut.play();
+            } else {
+                pane.setOpacity(0);
+                contentContainer.getChildren().setAll(pane);
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(180), pane);
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
+                fadeIn.play();
             }
 
-        } catch (Exception e) {
+            Object controller = loader.getController();
+            if (controller instanceof SajatAutokController) {
+                ((SajatAutokController) controller).setUsername(username);
+            } else if (controller instanceof HomeDashboardController) {
+                ((HomeDashboardController) controller).setUsername(username);
+
+                // --- Ide tesszük az automatikus popup hívást ---
+                CarReminderPopup popup = new CarReminderPopup();
+                popup.showReminders(username);
+            } else if (controller instanceof BudgetController) {
+                ((BudgetController) controller).setUsername(username);
+            }
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // ----------------- Menüpontok -----------------
-    @FXML private void showBudget() {
-        loadFXMLToContent("BudgetController.fxml");
+
+    private void setActiveMenu(Button activeBtn) {
+        for (Button btn : menuButtons) {
+            btn.getStyleClass().remove("menu-button-active");
+            if (!btn.getStyleClass().contains("menu-button")) {
+                btn.getStyleClass().add("menu-button");
+            }
+        }
+        if (activeBtn != null && !activeBtn.getStyleClass().contains("menu-button-active")) {
+            activeBtn.getStyleClass().add("menu-button-active");
+        }
     }
 
-    @FXML private void showLinks() {
-        loadFXMLToContent("LinksController.fxml");
+    @FXML
+    private void toggleSidebar() {
+        boolean collapse = menuToggle != null && menuToggle.isSelected();
+        animateSidebar(collapse);
+        Preferences prefs = Preferences.userNodeForPackage(HomeController.class);
+        prefs.putBoolean("sidebarCollapsed", collapse);
     }
 
-    @FXML private void showCalculator() {
-        loadFXMLToContent("CalculatorController.fxml");
+    private void applySidebarCollapsed(boolean collapse) {
+        if (sidebarBox == null) return;
+        if (collapse) {
+            sidebarBox.setPrefWidth(72);
+            sidebarBox.setMinWidth(72);
+            sidebarBox.setMaxWidth(72);
+            if (!sidebarBox.getStyleClass().contains("sidebar-collapsed")) {
+                sidebarBox.getStyleClass().add("sidebar-collapsed");
+            }
+            setMenuTextsCollapsed(true);
+        } else {
+            sidebarBox.setPrefWidth(250);
+            sidebarBox.setMinWidth(250);
+            sidebarBox.setMaxWidth(250);
+            sidebarBox.getStyleClass().remove("sidebar-collapsed");
+            setMenuTextsCollapsed(false);
+        }
+    }
+
+    private void animateSidebar(boolean collapse) {
+        if (sidebarBox == null) return;
+
+        double from = sidebarBox.getWidth() > 0 ? sidebarBox.getWidth() : (collapse ? 250 : 72);
+        double to = collapse ? 72 : 250;
+
+        KeyValue kvPref = new KeyValue(sidebarBox.prefWidthProperty(), to, Interpolator.EASE_BOTH);
+        KeyValue kvMin = new KeyValue(sidebarBox.minWidthProperty(), to, Interpolator.EASE_BOTH);
+        KeyValue kvMax = new KeyValue(sidebarBox.maxWidthProperty(), to, Interpolator.EASE_BOTH);
+
+        Timeline tl = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(sidebarBox.prefWidthProperty(), from),
+                        new KeyValue(sidebarBox.minWidthProperty(), from),
+                        new KeyValue(sidebarBox.maxWidthProperty(), from)),
+                new KeyFrame(Duration.millis(180), kvPref, kvMin, kvMax)
+        );
+
+        if (usernameLabel != null) {
+            double targetOpacity = collapse ? 0.0 : 1.0;
+            FadeTransition ftUser = new FadeTransition(Duration.millis(140), usernameLabel);
+            ftUser.setToValue(targetOpacity);
+            ftUser.play();
+        }
+
+        tl.setOnFinished(e -> applySidebarCollapsed(collapse));
+        tl.play();
+    }
+
+    private void cacheOriginalMenuTexts() {
+        if (!originalMenuTexts.isEmpty()) return;
+        for (Button b : menuButtons) {
+            originalMenuTexts.add(b.getText());
+        }
+    }
+
+    private void setMenuTextsCollapsed(boolean collapsed) {
+        for (int i = 0; i < menuButtons.size(); i++) {
+            Button b = menuButtons.get(i);
+            String full = originalMenuTexts.get(i);
+            if (collapsed) {
+                b.setText(extractLeadingIcon(full));
+            } else {
+                b.setText(full);
+            }
+        }
+    }
+
+    private String extractLeadingIcon(String text) {
+        if (text == null || text.isEmpty()) return "";
+        int spaceIdx = text.indexOf(' ');
+        if (spaceIdx > 0) return text.substring(0, spaceIdx);
+        int cp = text.codePointAt(0);
+        return new String(Character.toChars(cp));
+    }
+
+    private void setupTooltips() {
+        if (homeBtn != null) homeBtn.setTooltip(new Tooltip("Főoldal"));
+        if (carsBtn != null) carsBtn.setTooltip(new Tooltip("Saját autók"));
+        if (budgetBtn != null) budgetBtn.setTooltip(new Tooltip("Költségvetés"));
+        if (linksBtn != null) linksBtn.setTooltip(new Tooltip("Hasznos linkek"));
+        if (calculatorBtn != null) calculatorBtn.setTooltip(new Tooltip("Kalkulátor"));
+        if (settingsBtn != null) settingsBtn.setTooltip(new Tooltip("Beállítások"));
+        if (logoutButton != null) logoutButton.setTooltip(new Tooltip("Kijelentkezés"));
     }
 }

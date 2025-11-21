@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.image.ImageView?>
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.Beállítások.SettingsController"
+            fitToWidth="true" vbarPolicy="AS_NEEDED"
+            styleClass="app-bg">
+    <content>
+        <VBox spacing="25" maxWidth="900" alignment="TOP_CENTER">
+
+            <Label text="Alkalmazás Beállítások" styleClass="page-title">
+                <padding>
+                    <Insets top="20" bottom="10"/>
+                </padding>
+            </Label>
+            <Separator/>
+
+            <TitledPane text="Megjelenés és Felület" expanded="true" styleClass="card">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <Label text="Téma kiválasztása:" styleClass="card-subtitle"/>
+                        <ChoiceBox fx:id="themeChoiceBox">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Világos"/>
+                                    <String fx:value="Sötét"/>
+                                    <String fx:value="Rendszer alapértelmezett"/>
+                                </FXCollections>
+                            </items>
+                        </ChoiceBox>
+                    </HBox>
+
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <Label text="Alap betűméret:" styleClass="card-subtitle"/>
+                        <Slider fx:id="fontSizeSlider" min="10" max="18" value="14" showTickLabels="true" showTickMarks="true" majorTickUnit="2"/>
+                    </HBox>
+                </VBox>
+            </TitledPane>
+
+            <TitledPane text="Felhasználói Fiók és Adatok" expanded="false" styleClass="card">
+                <VBox spacing="15">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <GridPane hgap="15" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" maxWidth="150"/>
+                            <ColumnConstraints hgrow="ALWAYS" maxWidth="300"/>
+                        </columnConstraints>
+                        <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-sm"/>
+                        <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-sm"/>
+                        <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Regisztráció dátuma:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-sm"/>
+                        <Label fx:id="regDateLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="text-muted"/>
+
+                        <Separator orientation="HORIZONTAL" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+
+                        <Label text="Új jelszó:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-sm"/>
+                        <PasswordField fx:id="passwordField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        <Label text="Erős azonosítás (2FA):" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="label-sm"/>
+                        <CheckBox fx:id="twoFactorAuth" text="Engedélyezve" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                    </GridPane>
+                </VBox>
+            </TitledPane>
+
+
+            <TitledPane text="Adatvédelem és Értesítések" expanded="false" styleClass="card">
+                <VBox spacing="10">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label text="Értesítési Preferenciák:" styleClass="card-subtitle"/>
+                    <CheckBox fx:id="emailNotifications" text="Email (Szerviz &amp; Emlékeztetők)"/>
+                    <CheckBox fx:id="smsNotifications" text="SMS (Kritikus lejáratok)" disable="true"/>
+                    <Separator orientation="HORIZONTAL"/>
+                    <Label text="Adatkezelés:" styleClass="card-subtitle"/>
+                    <CheckBox fx:id="autoUpdate" text="Automatikus frissítések engedélyezése"/>
+                    <CheckBox fx:id="sendUsageStats" text="Használati statisztikák küldése (anonim)"/>
+                    <CheckBox fx:id="enableLogging" text="Részletes naplózás engedélyezése (Fejlesztőknek)"/>
+                </VBox>
+            </TitledPane>
+
+            <TitledPane text="Névjegy és Verzió" expanded="false" styleClass="card">
+                <VBox spacing="15" alignment="CENTER">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <ImageView fx:id="logoImageView" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+                    <Label text="DriveSync" styleClass="page-title"/>
+                    <Label text="Verzió: 0.8.1  " styleClass="text-muted"/>
+                    <Label text="Fejlesztők: [Morvai Roland, Dóczi Bence, Lőrincz Levente, Kovács Dávid]" styleClass="text-muted"/>
+                    <Label text="© 2025 Minden jog fenntartva." styleClass="text-muted"/>
+                </VBox>
+            </TitledPane>
+
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <padding>
+                    <Insets top="10" bottom="20"/>
+                </padding>
+                <Button text="Visszaállítás" fx:id="resetBtn" onAction="#handleReset" styleClass="btn-ghost"/>
+                <Button text="Mentés" fx:id="saveBtn" onAction="#handleSave" styleClass="btn-primary"/>
+            </HBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

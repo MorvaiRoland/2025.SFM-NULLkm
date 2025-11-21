@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane fx:id="mainLayout" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.Főoldal.HomeDashboardController"
+            prefWidth="1200" prefHeight="700"   stylesheets="@/drivesync/CSS/style.css" styleClass="app-bg">
+
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true" styleClass="content-scroll">
+            <FlowPane fx:id="widgetContainer"
+                      hgap="25" vgap="25" prefWrapLength="1000"
+                      styleClass="content-container flow-wrap"/>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox fx:id="menuHBox"
+              spacing="5"
+              alignment="CENTER"
+              styleClass="sidebar">
+
+            <Button fx:id="weatherBtn" text="Időjárás" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="fuelBtn" text="Üzemanyag" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="carsBtn" text="Autók" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="budgetBtn" text="Költségvetés" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="diagnosticsBtn" text="AI Diagnosztika" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="linksBtn" text="Linkek" contentDisplay="TOP" styleClass="menu-button"/>
+
+            <Button fx:id="notificationsBtn" text="Értesítések" contentDisplay="TOP" styleClass="menu-button"/>
+
+        </HBox>
+    </bottom>
+
+</BorderPane>

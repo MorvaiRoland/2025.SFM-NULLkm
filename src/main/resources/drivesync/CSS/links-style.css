@@ -1,0 +1,74 @@
+/* Világos téma */
+.links-root {
+    -fx-padding: 20;
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f4f6fb);
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+}
+
+.links-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10 0 10 0;
+}
+
+/* Link kártyák */
+.link-card {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10 14;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5,0,2,2);
+    -fx-cursor: hand;
+}
+
+.link-card:hover {
+    -fx-background-color: #E3F2FD;
+}
+
+.link-text {
+    -fx-font-size: 15px;
+    -fx-text-fill: #1565C0;
+    -fx-font-weight: 600;
+    -fx-underline: false;
+}
+
+.link-text:hover {
+    -fx-text-fill: #1976D2;
+}
+
+/* Widget linkek */
+.widget-link {
+    -fx-text-fill: #1565C0;
+    -fx-font-size: 14px;
+    -fx-underline: true;
+}
+
+/* Sötét téma */
+.theme-dark .links-root {
+    -fx-background-color: linear-gradient(to bottom, #2b2b2b, #3a3a3a);
+}
+
+.theme-dark .links-title {
+    -fx-text-fill: #ffffff;
+}
+
+.theme-dark .link-card {
+    -fx-background-color: #3a3a3a;
+}
+
+.theme-dark .link-card:hover {
+    -fx-background-color: #505050;
+}
+
+.theme-dark .link-text {
+    -fx-text-fill: #ffffff;
+}
+
+.theme-dark .link-text:hover {
+    -fx-text-fill: #cccccc;
+}
+
+.theme-dark .widget-link {
+    -fx-text-fill: #ffffff;
+}

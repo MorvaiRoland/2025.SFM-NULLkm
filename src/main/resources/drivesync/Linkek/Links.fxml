@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="drivesync.Linkek.LinksController"
+      prefWidth="420.0"
+      spacing="16"
+      alignment="TOP_CENTER"
+      stylesheets="@/drivesync/CSS/links-style.css"
+      styleClass="links-root">
+
+    <!-- CÍM -->
+    <Label text="🌐 Hasznos Linkek"
+           styleClass="links-title"/>
+
+    <!-- KÁRTYÁK -->
+    <VBox spacing="14" alignment="CENTER">
+
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="link-card">
+            <ImageView fx:id="imgHAHU"
+                       fitWidth="120"
+                       fitHeight="100"
+                       preserveRatio="true"
+                       smooth="true"/>
+            <Hyperlink fx:id="linkHAHU" text="Használtautó.hu" styleClass="link-text"/>
+        </HBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="link-card">
+            <ImageView fitWidth="120"
+                       fitHeight="100"
+                       preserveRatio="true"
+                       smooth="true" fx:id="imgFEKMESTER"/>
+            <Hyperlink fx:id="linkFEKMESTER" text="FékMester.hu" styleClass="link-text"/>
+        </HBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="link-card">
+            <ImageView fitWidth="120"
+                       fitHeight="100"
+                       preserveRatio="true"
+                       smooth="true" fx:id="imgHOLTANKOLJAK"/>
+            <Hyperlink fx:id="linkHOLTANKOLJAK" text="HolTankoljak.hu" styleClass="link-text"/>
+        </HBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="link-card">
+            <ImageView fitWidth="120"
+                       fitHeight="100"
+                       preserveRatio="true"
+                       smooth="true" fx:id="imgWAZE"/>
+            <Hyperlink fx:id="linkWAZE" text="Waze útvonaltervező" styleClass="link-text"/>
+        </HBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT" styleClass="link-card">
+            <ImageView fitWidth="120"
+                       fitHeight="100"
+                       preserveRatio="true"
+                       smooth="true" fx:id="imgGARVISOR"/>
+            <Hyperlink fx:id="linkGARVISOR" text="GarVisor szervizkereső" styleClass="link-text"/>
+        </HBox>
+
+    </VBox>
+
+</VBox>
