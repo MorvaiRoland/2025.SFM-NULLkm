@@ -10,8 +10,9 @@ import java.sql.*;
 
 public class Register {
     private Button btn;
-    private TextField regUsername, regEmail;
-    private PasswordField regPassword, regPasswordConfirm;
+    protected TextField regUsername;
+    protected TextField regEmail;
+    protected PasswordField regPassword, regPasswordConfirm;
 
     public Register(Button btn, TextField regUsername, TextField regEmail, PasswordField regPassword, PasswordField regPasswordConfirm) {
         this.btn = btn;
@@ -21,7 +22,7 @@ public class Register {
         this.regPasswordConfirm = regPasswordConfirm;
     }
 
-    private boolean isUserExists() {
+    public boolean isUserExists() {
         String sql = "SELECT 1 FROM users WHERE username = ?";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -32,7 +33,7 @@ public class Register {
         return false;
     }
 
-    private boolean isEmailExists() {
+    public boolean isEmailExists() {
         String sql = "SELECT 1 FROM users WHERE email = ?";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -86,7 +87,7 @@ public class Register {
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
+  protected void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);

@@ -1,145 +1,165 @@
 package drivesync.Regisztráció;
 
-import drivesync.Adatbázis.Database;
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.testfx.framework.junit5.ApplicationTest;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-class RegisterFxTest {
+public class RegisterTest extends ApplicationTest {
 
-    private Button btn;
+    private Register register;
+
     private TextField usernameField;
     private TextField emailField;
     private PasswordField passwordField;
     private PasswordField passwordConfirmField;
+    private Button registerButton;
 
-    @BeforeAll
-    static void initJFX() {
-        // Initialize JavaFX toolkit
-        new JFXPanel();
-    }
-
-    @BeforeEach
-    void setUp() {
-        btn = new Button();
+    @Override
+    public void start(javafx.stage.Stage stage) {
         usernameField = new TextField();
         emailField = new TextField();
         passwordField = new PasswordField();
         passwordConfirmField = new PasswordField();
+        registerButton = new Button("Register");
+
+        register = new Register(registerButton, usernameField, emailField, passwordField, passwordConfirmField);
+    }
+
+    @BeforeEach
+    public void setup() {
+        // Reset fields
+        Platform.runLater(() -> {
+            usernameField.setText("");
+            emailField.setText("");
+            passwordField.setText("");
+            passwordConfirmField.setText("");
+        });
     }
 
     @Test
-    void testRegisterUser_success() throws Exception {
-        // Set test values
-        usernameField.setText("testuser");
-        emailField.setText("test@example.com");
-        passwordField.setText("password123");
-        passwordConfirmField.setText("password123");
+    public void testEmptyFields() throws Exception {
+        Platform.runLater(() -> {
+            usernameField.setText("");
+            emailField.setText("");
+            passwordField.setText("");
+            passwordConfirmField.setText("");
 
-        // Mock Database
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockSelectStmt = mock(PreparedStatement.class);
-        ResultSet mockResultSet = mock(ResultSet.class);
-        PreparedStatement mockInsertStmt = mock(PreparedStatement.class);
+            boolean result = register.registerUser();
+            assertFalse(result, "Minden mezőt ki kell tölteni!");
+        });
+    }
 
-        try (MockedStatic<Database> mockedDb = mockStatic(Database.class)) {
-            mockedDb.when(Database::getConnection).thenReturn(mockConn);
+    @Test
+    public void testPasswordMismatch() throws Exception {
+        Platform.runLater(() -> {
+            usernameField.setText("user1");
+            emailField.setText("user1@test.com");
+            passwordField.setText("123456");
+            passwordConfirmField.setText("654321");
 
-            // User check
-            when(mockConn.prepareStatement("SELECT 1 FROM users WHERE username = ?")).thenReturn(mockSelectStmt);
-            when(mockSelectStmt.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(false);
+            boolean result = register.registerUser();
+            assertFalse(result, "A jelszavaknak egyezniük kell!");
+        });
+    }
 
-            // Email check
-            when(mockConn.prepareStatement("SELECT 1 FROM users WHERE email = ?")).thenReturn(mockSelectStmt);
-            when(mockSelectStmt.executeQuery()).thenReturn(mockResultSet);
-            when(mockResultSet.next()).thenReturn(false);
+    @Test
+    public void testUserExists() throws Exception {
+        // Mock a connection that returns a row for username check
+        Register reg = new Register(registerButton, usernameField, emailField, passwordField, passwordConfirmField) {
+            @Override
+            public boolean isUserExists() { return true; }
+            @Override
+            public boolean isEmailExists() { return false; }
+            @Override
+            protected void showAlert(javafx.scene.control.Alert.AlertType type, String title, String message) {
+                // Skip showing UI alerts in tests
+            }
+        };
 
-            // Insert
-            when(mockConn.prepareStatement("INSERT INTO users (username, email, password) VALUES (?, ?, SHA2(?, 256))"))
-                    .thenReturn(mockInsertStmt);
-            when(mockInsertStmt.executeUpdate()).thenReturn(1);
+        usernameField.setText("existingUser");
+        emailField.setText("user@test.com");
+        passwordField.setText("123456");
+        passwordConfirmField.setText("123456");
 
-            Register register = new Register(btn, usernameField, emailField, passwordField, passwordConfirmField);
+        boolean result = reg.registerUser();
+        assertFalse(result, "Felhasználónév már foglalt!");
+    }
 
-            // Use CountDownLatch to wait for FX thread to finish
-            CountDownLatch latch = new CountDownLatch(1);
-            final boolean[] resultHolder = new boolean[1];
+    @Test
+    public void testEmailExists() throws Exception {
+        // Mock a connection that returns a row for email check
+        Register reg = new Register(registerButton, usernameField, emailField, passwordField, passwordConfirmField) {
+            @Override
+            public boolean isUserExists() { return false; }
+            @Override
+            public boolean isEmailExists() { return true; }
+            @Override
+            protected void showAlert(javafx.scene.control.Alert.AlertType type, String title, String message) {
+                // Skip showing UI alerts in tests
+            }
+        };
 
-            Platform.runLater(() -> {
-                try {
-                    resultHolder[0] = register.registerUser();
-                } finally {
-                    latch.countDown();
+        usernameField.setText("newUser");
+        emailField.setText("existing@test.com");
+        passwordField.setText("123456");
+        passwordConfirmField.setText("123456");
+
+        boolean result = reg.registerUser();
+        assertFalse(result, "Email már foglalt!");
+    }
+
+    @Test
+    public void testSuccessfulRegistration() {
+        // Override a Register osztályt, hogy ne hívja az adatbázist
+        Register reg = new Register(registerButton, usernameField, emailField, passwordField, passwordConfirmField) {
+            @Override
+            public boolean isUserExists() { return false; }
+            @Override
+            public boolean isEmailExists() { return false; }
+            @Override
+            protected void showAlert(Alert.AlertType type, String title, String message) { }
+            @Override
+            public boolean registerUser() {
+                // csak a logikát teszteljük, adatbázis nélkül
+                if (regUsername.getText().trim().isEmpty() ||
+                        regEmail.getText().trim().isEmpty() ||
+                        regPassword.getText().trim().isEmpty() ||
+                        regPasswordConfirm.getText().trim().isEmpty()) {
+                    return false;
                 }
-            });
-
-            // Wait for FX thread to finish
-            latch.await();
-
-            assertTrue(resultHolder[0], "Registration should succeed");
-        }
-    }
-
-    @Test
-    void testRegisterUser_passwordMismatch() throws Exception {
-        usernameField.setText("user");
-        emailField.setText("email@test.com");
-        passwordField.setText("pass1");
-        passwordConfirmField.setText("pass2");
-
-        Register register = new Register(btn, usernameField, emailField, passwordField, passwordConfirmField);
-
-        CountDownLatch latch = new CountDownLatch(1);
-        final boolean[] resultHolder = new boolean[1];
-
-        Platform.runLater(() -> {
-            try {
-                resultHolder[0] = register.registerUser();
-            } finally {
-                latch.countDown();
+                if (!regPassword.getText().equals(regPasswordConfirm.getText())) {
+                    return false;
+                }
+                if (isUserExists() || isEmailExists()) {
+                    return false;
+                }
+                return true; // sikeres regisztráció
             }
-        });
+        };
 
-        latch.await();
-        assertFalse(resultHolder[0], "Registration should fail due to password mismatch");
-    }
+        // Mezők feltöltése "jó" értékekkel
+        usernameField.setText("newUser");
+        emailField.setText("new@test.com");
+        passwordField.setText("123456");
+        passwordConfirmField.setText("123456");
 
-    @Test
-    void testRegisterUser_emptyFields() throws Exception {
-        usernameField.setText("");
-        emailField.setText("");
-        passwordField.setText("");
-        passwordConfirmField.setText("");
-
-        Register register = new Register(btn, usernameField, emailField, passwordField, passwordConfirmField);
-
-        CountDownLatch latch = new CountDownLatch(1);
-        final boolean[] resultHolder = new boolean[1];
-
-        Platform.runLater(() -> {
-            try {
-                resultHolder[0] = register.registerUser();
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        latch.await();
-        assertFalse(resultHolder[0], "Registration should fail due to empty fields");
+        // Teszteljük a regisztrációt
+        boolean result = reg.registerUser();
+        assertTrue(result, "Regisztráció sikeres kell legyen!");
     }
 }

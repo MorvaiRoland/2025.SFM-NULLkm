@@ -97,9 +97,9 @@ public abstract class LoginController {
         }
     }
 
-    private boolean loginUser(String username, String password) {
+    protected boolean loginUser(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ? AND password = SHA2(?, 256)";
-        try (Connection conn = Database.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
@@ -113,7 +113,7 @@ public abstract class LoginController {
         }
     }
 
-    private void openHome(String username) {
+    protected void openHome(String username) {
         try {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(App.getHomeScene());
@@ -126,6 +126,11 @@ public abstract class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // For testability; by default use the real Database
+    protected Connection getConnection() throws Exception {
+        return Database.getConnection();
     }
 
 
