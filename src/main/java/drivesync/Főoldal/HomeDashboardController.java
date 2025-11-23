@@ -28,6 +28,7 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import javafx.concurrent.Task;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,7 +53,8 @@ public class HomeDashboardController {
 
     private final AIDiagnosticsService aiService = new AIDiagnosticsService(); // AI szolgáltatás
 
-    @FXML private BorderPane mainLayout;
+    @FXML
+    protected BorderPane mainLayout;
 
     private boolean isCollapsed = false;
     private final Map<String, VBox> activeWidgets = new HashMap<>();
@@ -111,7 +113,7 @@ public class HomeDashboardController {
     }
 
     @FXML
-    private void toggleTheme() {
+    protected void toggleTheme() {
         darkTheme = !darkTheme;
         var root = mainLayout.getScene().getRoot();
         root.getStyleClass().removeAll("theme-light", "theme-dark");
@@ -239,7 +241,7 @@ public class HomeDashboardController {
     }
 
 
-    private VBox createWeatherWidget() {
+    protected VBox createWeatherWidget() {
         VBox box = baseWidget("🌤 Időjárás", "#f1c40f");
         box.getStyleClass().add("widget-card"); // Alap widget stílus
 
@@ -310,7 +312,7 @@ public class HomeDashboardController {
 
 
 
-    private VBox createFuelWidget() {
+    public VBox createFuelWidget() {
         VBox box = baseWidget("⛽ Üzemanyagárak", "#f1c40f");
 
         // Alap CSS osztály a widgethez
@@ -347,9 +349,11 @@ public class HomeDashboardController {
                 fuelBox.setMinWidth(240);
                 fuelBox.setMaxWidth(320);
 
-                ImageView icon = new ImageView(getClass().getResource(fuelIcons.get(fuel)).toExternalForm());
-                icon.setFitWidth(70);  // nagyobb ikon
+                URL iconUrl = getClass().getResource(fuelIcons.get(fuel));
+                ImageView icon = new ImageView(iconUrl != null ? iconUrl.toExternalForm() : null);
+                icon.setFitWidth(70);
                 icon.setFitHeight(70);
+
 
                 Label fuelLabel = new Label(fuel);
                 fuelLabel.getStyleClass().add("widget-header");
@@ -400,7 +404,7 @@ public class HomeDashboardController {
 
 
 
-    private VBox createCarsWidget() {
+    protected VBox createCarsWidget() {
         VBox box = baseWidget("🚗 Autók", "#f1c40f");
 
         // CSS osztály a theme-kompatibilitáshoz
@@ -469,7 +473,7 @@ public class HomeDashboardController {
     }
 
 
-    private VBox createBudgetWidget() {
+    protected VBox createBudgetWidget() {
         // Widget alap
         VBox box = baseWidget("💰 Költségvetés", "#f1c40f");
 
@@ -543,7 +547,7 @@ public class HomeDashboardController {
     }
 
 
-    private VBox createLinksWidget() {
+    protected VBox createLinksWidget() {
         VBox box = baseWidget("🔗 Linkek", "#f1c40f");
 
         // CSS osztály a theme-kompatibilitáshoz
@@ -559,7 +563,7 @@ public class HomeDashboardController {
 
     // drivesync.Főoldal.HomeDashboardController.java
 
-    private VBox createNotificationWidgets() {
+    protected VBox createNotificationWidgets() {
         // Base widget létrehozása a "widget-card" stílussal
         VBox box = baseWidget("🔔 Szerviz értesítések", "#f1c40f");
         box.getStyleClass().add("widget-card");
@@ -594,7 +598,7 @@ public class HomeDashboardController {
     }
 
     // VÁLTOZÁS 5: AI DIAGNOSZTIKAI WIDGET LÉTREHOZÁSA
-    private VBox createAIDiagnosticsWidget() {
+    protected VBox createAIDiagnosticsWidget() {
         // 1. Felhasználói felület elemek inicializálása
         symptomField = new TextField();
         symptomField.setPromptText("Pl.: Rángat a motor alacsony fordulaton...");
@@ -656,4 +660,10 @@ public class HomeDashboardController {
     private interface WidgetCreator {
         VBox create();
     }
+    private ServiceDAO serviceDAO = new ServiceDAO();
+
+    public void setServiceDAO(ServiceDAO serviceDAO) {
+        this.serviceDAO = serviceDAO;
+    }
+
 }
