@@ -14,6 +14,21 @@ public class CalculatorController {
     @FXML private Label resultLabel9;
     @FXML private Button calcButton9;
 
+    public TextField getAvgDistance() {
+        return avgDistance;
+    }
+
+    public TextField getAvgFuelUsed() {
+        return avgFuelUsed;
+    }
+
+    public Label getResultLabel9() {
+        return resultLabel9;
+    }
+
+    public Button getCalcButton9() {
+        return calcButton9;
+    }
 
     // Üzemanyag kalkulátor
     @FXML private TextField distanceField;
@@ -22,11 +37,47 @@ public class CalculatorController {
     @FXML private Label resultLabel;
     @FXML private Button calcButton;
 
+    public TextField getDistanceField() {
+        return distanceField;
+    }
+
+    public TextField getConsumptionField() {
+        return consumptionField;
+    }
+
+    public TextField getPriceField() {
+        return priceField;
+    }
+
+    public Label getResultLabel() {
+        return resultLabel;
+    }
+
+    public Button getCalcButton() {
+        return calcButton;
+    }
+
     // Gépjárműadó kalkulátor
     @FXML private TextField HorsePower;
     @FXML private TextField ProductionYear;
     @FXML private Label resultLabel1;
     @FXML private Button calcButton1;
+
+    public TextField getHorsePower() {
+        return HorsePower;
+    }
+
+    public TextField getProductionYear() {
+        return ProductionYear;
+    }
+
+    public Label getResultLabel1() {
+        return resultLabel1;
+    }
+
+    public Button getCalcButton1() {
+        return calcButton1;
+    }
 
     // Kötelező biztosítás kalkulátor
     @FXML private TextField BaseFee;
@@ -36,6 +87,30 @@ public class CalculatorController {
     @FXML private Label resultLabel2;
     @FXML private Button calcButton2;
 
+    public TextField getBaseFee() {
+        return BaseFee;
+    }
+
+    public TextField getPowerFactor() {
+        return PowerFactor;
+    }
+
+    public TextField getProductionYear1() {
+        return ProductionYear1;
+    }
+
+    public ComboBox<String> getBonusMalus() {
+        return BonusMalus;
+    }
+
+    public Label getResultLabel2() {
+        return resultLabel2;
+    }
+
+    public Button getCalcButton2() {
+        return calcButton2;
+    }
+
     // Lízing kalkulátor
     @FXML private TextField vehiclePrice;
     @FXML private TextField downPayment;
@@ -44,12 +119,56 @@ public class CalculatorController {
     @FXML private Label resultLabel3;
     @FXML private Button calcButton3;
 
+    public TextField getVehiclePrice() {
+        return vehiclePrice;
+    }
+
+    public TextField getDownPayment() {
+        return downPayment;
+    }
+
+    public TextField getLeaseTerm() {
+        return leaseTerm;
+    }
+
+    public TextField getInterestRate() {
+        return interestRate;
+    }
+
+    public Label getResultLabel3() {
+        return resultLabel3;
+    }
+
+    public Button getCalcButton3() {
+        return calcButton3;
+    }
+
     // Amortizáció kalkulátor
     @FXML private TextField purchasePrice;
     @FXML private TextField currentAge;
     @FXML private TextField lifespan;
     @FXML private Label resultLabel4;
     @FXML private Button calcButton4;
+
+    public TextField getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public TextField getCurrentAge() {
+        return currentAge;
+    }
+
+    public TextField getLifespan() {
+        return lifespan;
+    }
+
+    public Label getResultLabel4() {
+        return resultLabel4;
+    }
+
+    public Button getCalcButton4() {
+        return calcButton4;
+    }
 
     // Költség per kilométer kalkulátor
     @FXML private TextField annualKm;
@@ -60,11 +179,55 @@ public class CalculatorController {
     @FXML private Label resultLabel5;
     @FXML private Button calcButton5;
 
+    public TextField getAnnualKm() {
+        return annualKm;
+    }
+
+    public TextField getFuelCostYear() {
+        return fuelCostYear;
+    }
+
+    public TextField getInsuranceCost() {
+        return insuranceCost;
+    }
+
+    public TextField getTaxCost() {
+        return taxCost;
+    }
+
+    public TextField getMaintenanceCost() {
+        return maintenanceCost;
+    }
+
+    public Label getResultLabel5() {
+        return resultLabel5;
+    }
+
+    public Button getCalcButton5() {
+        return calcButton5;
+    }
+
     // Útdíj kalkulátor
     @FXML private ComboBox<String> vehicleCategory;
     @FXML private ComboBox<String> vignetteType;
     @FXML private Label resultLabel6;
     @FXML private Button calcButton6;
+
+    public ComboBox<String> getVehicleCategory() {
+        return vehicleCategory;
+    }
+
+    public ComboBox<String> getVignetteType() {
+        return vignetteType;
+    }
+
+    public Label getResultLabel6() {
+        return resultLabel6;
+    }
+
+    public Button getCalcButton6() {
+        return calcButton6;
+    }
 
     // Benzin vs Dízel kalkulátor
     @FXML private TextField priceDifference;
@@ -75,12 +238,60 @@ public class CalculatorController {
     @FXML private Label resultLabel7;
     @FXML private Button calcButton7;
 
+    public TextField getPriceDifference() {
+        return priceDifference;
+    }
+
+    public TextField getPetrolConsumption() {
+        return petrolConsumption;
+    }
+
+    public TextField getDieselConsumption() {
+        return dieselConsumption;
+    }
+
+    public TextField getPetrolPrice() {
+        return petrolPrice;
+    }
+
+    public TextField getDieselPrice() {
+        return dieselPrice;
+    }
+
+    public Label getResultLabel7() {
+        return resultLabel7;
+    }
+
+    public Button getCalcButton7() {
+        return calcButton7;
+    }
+
     // Gumiabroncs kalkulátor
     @FXML private TextField tireSetPrice;
     @FXML private TextField tireLifespan;
     @FXML private TextField annualKmTire;
     @FXML private Label resultLabel8;
     @FXML private Button calcButton8;
+
+    public TextField getTireSetPrice() {
+        return tireSetPrice;
+    }
+
+    public TextField getTireLifespan() {
+        return tireLifespan;
+    }
+
+    public TextField getAnnualKmTire() {
+        return annualKmTire;
+    }
+
+    public Label getResultLabel8() {
+        return resultLabel8;
+    }
+
+    public Button getCalcButton8() {
+        return calcButton8;
+    }
 
     @FXML
     private void initialize() {
