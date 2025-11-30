@@ -1,8 +1,3 @@
-Az alábbiakban elkészítettem **a teljes, formázott, hivatalos stílusú README.md** dokumentumot, amelyet **közvetlenül bemásolhatsz a GitHub repo-ba**.
-A végén külön fejezetben szerepel az **Üzleti Logika** is.
-
----
-
 # Szoftverfejlesztés Mérnököknek 2025 – DriveSync Projekt
 
 **Autószerviz és nyilvántartó alkalmazás**
