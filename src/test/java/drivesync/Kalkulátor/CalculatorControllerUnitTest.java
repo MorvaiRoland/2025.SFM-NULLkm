@@ -463,7 +463,7 @@ public class CalculatorControllerUnitTest {
 
             calcButton8.fire();
 
-            // Várt eredmény: Évente: 30 000 Ft | Per km: 3.00 Ft | Csere: 4.0 év
+            // Várt eredmény: Évente: 30 000 Ft | Per km: 3.00 Ft | Csere: 4.0 ev
 
             String expectedClean = "Évente:30000Ft|Perkm:300Ft|Csere:40év";
 
