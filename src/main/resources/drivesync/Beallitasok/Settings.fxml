@@ -44,52 +44,10 @@
                 </VBox>
             </TitledPane>
 
-            <TitledPane text="Felhasználói Fiók és Adatok" expanded="false" styleClass="card">
-                <VBox spacing="15">
-                    <padding>
-                        <Insets top="15" right="15" bottom="15" left="15"/>
-                    </padding>
-                    <GridPane hgap="15" vgap="10">
-                        <columnConstraints>
-                            <ColumnConstraints halignment="RIGHT" maxWidth="150"/>
-                            <ColumnConstraints hgrow="ALWAYS" maxWidth="300"/>
-                        </columnConstraints>
-                        <Label text="Felhasználónév:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-sm"/>
-                        <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                        <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-sm"/>
-                        <TextField fx:id="emailField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                        <Label text="Regisztráció dátuma:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-sm"/>
-                        <Label fx:id="regDateLabel" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="text-muted"/>
-
-                        <Separator orientation="HORIZONTAL" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-
-                        <Label text="Új jelszó:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-sm"/>
-                        <PasswordField fx:id="passwordField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                        <Label text="Erős azonosítás (2FA):" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="label-sm"/>
-                        <CheckBox fx:id="twoFactorAuth" text="Engedélyezve" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-
-                    </GridPane>
-                </VBox>
-            </TitledPane>
 
 
-            <TitledPane text="Adatvédelem és Értesítések" expanded="false" styleClass="card">
-                <VBox spacing="10">
-                    <padding>
-                        <Insets top="15" right="15" bottom="15" left="15"/>
-                    </padding>
-                    <Label text="Értesítési Preferenciák:" styleClass="card-subtitle"/>
-                    <CheckBox fx:id="emailNotifications" text="Email (Szerviz &amp; Emlékeztetők)"/>
-                    <CheckBox fx:id="smsNotifications" text="SMS (Kritikus lejáratok)" disable="true"/>
-                    <Separator orientation="HORIZONTAL"/>
-                    <Label text="Adatkezelés:" styleClass="card-subtitle"/>
-                    <CheckBox fx:id="autoUpdate" text="Automatikus frissítések engedélyezése"/>
-                    <CheckBox fx:id="sendUsageStats" text="Használati statisztikák küldése (anonim)"/>
-                    <CheckBox fx:id="enableLogging" text="Részletes naplózás engedélyezése (Fejlesztőknek)"/>
-                </VBox>
-            </TitledPane>
+
+
 
             <TitledPane text="Névjegy és Verzió" expanded="false" styleClass="card">
                 <VBox spacing="15" alignment="CENTER">
