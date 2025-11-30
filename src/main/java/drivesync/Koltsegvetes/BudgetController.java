@@ -31,7 +31,7 @@ import java.util.function.Supplier;
 public class BudgetController {
 
     @FXML
-    protected TextField txt_what;
+    public TextField txt_what;
     @FXML
     protected TextField txt_amount;
     @FXML

@@ -1,6 +1,6 @@
-package drivesync.Főoldal;
+package drivesync.Fooldal;
 
-import drivesync.Adatbázis.ServiceDAO;
+import drivesync.Adatbazis.ServiceDAO;
 import drivesync.FuelService.FuelService;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;

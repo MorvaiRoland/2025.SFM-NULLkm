@@ -1,6 +1,6 @@
-package drivesync.SajátAutók;
+package drivesync.SajatAutok;
 
-import drivesync.Adatbázis.Database;
+import drivesync.Adatbazis.Database;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;

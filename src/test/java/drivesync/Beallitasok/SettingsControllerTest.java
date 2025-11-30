@@ -1,6 +1,6 @@
-package drivesync.Beállítások;
+package drivesync.Beallitasok;
 
-import drivesync.Adatbázis.Database;
+import drivesync.Adatbazis.Database;
 import javafx.application.Platform;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

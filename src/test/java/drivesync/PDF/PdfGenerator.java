@@ -1,6 +1,6 @@
 package drivesync.PDF;
 
-import drivesync.Adatbázis.Database;
+import drivesync.Adatbazis.Database;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

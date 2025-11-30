@@ -1,7 +1,6 @@
-package drivesync.Időjárás;
+package drivesync.Idojaras;
 
-import drivesync.Időjárás.WeatherService;
-import drivesync.Időjárás.WeatherService.Weather;
+import drivesync.Idojaras.WeatherService.Weather;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.Test;

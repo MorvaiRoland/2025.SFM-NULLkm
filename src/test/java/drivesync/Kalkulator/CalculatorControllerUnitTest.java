@@ -1,4 +1,4 @@
-package drivesync.Kalkulátor;
+package drivesync.Kalkulator;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -8,14 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.concurrent.CountDownLatch;
 
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.*;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 

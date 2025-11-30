@@ -1,5 +1,6 @@
 package drivesync.AutóModell;
 
+import drivesync.AutoModell.Car;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;

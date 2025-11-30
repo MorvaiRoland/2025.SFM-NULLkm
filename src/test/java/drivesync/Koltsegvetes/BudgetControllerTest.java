@@ -1,6 +1,6 @@
-package drivesync.Költségvetés;
+package drivesync.Koltsegvetes;
 
-import drivesync.Adatbázis.Database;
+import drivesync.Adatbazis.Database;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
@@ -17,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
