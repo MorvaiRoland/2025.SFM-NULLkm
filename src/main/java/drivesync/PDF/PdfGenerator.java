@@ -16,7 +16,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import drivesync.Adatbázis.Database;
+import drivesync.Adatbazis.Database;
 
 import java.io.File;
 import java.io.InputStream;

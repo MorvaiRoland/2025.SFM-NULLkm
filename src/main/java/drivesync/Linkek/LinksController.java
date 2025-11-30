@@ -13,17 +13,27 @@ import java.net.URISyntaxException;
 
 public class LinksController {
 
-    @FXML private Hyperlink linkHAHU;
-    @FXML private Hyperlink linkFEKMESTER;
-    @FXML private Hyperlink linkHOLTANKOLJAK;
-    @FXML private Hyperlink linkWAZE;
-    @FXML private Hyperlink linkGARVISOR;
+    @FXML
+    protected Hyperlink linkHAHU;
+    @FXML
+    protected Hyperlink linkFEKMESTER;
+    @FXML
+    protected Hyperlink linkHOLTANKOLJAK;
+    @FXML
+    protected Hyperlink linkWAZE;
+    @FXML
+    protected Hyperlink linkGARVISOR;
 
-    @FXML private ImageView imgHAHU;
-    @FXML private ImageView imgFEKMESTER;
-    @FXML private ImageView imgHOLTANKOLJAK;
-    @FXML private ImageView imgWAZE;
-    @FXML private ImageView imgGARVISOR;
+    @FXML
+    protected ImageView imgHAHU;
+    @FXML
+    protected ImageView imgFEKMESTER;
+    @FXML
+    protected ImageView imgHOLTANKOLJAK;
+    @FXML
+    protected ImageView imgWAZE;
+    @FXML
+    protected ImageView imgGARVISOR;
 
     @FXML
     private void initialize() {
