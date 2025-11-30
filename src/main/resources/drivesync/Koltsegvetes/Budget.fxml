@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="drivesync.Koltsegvetes.BudgetController"
+            prefHeight="800.0"
+            prefWidth="1200.0"
+            stylesheets="@/drivesync/CSS/style.css"
+            styleClass="budget-root">
+
+    <top>
+        <VBox spacing="20">
+            <!-- BEVITEL + ÖSSZESÍTÉS EGY SORBAN -->
+            <HBox spacing="20" alignment="TOP_CENTER">
+                <!-- BEVITEL PANEL -->
+                <VBox spacing="10" prefWidth="300" styleClass="card">
+                    <Label text="💰 Költség rögzítése" styleClass="card-title"/>
+                    <TextField fx:id="txt_what" promptText="Mire" styleClass="input-field"/>
+                    <TextField fx:id="txt_amount" promptText="Mennyit (Ft)" styleClass="input-field"/>
+                    <DatePicker fx:id="txt_date" promptText="Mikor" styleClass="input-field"/>
+                    <ComboBox fx:id="categoryBox" promptText="Kategória" styleClass="input-field"/>
+                    <Button fx:id="saveBtn" text="Rögzítés" onAction="#saveData" styleClass="btn-primary"/>
+                    <Label fx:id="msg" text="" styleClass="msg-label"/>
+                </VBox>
+
+                <!-- ÖSSZESÍTÉS + SZŰRÉS + EXPORT PANEL -->
+                <VBox spacing="10" prefWidth="350" styleClass="card">
+                    <Label text="📊 Összesítés" styleClass="card-title"/>
+                    <Label text="Havi kiadás:"/>
+                    <Label fx:id="monthlyAmount" text="0 Ft" styleClass="highlight-label"/>
+                    <Label text="Éves kiadás:"/>
+                    <Label fx:id="yearlyAmount" text="0 Ft" styleClass="highlight-label"/>
+                    <Separator/>
+
+                    <Label text="🔍 Szűrés" styleClass="card-subtitle"/>
+                    <ComboBox fx:id="filterBox" promptText="Szűrés típusa" styleClass="combo-box"/>
+                    <ComboBox fx:id="yearBox" promptText="Év" styleClass="combo-box"/>
+                    <ComboBox fx:id="filterCategoryBox" promptText="Kategória" styleClass="combo-box"/> <!-- Új kategória szűrő -->
+                    <Separator/>
+
+                    <Label text="📄 Export" styleClass="card-subtitle"/>
+                    <Button fx:id="exportPdfBtn" text="Exportálás PDF-be" onAction="#exportPDF" styleClass="btn-secondary"/>
+                </VBox>
+            </HBox>
+
+            <!-- TÁBLÁZAT külön sorban -->
+            <VBox spacing="10" alignment="CENTER">
+                <Label text="Rögzített költések" styleClass="chart-title"/>
+                <TableView fx:id="table" prefHeight="260" prefWidth="1000">
+                    <columns>
+                        <TableColumn fx:id="colWhat" text="Mire" prefWidth="200"/>
+                        <TableColumn fx:id="colAmount" text="Összeg (Ft)" prefWidth="120"/>
+                        <TableColumn fx:id="colDate" text="Dátum" prefWidth="120"/>
+                        <TableColumn fx:id="colCategory" text="Kategória" prefWidth="150"/>
+                        <TableColumn fx:id="colEdit" text="Szerkeszt" prefWidth="90"/>
+                        <TableColumn fx:id="colDelete" text="Törlés" prefWidth="90"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </top>
+
+    <!-- GRAFIKONOK CENTERBEN NAGYOBB MÉRETBEN -->
+    <center>
+        <HBox spacing="30" alignment="CENTER">
+            <padding><Insets top="40" right="30" bottom="30" left="30"/></padding>
+            <VBox alignment="CENTER">
+                <Label text="Kategóriánkénti kiadások" styleClass="chart-title"/>
+                <BarChart fx:id="monthlyChart" prefWidth="600" prefHeight="600">
+                    <xAxis><CategoryAxis fx:id="months" label="Hónapok"/></xAxis>
+                    <yAxis><NumberAxis fx:id="expense" label="Kiadás"/></yAxis>
+                </BarChart>
+            </VBox>
+            <VBox alignment="CENTER">
+                <Label text="Kiadások trendje" styleClass="chart-title"/>
+                <LineChart fx:id="trendChart" prefWidth="600" prefHeight="600">
+                    <xAxis><CategoryAxis label="Hónapok"/></xAxis>
+                    <yAxis><NumberAxis label="Kiadás"/></yAxis>
+                </LineChart>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

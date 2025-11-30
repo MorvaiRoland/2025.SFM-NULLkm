@@ -66,7 +66,7 @@ public class MainController {
     private void loadDBConfig() {
         // A konfigurációs útvonal feltételezve, hogy a drivesync/Adatbázis/db_config.properties a helyes.
         // Ha /drivesync/NO-GITHUB/db_config.properties a helyes, módosítsd az útvonalat!
-        try (InputStream input = getClass().getResourceAsStream("/drivesync/Adatbázis/db_config.properties")) {
+        try (InputStream input = getClass().getResourceAsStream("/drivesync/Adatbazis/db_config.properties")) {
             Properties props = new Properties();
             if (input == null) {
                 System.err.println("Hiba: db_config.properties nem található!");
@@ -363,36 +363,50 @@ public class MainController {
 
     private void loadHomeScene(String username, Stage stage) {
         if (stage == null) {
-            System.err.println("Hiba: loadHomeScene Stage paramétere null. Nem lehet scene-t váltani.");
+            showAlert(Alert.AlertType.ERROR, "Hiba", "Stage is null!");
             return;
         }
 
         try {
+            // Ellenőrizzük, hogy az App osztályban megvan-e a Scene
             Scene home = App.getHomeScene();
             if (home == null) {
-                throw new IllegalStateException("Hiba: Az App.getHomeScene() null-t adott vissza!");
+                // Ha ez a hiba jön, akkor az App.java nem tudta betölteni a Home.fxml-t (valószínűleg az ékezetek miatt)
+                throw new RuntimeException("A Főoldal (HomeScene) nem lett előre betöltve az App.java-ban!");
             }
 
             HomeController hc = App.getHomeController();
-            if (hc != null) hc.setUsername(username);
+            if (hc != null) {
+                hc.setUsername(username);
+            } else {
+                throw new RuntimeException("A HomeController nem érhető el (null)!");
+            }
 
             stage.setScene(home);
 
-            // Ablak középre igazítása
+            // Ablak középre
             Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
             stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
 
-            // CarReminderPopup egyszeri megjelenítése
+            // Popup kezelés hibaellenőrzéssel
             if (!remindersShown) {
-                remindersShown = true;
-                CarReminderPopup popup = new CarReminderPopup();
-                popup.showReminders(username);
+                try {
+                    remindersShown = true;
+                    CarReminderPopup popup = new CarReminderPopup();
+                    popup.showReminders(username);
+                } catch (Exception popupError) {
+                    // Ha a popup hibás, ne állítsa meg a belépést, csak írja ki
+                    System.err.println("Popup hiba: " + popupError.getMessage());
+                    // Opcionális: showAlert(Alert.AlertType.WARNING, "Popup Hiba", popupError.getMessage());
+                }
             }
 
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Betöltési hiba", "Nem sikerült betölteni a főoldalt: " + e.getMessage());
+            // EZ A LÉNYEG: Írjuk ki a hibát ablakban!
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Betöltési Hiba",
+                    "Nem sikerült betölteni a főoldalt:\n" + e.getMessage() + "\n\n" + e.toString());
         }
     }
 

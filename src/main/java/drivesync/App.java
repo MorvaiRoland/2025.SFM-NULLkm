@@ -29,7 +29,7 @@ public class App extends Application {
         stage.setTitle("DriveSync");
         stage.setScene(loginScene);
         stage.setResizable(false);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/drivesync/Logók/DriveSync logo-2.png")));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/drivesync/Logók/drivesync-logo.png")));
         stage.show();
 
         // Finom belépő animáció (első benyomás)

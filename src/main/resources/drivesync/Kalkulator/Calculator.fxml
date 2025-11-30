@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="drivesync.Kalkulator.CalculatorController"
+            fitToHeight="true"
+            fitToWidth="true"
+            styleClass="app-bg">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="20">
+            <padding>
+                <Insets top="24" right="24" bottom="24" left="24"/>
+            </padding>
+
+            <Label text="Kalkulátorok" styleClass="page-title"/>
+            <Label text="Számold ki gyorsan a költségeket és díjakat." styleClass="page-subtitle"/>
+
+            <FlowPane alignment="CENTER" hgap="20" vgap="20" prefWrapLength="960" styleClass="flow-wrap">
+
+                <!-- Átlagfogyasztás kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Átlagfogyasztás kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki az autó átlagos fogyasztását." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Megtett távolság (km)" styleClass="label-sm"/>
+                        <TextField fx:id="avgDistance" promptText="pl. 450" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Elhasznált üzemanyag (liter)" styleClass="label-sm"/>
+                        <TextField fx:id="avgFuelUsed" promptText="pl. 30" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton9" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel9" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+
+                <!-- Üzemanyag kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Üzemanyag kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki, mennyibe kerül egy út üzemanyagköltsége." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Megtett távolság (km)" styleClass="label-sm"/>
+                        <TextField fx:id="distanceField" promptText="pl. 120" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Fogyasztás (l/100 km)" styleClass="label-sm"/>
+                        <TextField fx:id="consumptionField" promptText="pl. 6.5" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Üzemanyag ára (Ft/l)" styleClass="label-sm"/>
+                        <TextField fx:id="priceField" promptText="pl. 650" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Gépjárműadó kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Gépjárműadó kalkulátor" styleClass="card-title"/>
+                    <Label text="Becsüld meg az éves gépjárműadót a teljesítmény és a jármű kora alapján." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Teljesítmény (kW)" styleClass="label-sm"/>
+                        <TextField fx:id="HorsePower" promptText="pl. 85" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Gyártás éve" styleClass="label-sm"/>
+                        <TextField fx:id="ProductionYear" promptText="pl. 2015" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton1" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel1" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Kötelező biztosítás kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Kötelező biztosítás kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki az éves kötelező biztosítás díját." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Alapdíj (Ft)" styleClass="label-sm"/>
+                        <TextField fx:id="BaseFee" promptText="pl. 30000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Teljesítmény (kW)" styleClass="label-sm"/>
+                        <TextField fx:id="PowerFactor" promptText="pl. 85" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Gyártás éve" styleClass="label-sm"/>
+                        <TextField fx:id="ProductionYear1" promptText="pl. 2010" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Bónusz-Malusz fokozat" styleClass="label-sm"/>
+                        <ComboBox fx:id="BonusMalus" promptText="Válassz..." prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton2" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel2" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Lízing kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Lízing kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki a havi lízingdíjat." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Jármű ára (Ft)" styleClass="label-sm"/>
+                        <TextField fx:id="vehiclePrice" promptText="pl. 5000000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Önerő (%)" styleClass="label-sm"/>
+                        <TextField fx:id="downPayment" promptText="pl. 20" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Futamidő (hónap)" styleClass="label-sm"/>
+                        <TextField fx:id="leaseTerm" promptText="pl. 60" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Éves kamatláb (%)" styleClass="label-sm"/>
+                        <TextField fx:id="interestRate" promptText="pl. 8.5" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton3" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel3" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Amortizáció kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Amortizáció kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki az autó értékcsökkenését." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Vételár (Ft)" styleClass="label-sm"/>
+                        <TextField fx:id="purchasePrice" promptText="pl. 3000000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Jelenlegi életkor (év)" styleClass="label-sm"/>
+                        <TextField fx:id="currentAge" promptText="pl. 5" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Becsült futamidő (év)" styleClass="label-sm"/>
+                        <TextField fx:id="lifespan" promptText="pl. 15" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton4" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel4" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Költség per kilométer kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Költség/km kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki a teljes kilométerenkénti költséget." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Éves km (km/év)" styleClass="label-sm"/>
+                        <TextField fx:id="annualKm" promptText="pl. 15000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Üzemanyag költség (Ft/év)" styleClass="label-sm"/>
+                        <TextField fx:id="fuelCostYear" promptText="pl. 500000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Biztosítás (Ft/év)" styleClass="label-sm"/>
+                        <TextField fx:id="insuranceCost" promptText="pl. 80000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Adó (Ft/év)" styleClass="label-sm"/>
+                        <TextField fx:id="taxCost" promptText="pl. 30000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Szerviz/javítás (Ft/év)" styleClass="label-sm"/>
+                        <TextField fx:id="maintenanceCost" promptText="pl. 100000" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton5" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel5" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Útdíj kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Útdíj kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki az autópálya matrica költségét." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Jármű kategória" styleClass="label-sm"/>
+                        <ComboBox fx:id="vehicleCategory" promptText="Válassz..." prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Matrica típus" styleClass="label-sm"/>
+                        <ComboBox fx:id="vignetteType" promptText="Válassz..." prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton6" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel6" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Megtérülési kalkulátor (Benzin vs Dízel) -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Benzin vs Dízel kalkulátor" styleClass="card-title"/>
+                    <Label text="Mikor térül meg a dízel többletára?" wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Árkülönbség (Ft)" styleClass="label-sm"/>
+                        <TextField fx:id="priceDifference" promptText="pl. 800000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Benzin fogyasztás (l/100km)" styleClass="label-sm"/>
+                        <TextField fx:id="petrolConsumption" promptText="pl. 7.5" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Dízel fogyasztás (l/100km)" styleClass="label-sm"/>
+                        <TextField fx:id="dieselConsumption" promptText="pl. 5.5" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Benzin ára (Ft/l)" styleClass="label-sm"/>
+                        <TextField fx:id="petrolPrice" promptText="pl. 650" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Dízel ára (Ft/l)" styleClass="label-sm"/>
+                        <TextField fx:id="dieselPrice" promptText="pl. 670" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton7" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel7" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Gumiabroncs költség kalkulátor -->
+                <VBox spacing="12" prefWidth="400" styleClass="card">
+                    <Label text="Gumiabroncs kalkulátor" styleClass="card-title"/>
+                    <Label text="Számold ki a gumi költségét kilométerenként." wrapText="true" styleClass="card-subtitle"/>
+
+                    <VBox spacing="6">
+                        <Label text="Garnitúra ára (Ft)" styleClass="label-sm"/>
+                        <TextField fx:id="tireSetPrice" promptText="pl. 120000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Várható futásteljesítmény (km)" styleClass="label-sm"/>
+                        <TextField fx:id="tireLifespan" promptText="pl. 50000" prefWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6">
+                        <Label text="Éves km" styleClass="label-sm"/>
+                        <TextField fx:id="annualKmTire" promptText="pl. 15000" prefWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="calcButton8" text="Számolás" styleClass="btn-primary"/>
+                        <Label fx:id="resultLabel8" text="" styleClass="result-label"/>
+                    </HBox>
+                </VBox>
+
+            </FlowPane>
+        </VBox>
+    </content>
+</ScrollPane>
