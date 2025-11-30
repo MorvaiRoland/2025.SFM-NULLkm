@@ -11,7 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>23</javafx.version>
+        <!-- Keep JavaFX artifacts on the same version across all modules to avoid IllegalAccessError -->
+        <javafx.version>23.0.2</javafx.version>
         <maven.compiler.release>21</maven.compiler.release>
         <main.class>drivesync.Launcher</main.class>
         <junit.version>5.11.0</junit.version>
@@ -37,14 +38,14 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version> <!-- FONTOS: 25, nem 20.0.2 -->
+            <version>${javafx.version}</version>
         </dependency>
 
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -58,6 +59,12 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
@@ -83,7 +90,7 @@
             <artifactId>jsoup</artifactId>
             <version>1.16.1</version>
         </dependency>
-
+        <!-- Removed openjfx-monocle to prevent pulling JavaFX 12 at runtime and causing version mismatch -->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -155,12 +162,7 @@
             <version>v2-rev157-1.25.0</version>
         </dependency>
 
-        <!-- Web scraping -->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.16.1</version>
-        </dependency>
+        <!-- Web scraping (jsoup declared once above) -->
 
         <!-- Jakarta Mail (Eclipse Angus) -->
         <dependency>
