@@ -1,161 +1,351 @@
-# Szoftverfejlesztés Mérnököknek 2025.
-
-Ez a repository tartalmazza a tárgyhoz készült projektmunkát
-
-Csapattagok
------------
-
-* Morvai Roland  
-* Dóczi Bence  
-* Lőrincz Levente  
-* Kovács Dávid  
-  
----
-
-Téma
----
-
-Autó szervíz és nyilvántartó alkalmazás ami segíti a papír alapú adminisztráció digitalizációját.   
-
-
-Funkciók (Későbbre a végén a bele írni hogy mik lettek implementálva.)
----
-
-
-További fejlesztési ötletek és roadmap
----
-
-Az alábbi lista a projekt lehetséges bővítési irányait gyűjti össze. A javaslatok prioritás szerint vannak csoportosítva (Quick Win / Középtáv / Hosszútáv), és tématerületekre bontva.
-
-1) Funkcionális bővítések
-- Több jármű kezelése: járművek hozzáadása, címkézés, szűrés, aktív jármű kiválasztása (Quick Win)
-- Karbantartási napló: szerviz bejegyzések, alkatrészcserék, garanciák, mellékletek/fotók kezelése (Középtáv)
-- Üzemanyag-napló és statisztikák: tankolások rögzítése, átlagfogyasztás, havi költség grafikonok (Középtáv)
-- Szerviz időpontfoglalás és emlékeztetők: naptár integráció, értesítések (e-mail/desktop) (Középtáv)
-- Dokumentumkezelés: számlák, biztosítási kötvények, forgalmi engedély digitális tárolása; OCR alapadat-kinyeréssel (Hosszútáv)
-- Külső API integrációk: üzemanyagár API, biztosítási ajánlatkérés API, VIN dekóder, térképes útvonal-költség kalkuláció (Hosszútáv)
-- Export/Import: CSV/Excel/PDF export, teljes adatmentés importálása (Középtáv)
-- Jogosultságkezelés: több felhasználó, szerepkörök (admin/felhasználó), audit log (Hosszútáv)
-
-2) UX/UI és hozzáférhetőség
-- Egységes stílus: inline FXML stílusok átszervezése közös CSS-be; világos/sötét téma támogatás (Quick Win)
-- Bevitel-ellenőrzés és hibajelzés: kötelező mezők, formátumellenőrzés, hibaüzenetek és vizuális jelölések (Quick Win)
-- Nemzetköziesítés (i18n): magyar/angol nyelv, resource bundle alapú szövegkezelés (Középtáv)
-- Hozzáférhetőség: kontraszt, fókuszjelölések, billentyűzet-navigáció, screen reader támogatás (Középtáv)
-
-3) Architektúra és perzisztencia
-- Rétegzett felépítés tisztítása: Controller – Service – Repository rétegek szétválasztása (Középtáv)
-- Adatbázis réteg: JPA/Hibernate vagy MyBatis bevezetése; Flyway/liquibase migrációk (Középtáv)
-- Tároló választás: lokális SQLite → opcionálisan Postgres támogatás (Hosszútáv)
-- Konfigurációkezelés: környezetenkénti beállítások, .properties/.yaml (Quick Win)
-
-4) Minőségbiztosítás és eszközök
-- Unit tesztek (JUnit5), egyszerű szolgáltatás tesztek hozzáadása (Quick Win)
-- UI tesztelés (TestFX) a kritikus képernyőkre (Középtáv)
-- Statikus analízis: Checkstyle, SpotBugs, PMD; kódformázási szabályok (Quick Win)
-- Kódfedettség: JaCoCo riportok CI-ben (Középtáv)
-
-5) CI/CD és kiadás
-- GitHub Actions/JetBrains Space CI: build, tesztek, kódfedettség (Quick Win)
-- Csomagolás jpackage-szel; telepítő készítése Windowsra (Középtáv)
-- Release workflow: verziózás, changelog generálás, artefaktok publikálása (Középtáv)
-
-6) Biztonság és adatvédelem
-- Hitelesítés/jelszavak biztonságos tárolása (hash+salt); érzékeny adatok titkosítása (Középtáv)
-- GDPR szempontok: adatmegőrzési idők, exportálhatóság, törlési kérések kezelése (Hosszútáv)
-
-Javasolt roadmap
-- Quick Win (1–2 hét):
-  - Közös CSS bevezetése és FXML-ek style kiszervezése
-  - Alap bevitel-ellenőrzés és hibaüzenetek a kalkulátorokban
-  - Checkstyle + egyszerű JUnit tesztek és Action workflow
-- Középtáv (1–2 hónap):
-  - Üzemanyag-napló grafikonokkal, karbantartási napló
-  - i18n támogatás és hozzáférhetőségi fejlesztések
-  - JPA + Flyway bevezetése, export/import
-- Hosszútáv (3+ hónap):
-  - Külső API integrációk, felhős szinkronizáció, többfelhasználós üzem
-
-Megjegyzés
-- A Calculator.fxml dizájnja már átdolgozásra került a jobb olvashatóságért. Következő lépésként érdemes a stílusokat a /src/main/resources/drivesync/CSS/style.css fájlba áthelyezni és a képernyőket ehhez igazítani.
+Az alábbiakban elkészítettem **a teljes, formázott, hivatalos stílusú README.md** dokumentumot, amelyet **közvetlenül bemásolhatsz a GitHub repo-ba**.
+A végén külön fejezetben szerepel az **Üzleti Logika** is.
 
 ---
 
-Közös CSS és Beállítások
----
+# Szoftverfejlesztés Mérnököknek 2025 – DriveSync Projekt
 
-- Bevezetésre került a közös stíluslap: `src/main/resources/drivesync/CSS/style.css`. Ebbe kerültek az általános stílusok (oldalsó menü, gombok, kártyák, címek stb.).
-- A főképernyő (Menü/Home.fxml), a Kalkulátor (Kalkulátor/Calculator.fxml) és a Beállítások (Beállítások/Settings.fxml) képernyők frissítve lettek, hogy a stílusokat a közös CSS-ből vegyék (inline stílusok kivezetve).
-- A beállítások menüpont működik: a Home oldalsó menü „⚙ Beállítások” gombja betölti a Beállítások képernyőt.
-- A JavaFX Scene-ekhez a stíluslap automatikusan csatolódik (App.java).
+**Autószerviz és nyilvántartó alkalmazás**
 
-Indítás után: bejelentkezés → a bal oldali menüben válaszd a „⚙ Beállítások” menüpontot, a dizájn egységes megjelenését a style.css biztosítja.
+## Csapattagok
 
----
-
-Modern 2025 UI és animációk
----
-
-- Oldalsáv (sidebar) finom, gyors animációval csukható/nyitható (180 ms, EASE_BOTH). Az állapot Preferences-ben tárolódik és induláskor visszaáll.
-- Navigáció tartalomváltása áttűnéses animációval történik (ki-fade 140 ms, be-fade 180 ms), így kellemesebb a képernyőváltás.
-- Bejelentkező képernyő (login) finom belépő animációt kapott (220 ms fade-in), jobb első benyomást ad.
-- Tooltip-ek a menügombokhoz: összecsukott nézetben is egyértelmű, hova vezet egy menüpont.
-- Modern interakciók: 
-  - Menü- és akciógombok hoverkor enyhe skálázás és árnyék, nyomáskor visszajelző „összenyomódás”.
-  - Kártyák hoverkor nagyobb elevációt kapnak.
-  - Beviteli mezők jól látható fókuszgyűrűt kapnak (világos/sötét témában is megfelelő kontraszt).
-- Sötét téma frissített kontrasztokkal (sidebar, menügombok, címkék, logout gomb), egységes modern megjelenéssel.
-
-Érintett fő fájlok:
-- src/main/java/drivesync/HomeController.java – Sidebar animációk, tartalom fade, tooltip-ek.
-- src/main/java/drivesync/App.java – Indító jelenet (login) belépő animáció, globális CSS csatolása mindkét Scene-hez.
-- src/main/resources/drivesync/CSS/style.css – Sidebar, gombok, kártyák, beviteli mezők modern stílusai és sötét téma kiegészítések.
-
-Tipp: A Beállítások → Megjelenés alatt a Téma és Betűméret azonnal érvényesül. A modern animációk rövidek és nem tolakodóak, így nem lassítják a használatot, mégis „élettel” töltik meg a felületet.
+* **Morvai Roland**
+* **Dóczi Bence**
+* **Lőrincz Levente**
+* **Kovács Dávid**
 
 ---
 
-Modern menürendszer és működő Beállítások
----
+# 🔧 Projekt Áttekintés
 
-- Új, modern, összecsukható oldalsávos menü készült:
-  - Hamburger gombbal (☰) nyitható/csukható.
-  - Az összecsukott állapot a felhasználói beállításokban (Preferences) megőrződik.
-  - Aktív menüpont kiemelés CSS-sel (menu-button-active), egységes hover állapotok.
-- Beállítások képernyő funkciói:
-  - Téma váltás: Világos / Sötét / Rendszer alapértelmezett. A sötét témát a `theme-dark` osztály aktiválja, és azonnal érvényesül az alkalmazásban.
-  - Betűméret skálázás: 10–24 px-ig csúszkával, azonnali élő frissítéssel az egész UI-ra.
-  - Értesítések és általános kapcsolók (email/SMS/push, automatikus frissítés, naplózás, statisztikák) mentése és visszatöltése Preferences-ben.
-  - Felhasználói adatok (felhasználónév, email, jelszó) mentése adatbázisba, ha a kapcsolat és userId átadásra kerül a SettingsController számára (opcionális).
-
-Megjegyzés: A téma és betűméret beállításai már alkalmazásindításkor is érvényesülnek (App.java mindkét jelenetre alkalmazza a Preferences-ből betöltött értékeket).
+A **DriveSync** egy JavaFX alapú, MySQL adatbázissal működő autószerviz- és járműnyilvántartó rendszer, amely célja a papír alapú adminisztráció digitalizálása, a szervizidőpontok és költségek nyomon követése, valamint egy modern irányítópult biztosítása felhasználók számára.
+A rendszer tartalmaz AI alapú diagnosztikát, költségkezelést, PDF generálást, személyre szabható beállításokat és figyelmeztető értesítéseket is.
 
 ---
 
-Design system (stílus-útmutató)
+# 🛠️ Technológiák
+
+* **Java / JavaFX**
+* **MySQL** – relációs adatbázis
+* **JDBC** – adatbázis kapcsolat
+* **SHA-256 titkosítás** jelszókezeléshez
+* **DAO architektúra** adat-hozzáféréshez
+* **PDFBox / ReportLab** – PDF generálás
+* **Preferences API** – lokális beállítások tárolása
+* **AI modul** – tünet alapú diagnosztika
+
 ---
 
-Alap komponensek és osztályok a közös stíluslapban (src/main/resources/drivesync/CSS/style.css):
+# 🔑 Bejelentkezési Modul
 
-- Háttér és tartalom
-  - app-bg: világos/sötét téma kompatibilis oldalháttér
-  - content-scroll: modern görgetősáv és háttér a ScrollPane-hez
-  - content-container: kényelmes belső margók
-- Tipográfia
-  - page-title, page-subtitle: oldal- és szakaszcímek
-  - card-title, card-subtitle, label-sm: kártyacímek és mezőcímkék
-  - text-muted, text-danger, text-success: segédszínek
-- Kártyák és layout
-  - card: kártya háttér, lekerekítés, árnyék, hover eleváció
-  - flow-wrap: rugalmas rács elrendezéshez (FlowPane)
-- Gombok
-  - btn-primary, btn-danger, btn-secondary, btn-ghost: akciógombok és alternatívák
-- Menü/Sidebar
-  - sidebar, sidebar-appname, sidebar-label, sidebar-username
-  - menu-button, menu-button-active, menu-toggle, logout-button
-- Form elemek
-  - Látható fókuszgyűrű és kontrasztos keret fókuszban (TextField, PasswordField, ChoiceBox, stb.)
+**Csomag:** `drivesync.Bejelentkezes`
 
-Téma
-- Sötét téma a theme-dark osztállyal aktiválható a Scene gyökérre.
-- A Beállításokban választott téma/betűméret a Preferences-ben tárolódik és az App indításkor automatikusan alkalmazza.
+### Login.java
+
+Feladata a felhasználók hitelesítése MySQL adatbázisban.
+
+* SHA-256 hash összehasonlítás (MySQL: `SHA2(?, 256)`)
+* SQL injekció elleni védelem Prepared Statement segítségével
+
+### LoginController.java
+
+JavaFX alapú felhasználói felület kezelése.
+
+**Funkciók:**
+
+* Bejelentkezés kezelése (input validáció, hibaüzenetek)
+* „Emlékezz rám” funkció Preferences segítségével
+* Jelszó megjelenítési váltás
+* Oldalsó intro videó betöltése
+* Sikeres bejelentkezés után HomeController megnyitása
+
+---
+
+# 📝 Regisztrációs Modul
+
+**Csomag:** `drivesync.Regisztracio`
+
+### Register.java
+
+Új felhasználók létrehozása.
+
+**Validációk:**
+
+* Teljes mezőellenőrzés
+* Jelszó egyezés ellenőrzése
+* Felhasználónév és email egyediség ellenőrzése
+
+**Adatbázis műveletek:**
+
+* SHA-256 hash-elt jelszót tárol
+* Siker vagy hiba esetén JavaFX Alert
+
+---
+
+# 🏠 Irányítópult (Dashboard)
+
+**Csomag:** `drivesync.Home`
+
+A fő kezelőfelület, widget alapú moduláris megoldással.
+
+### ⚙️ Funkciók
+
+* Widgetek dinamikus hozzáadása/eltávolítása
+* Sötét/világos téma váltás
+* Egér-effektusok, tooltip-ek, ikonok
+
+### 🌤 Időjárás Widget
+
+* WeatherService segítségével adatlekérés
+* Városkeresés
+* Hőmérséklet, szél, páratartalom, leírás
+
+### ⛽ Üzemanyag Widget
+
+* 95, 100 benzin + dízel árak
+* Min/átlag/max értékek
+* Óránkénti automatikus frissítés (Timeline)
+
+### 🚗 Autók Widget
+
+* Felhasználó járművei az adatbázisból
+* Aszinkron lekérdezés
+* Márka, típus, rendszám, évjárat stb.
+
+### 💰 Költségvetés Widget
+
+* Havi/éves összkiadás
+* BarChart vizualizáció havi bontásban
+* Kategóriák: Üzemanyag / Szervíz / Egyéb
+
+### 🔔 Szerviz Értesítések Widget
+
+* Közelgő szervizek listázása
+* Emlékeztetők jelzése
+* Archív kezelés
+
+---
+
+# 🤖 AI Diagnosztikai Modul
+
+**Új funkció**
+
+### AIDiagnostics Widget
+
+* Felhasználó megad egy tünetet
+* Rendszer lekéri a felhasználó elsődleges autóját
+* AI szolgáltatás elemzi a tünetet (Async Task)
+* Javasolt diagnózis jelenik meg
+
+Alkalmazott technikák:
+
+* Thread + Task → UI nem fagy le
+* Biztonságos adatkezelés
+
+---
+
+# 🚗 Saját Autók Kezelése
+
+**Csomag:** `drivesync.SajatAutok`
+
+### 🔍 Autók kezelése
+
+* Autók listázása FlowPane-ben
+* Dinamikus kártyák hover-effektussal
+* Válogatás, részletek megjelenítése
+
+### 🛠️ Autó hozzáadása/szerkesztése
+
+* Márkák, típusok, motorok dinamikus betöltése
+* Kombinált kereshető ComboBox mezők
+* Szín kiválasztása ColorPicker-rel
+* Validációk (km, évjárat, ár stb.)
+
+### 🔧 Szerviztörténet és Közelgő Szerviz
+
+* Megtörtént szerviz rögzítése
+* Új szerviztípus automatikus felvétele, ha nem létezik
+* Közelgő szervizek létrehozása, szerkesztése, törlése
+* Emlékeztetők email küldéssel
+
+### 📧 Emlékeztetők
+
+* Háttérszálon futó figyelés
+* 3 napon belüli szervizek email értesítést küldenek
+* Egyszeri küldés (last_email_sent mező)
+
+### 📄 PDF generálás
+
+* Több autó kiválasztható
+* Külső PdfGenerator modul
+* Szerviztörténeti jelentés
+
+---
+
+# 💰 Költségvetés Kezelő
+
+**Csomag:** `drivesync.Budget`
+
+### Adatbevitel
+
+* Kiadások rögzítése (mit, mennyi, mikor)
+* Owner ID automatikus feloldása
+* Érvényesség ellenőrzés
+
+### Táblázat funkciók
+
+* Szerkesztés, törlés
+* Automatikusan frissülő TableView
+
+### 📊 Diagramok
+
+* BarChart: havi bontás kategóriánként
+* LineChart: éves trend
+* Tooltipek minden adatponthoz
+
+### Figyelmeztetések
+
+* 200 000 Ft havi kategória limit
+* Vizualizált figyelmeztetés
+
+### 📄 PDF Export
+
+* PDFBox használata
+* Unicode betűkészlet támogatás
+* Havi/kategóriás bontás exportálása
+
+---
+
+# ⚙️ Beállítások Modul
+
+**Csomag:** `drivesync.Settings`
+
+### Felhasználói adatok betöltése
+
+* Név, email, regisztráció dátuma, 2FA állapot
+* Google-felhasználók felismerése (nincs jelszó hash)
+
+### Jelszó módosítás
+
+* Ha Google felhasználó → tiltva
+* Ha nem → SHA-256 hash frissítés
+
+### Lokális beállítások
+
+* Téma (világos/sötét)
+* Betűméret
+* Értesítések
+* Preferences API mentés
+
+### Visszajelzés
+
+* Egyedi Toast értesítés kis animációval
+
+---
+
+# 🧠 Üzleti Logika (Business Logic)
+
+A DriveSync üzleti logikája arra épül, hogy a felhasználók digitálisan, gyorsan és biztonságosan kezelhessék járműveik és szervizeléseik teljes életciklusát.
+A rendszer az alábbi fő üzleti folyamatokat valósítja meg:
+
+---
+
+## 1. Felhasználókezelés
+
+* Regisztráció egyedi email + felhasználónév alapján
+* Jelszó biztonságos SHA-256 hash-elése
+* Bejelentkezés preferenciák alapján
+* Külső azonosítás támogatása (Google Login)
+
+**Üzleti szabályok:**
+
+* Felhasználónév és email egyedi
+* Google felhasználó nem módosíthat jelszót
+* Sikertelen bejelentkezés nem fedi fel, hogy melyik adat hibás
+
+---
+
+## 2. Járműkezelés
+
+* Több jármű rögzítése egy felhasználóhoz
+* Adatok részletes nyilvántartása (motor, gumi, olaj stb.)
+* Dinamikus adatkapcsolatok (márka → típus → motor)
+
+**Üzleti szabályok:**
+
+* Jármű csak teljes és érvényes adatokkal rögzíthető
+* KM és évjárat számszerű validáció
+* Szín HEX formátumban kerül eltárolásra
+
+---
+
+## 3. Szervizelés és karbantartás
+
+* Szerviztörténet rögzítése
+* Közelgő szervizek határidővel és emlékeztetővel
+* Emlékeztetők automatikus kiküldése emailben
+
+**Üzleti szabályok:**
+
+* Új szerviztípus automatikusan felvehető
+* 3 napon belüli szervizekről értesítés küldése
+* Lejárt szervizek archiválása automatikus
+
+---
+
+## 4. Költségkezelés
+
+* Külön költségkategóriák rögzítése
+* Éves és havi kiadás összesítés
+* Limit figyelmeztető rendszer
+
+**Üzleti szabályok:**
+
+* Kiadás csak pozitív összegű lehet
+* 200 000 Ft feletti havi kategóriakiadás figyelmeztet
+* Export PDF tartalmazza az összesített értékeket
+
+---
+
+## 5. AI Diagnosztika
+
+* Tünet alapján automatikus előzetes hibaelemzés
+* Autó márka + típus figyelembevétele
+* Felhasználónak javaslat és hiba lehetséges oka
+
+**Üzleti szabályok:**
+
+* Diagnózis csak akkor indítható, ha van aktív autó
+* Hálózati hibák kezelése
+* UI soha nem fagy le (Task háttérszál)
+
+---
+
+## 6. Jelentések és Export
+
+* Szerviztörténeti PDF minden autóról
+* Költségvetési PDF éves bontásban
+* Unicode támogatás a magyar karakterek miatt
+
+**Üzleti szabályok:**
+
+* PDF csak kiválasztott autókról generálható
+* Exportált dokumentum dátummal és felhasználóval ellátott
+
+---
+
+# 📦 Összegzés
+
+A DriveSync egy modern, biztonságos, moduláris és erősen adatvezérelt autónyilvántartó rendszer, amely lefedi egy jármű tulajdonos teljes digitális igényeit:
+
+* Adminisztráció → digitalizált
+* Szervizelések → dokumentált
+* Költségvetés → vizualizált
+* Emlékeztetők → automatizált
+* Diagnosztika → AI támogatott
+
+Teljes mértékben alkalmas egy járműkarbantartó rendszer valós vállalati bevezetésére is.
+
+---
+
+
