@@ -1,6 +1,6 @@
-package drivesync.Regisztracio;
+package drivesync.Regisztráció;
 
-import drivesync.Adatbazis.Database;
+import drivesync.Adatbázis.Database;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Button;

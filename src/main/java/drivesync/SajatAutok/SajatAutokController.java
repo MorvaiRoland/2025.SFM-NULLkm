@@ -37,24 +37,49 @@ public class SajatAutokController {
     @FXML private FlowPane carsList;
     @FXML private ScrollPane carsScrollPane;
     @FXML private TitledPane addCarTitledPane, carDetailsPane, upcomingServicePane, addServicePane;
-    @FXML private TextField licenseField, kmField;
+    @FXML
+    protected TextField licenseField;
+    @FXML
+    protected TextField kmField;
 
     // FXML ComboBox/ChoiceBox-ok (Minimalizált bevitelhez)
-    @FXML private ComboBox<String> brandCombo, typeCombo, serviceTypeCombo;
-    @FXML private ComboBox<String> engineTypeCombo;
-    @FXML private ComboBox<String> oilTypeCombo;
-    @FXML private ChoiceBox<String> oilQuantityChoice;
-    @FXML private ComboBox<String> tireSizeCombo;
+    @FXML
+    protected ComboBox<String> brandCombo;
+    @FXML
+    protected ComboBox<String> typeCombo;
+    @FXML
+    protected ComboBox<String> serviceTypeCombo;
+    @FXML
+    protected ComboBox<String> engineTypeCombo;
+    @FXML
+    protected ComboBox<String> oilTypeCombo;
+    @FXML
+    protected ChoiceBox<String> oilQuantityChoice;
+    @FXML
+    protected ComboBox<String> tireSizeCombo;
 
-    @FXML private ChoiceBox<String> fuelTypeField;
-    @FXML private ChoiceBox<Integer> vintageField;
-    @FXML private DatePicker insuranceDatePicker, inspection_date;
-    @FXML private ColorPicker colorPicker;
-    @FXML private TextArea notesField;
+    @FXML
+    protected ChoiceBox<String> fuelTypeField;
+    @FXML
+    protected ChoiceBox<Integer> vintageField;
+    @FXML
+    protected DatePicker insuranceDatePicker;
+    @FXML
+    protected DatePicker inspection_date;
+    @FXML
+    protected ColorPicker colorPicker;
+    @FXML
+    protected TextArea notesField;
 
     // --- FXML Referenciák (Szerviz Adatok) ---
-    @FXML private TextField serviceKmField, servicePriceField, replacedPartsField;
-    @FXML private DatePicker serviceDatePicker;
+    @FXML
+    protected TextField serviceKmField;
+    @FXML
+    protected TextField servicePriceField;
+    @FXML
+    protected TextField replacedPartsField;
+    @FXML
+    protected DatePicker serviceDatePicker;
     @FXML private Label selectedCarLabel;
     @FXML private ListView<String> serviceListView;
     @FXML private VBox servicesContainer;
@@ -66,8 +91,8 @@ public class SajatAutokController {
     @FXML private CheckBox upcomingServiceReminder;
 
     // --- Belső állapot ---
-    private String username;
-    private int selectedCarId = -1;
+    protected String username;
+    protected int selectedCarId = -1;
     private VBox currentlySelectedCard = null;
     private Integer editingCarId = null;
 
@@ -719,7 +744,7 @@ public class SajatAutokController {
 
 
     @FXML
-    private void saveService() {
+    protected void saveService() {
         if (selectedCarId == -1) {
             showAlert("Hiba", "Nincs kiválasztott autó!");
             return;
@@ -837,7 +862,7 @@ public class SajatAutokController {
         }
     }
 
-    private void addCar() {
+    protected void addCar() {
         // VÁLTOZÁS: SQL Lekérdezés oil -> oil_type, oil_quantity
         String sql = """
     INSERT INTO cars 
@@ -1185,7 +1210,7 @@ public class SajatAutokController {
         editingCarId = null;
     }
 
-    private void showAlert(String title, String message) {
+    protected void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
