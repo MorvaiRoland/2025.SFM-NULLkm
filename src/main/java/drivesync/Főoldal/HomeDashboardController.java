@@ -604,6 +604,7 @@ public class HomeDashboardController {
         symptomField.setPromptText("Pl.: Rángat a motor alacsony fordulaton...");
 
         diagnosisResultArea = new TextArea();
+        diagnosisResultArea.getStyleClass().add("ai-output");
         diagnosisResultArea.setEditable(false);
         diagnosisResultArea.setPrefRowCount(10);
         diagnosisResultArea.setText("Írd le a tünetet, majd kattints a Diagnózis indítása gombra.");

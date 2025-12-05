@@ -782,7 +782,219 @@
 .theme-dark .choice-box .arrow {
     -fx-background-color: #e0e0e0;
 }
+/* Popup háttér */
+.theme-dark .combo-box-popup .list-view,
+.theme-dark .choice-box-popup .list-view {
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e;
+}
 
+/* Alap lista cellák */
+.theme-dark .list-view .list-cell {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 6 10;
+}
+.theme-dark .menu-item {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Menü elem tartalom */
+.theme-dark .menu-item .label {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Hover */
+.theme-dark .menu-item:focused {
+    -fx-background-color: #333333;
+}
+
+
+
+/* Hover */
+.theme-dark .list-view .list-cell:hover {
+    -fx-background-color: #333333;
+}
+
+/* Selected (KIVÁLASZTOTT sor) */
+.theme-dark .list-view .list-cell:selected {
+    -fx-background-color: #3a3a3a !important;
+    -fx-text-fill: white;
+}
+
+/* Hover + selected */
+.theme-dark .list-view .list-cell:selected:hover {
+    -fx-background-color: #444444 !important;
+}
+
+/* Görgetősáv */
+.theme-dark .list-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #3a3a3a;
+    -fx-background-radius: 4;
+}
+.theme-dark .combo-box .arrow-button {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-color: #555555;
+    -fx-border-width: 1 1 1 0;
+}
+
+/* --- ComboBox nyíl ikon --- */
+.theme-dark .combo-box .arrow {
+    -fx-background-color: #e0e0e0; /* világos nyíl */
+}
+
+/* --- ChoiceBox nyíl háttere --- */
+.theme-dark .choice-box .open-button {
+    -fx-background-color: #2b2b2b;
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-color: #555555;
+    -fx-border-width: 1 1 1 0;
+}
+/* ============================================================
+   ULTRA CLEAN DARK COMBOBOX + CHOICEBOX
+   (olyan stílus, mint a modern UI-kban)
+   ============================================================ */
+
+.theme-dark .combo-box,
+.theme-dark .choice-box {
+    -fx-background-color: #2c2f36;
+    -fx-background-radius: 6;
+    -fx-border-color: #4a4d55;
+    -fx-border-radius: 6;
+    -fx-text-fill: #e6e6e6;
+}
+
+/* belső text field (ComboBox esetén) */
+.theme-dark .combo-box .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e6e6e6;
+}
+
+/* LISTA popup */
+.theme-dark .combo-box-popup .list-view,
+.theme-dark .choice-box-popup .list-view {
+    -fx-background-color: #2c2f36;
+    -fx-control-inner-background: #2c2f36;
+}
+
+/* lista cella */
+.theme-dark .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e6e6e6;
+}
+
+.theme-dark .list-cell:hover {
+    -fx-background-color: #3a3d45;
+}
+
+/* ============================================================
+   EGYSÉGES NYÍL GOMB MINDKÉT ELEMEN
+   ============================================================ */
+
+/* a nyíl gomb háttere eltűnik → egybeolvad a mezővel */
+.theme-dark .combo-box .arrow-button,
+.theme-dark .choice-box .open-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0 10;
+    -fx-border-width: 0;
+}
+
+/* maga a nyíl ikon */
+.theme-dark .combo-box .arrow,
+.theme-dark .choice-box .arrow {
+    -fx-background-color: #d9d9d9;
+    -fx-shape: "M0 0 L4 4 L8 0 Z";  /* letisztult kis háromszög */
+    -fx-min-width: 8;
+    -fx-min-height: 8;
+}
+.theme-dark .table-view {
+    -fx-background-color: #1f1f1f;
+    -fx-control-inner-background: #1f1f1f;
+    -fx-table-cell-border-color: #3a3a3a;
+    -fx-padding: 0;
+}
+
+/* Fejléc */
+.theme-dark .table-view .column-header-background {
+    -fx-background-color: #2b2b2b;
+}
+
+.theme-dark .table-view .column-header .label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-weight: bold;
+}
+
+/* Fejléc alatti border */
+.theme-dark .table-view .column-header,
+.theme-dark .table-view .filler {
+    -fx-border-color: #444444;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Cellák */
+.theme-dark .table-row-cell {
+    -fx-background-color: #1f1f1f;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* Páros sorok */
+.theme-dark .table-row-cell:odd {
+    -fx-background-color: #242424;
+}
+
+/* Hover */
+.theme-dark .table-row-cell:hover {
+    -fx-background-color: #333333;
+}
+
+/* Kijelölés */
+.theme-dark .table-row-cell:selected {
+    -fx-background-color: #3f5b85 !important; /* szép kékes highlight */
+    -fx-text-fill: white;
+}
+
+/* Cellák szövege */
+.theme-dark .table-cell {
+    -fx-text-fill: #e0e0e0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Scrollbar */
+.theme-dark .scroll-bar:vertical .thumb,
+.theme-dark .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(255,255,255,0.25);
+    -fx-background-radius: 4;
+}
+.theme-dark .ai-output {
+    -fx-control-inner-background: #1e1e1e;
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #e6e6e6;
+    -fx-border-color: #3a3a3a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.theme-dark .ai-output .scroll-bar {
+    -fx-background-color: #2b2b2b;
+}
+
+.theme-dark .ai-output .scroll-bar .thumb {
+    -fx-background-color: #555;
+    -fx-background-radius: 5;
+}
+.ai-output {
+    -fx-control-inner-background: white;
+    -fx-text-fill: black;
+    -fx-border-color: #d0d0d0;
+}
+
+/* --- ChoiceBox nyíl ikon --- */
+.theme-dark .choice-box .arrow {
+    -fx-background-color: #e0e0e0;
+}
 /* Progress Bar Szín Definíciók */
 .red-bar > .bar {
     -fx-accent: #e53935; /* Piros */

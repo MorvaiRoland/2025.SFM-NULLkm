@@ -38,7 +38,7 @@ public class PdfGenerator {
     // --- Font BÁJTOK betöltése statikusan (UNICODE FIX) ---
     private static final byte[] FONT_BYTES;
     static {
-        try (InputStream fontStream = PdfGenerator.class.getResourceAsStream("/fonts/arial.ttf")) {
+        try (InputStream fontStream = PdfGenerator.class.getResourceAsStream("/drivesync/fonts/arial.ttf")) {
             if (fontStream != null) {
                 FONT_BYTES = fontStream.readAllBytes();
                 System.out.println("✅ Unicode betűtípus bájtok betöltve a memóriába.");
