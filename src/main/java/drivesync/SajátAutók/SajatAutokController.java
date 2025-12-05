@@ -96,6 +96,7 @@ public class SajatAutokController {
     private VBox currentlySelectedCard = null;
     private Integer editingCarId = null;
 
+
     // A márkák és típusok kereshetőségéhez
     private ObservableList<String> typeItems = FXCollections.observableArrayList();
     private FilteredList<String> filteredTypes;

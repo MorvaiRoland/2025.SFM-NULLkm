@@ -775,6 +775,14 @@
     -fx-text-fill: #cccccc;
     -fx-opacity: 1.0;
 }
+.theme-dark .choice-box .label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.theme-dark .choice-box .arrow {
+    -fx-background-color: #e0e0e0;
+}
+
 /* Progress Bar Szín Definíciók */
 .red-bar > .bar {
     -fx-accent: #e53935; /* Piros */
