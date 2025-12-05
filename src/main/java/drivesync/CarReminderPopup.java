@@ -1,8 +1,6 @@
 package drivesync;
 
-import drivesync.Adatbázis.Database;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import drivesync.Adatbazis.Database;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 
 import java.sql.*;
 import java.time.LocalDate;

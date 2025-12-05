@@ -1,8 +1,8 @@
 package drivesync;
 
-import drivesync.Költségvetés.BudgetController;
-import drivesync.SajátAutók.SajatAutokController;
-import drivesync.Főoldal.HomeDashboardController;
+import drivesync.Koltsegvetes.BudgetController;
+import drivesync.SajatAutok.SajatAutokController;
+import drivesync.Fooldal.HomeDashboardController;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -101,12 +101,12 @@ public class HomeController {
 
 
 
-    @FXML private void showHome()       { loadFXML("/drivesync/Főoldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
-    @FXML private void showCars()       { loadFXML("/drivesync/SajátAutók/SajatAutok.fxml"); setActiveMenu(carsBtn); }
-    @FXML private void showBudget()     { loadFXML("/drivesync/Költségvetés/Budget.fxml"); setActiveMenu(budgetBtn); }
+    @FXML private void showHome()       { loadFXML("/drivesync/Fooldal/HomeDashboard.fxml"); setActiveMenu(homeBtn); }
+    @FXML private void showCars()       { loadFXML("/drivesync/SajatAutok/SajatAutok.fxml"); setActiveMenu(carsBtn); }
+    @FXML private void showBudget()     { loadFXML("/drivesync/Koltsegvetes/Budget.fxml"); setActiveMenu(budgetBtn); }
     @FXML private void showLinks()      { loadFXML("/drivesync/Linkek/Links.fxml"); setActiveMenu(linksBtn); }
-    @FXML private void showCalculator() { loadFXML("/drivesync/Kalkulátor/Calculator.fxml"); setActiveMenu(calculatorBtn); }
-    @FXML private void showSettings()   { loadFXML("/drivesync/Beállítások/Settings.fxml"); setActiveMenu(settingsBtn); }
+    @FXML private void showCalculator() { loadFXML("/drivesync/Kalkulator/Calculator.fxml"); setActiveMenu(calculatorBtn); }
+    @FXML private void showSettings()   { loadFXML("/drivesync/Beallitasok/Settings.fxml"); setActiveMenu(settingsBtn); }
 
     private void loadFXML(String fxmlPath) {
         try {

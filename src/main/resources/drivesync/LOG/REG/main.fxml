@@ -27,7 +27,7 @@
 
                 <ImageView fx:id="logoImage" fitWidth="120" fitHeight="120" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 15, 0.5, 0, 5);">
                     <image>
-                        <Image url="@/drivesync/Logók/DriveSync logo-2.png" />
+                        <Image url="@/drivesync/Logók/drivesync-logo.png" />
                     </image>
                 </ImageView>
 
