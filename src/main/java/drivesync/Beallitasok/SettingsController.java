@@ -59,7 +59,7 @@ public class SettingsController {
     private void initialize() {
         // Logó betöltése
         try {
-            logoImageView.setImage(new Image(App.class.getResourceAsStream("/drivesync/Logók/DriveSync logo-2.png")));
+            logoImageView.setImage(new Image(App.class.getResourceAsStream("/drivesync/Logok/DriveSync logo-2.png")));
         } catch (Exception e) {
             System.err.println("Logó betöltése sikertelen.");
         }

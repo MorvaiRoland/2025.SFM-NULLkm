@@ -99,7 +99,7 @@ public class PdfGenerator {
 
                 // Logo hozzáadása (MÉRET FIX)
                 try {
-                    InputStream logoStream = PdfGenerator.class.getResourceAsStream("/drivesync/Logók/DriveSync logo-2.png");
+                    InputStream logoStream = PdfGenerator.class.getResourceAsStream("/drivesync/Logok/DriveSync logo-2.png");
                     if (logoStream != null) {
                         ImageData logoData = ImageDataFactory.create(logoStream.readAllBytes());
                         Image logo = new Image(logoData);
